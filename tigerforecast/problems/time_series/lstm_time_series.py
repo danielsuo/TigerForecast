@@ -7,9 +7,10 @@ import jax.random as random
 import jax.experimental.stax as stax
 import tigerforecast
 from tigerforecast.utils.random import generate_key
-from tigerforecast.problems.control import ControlProblem
+from tigerforecast.problems.time_series import TimeSeriesProblem
 
-class LSTM_TimeSeries(ControlProblem):
+
+class LSTM_TimeSeries(TimeSeriesProblem):
     """
     Description: Produces outputs from a randomly initialized recurrent neural network.
     """

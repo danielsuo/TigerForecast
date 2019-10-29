@@ -8,10 +8,10 @@ import jax.random as random
 
 import tigerforecast
 from tigerforecast.utils import generate_key
-from tigerforecast.problems.control import ControlProblem
+from tigerforecast.problems.time_series import TimeSeriesProblem
 
 
-class LDS_TimeSeries(ControlProblem):
+class LDS_TimeSeries(TimeSeriesProblem):
     """
     Description: Simulates a linear dynamical system.
     """

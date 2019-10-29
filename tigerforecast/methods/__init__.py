@@ -57,37 +57,3 @@ method_register(
     entry_point='tigerforecast.methods.boosting:SimpleBoostAdj',
 )
 
-
-# ---------- Control Methods ----------
-
-
-method_register(
-    id='KalmanFilter',
-    entry_point='tigerforecast.methods.control:KalmanFilter',
-)
-
-method_register(
-    id='ODEShootingMethod',
-    entry_point='tigerforecast.methods.control:ODEShootingMethod',
-)
-
-method_register(
-    id='LQR',
-    entry_point='tigerforecast.methods.control:LQR',
-)
-
-method_register(
-    id='ILQR',
-    entry_point='tigerforecast.methods.control:ILQR',
-)
-
-method_register(
-    id='CartPoleNN',
-    entry_point='tigerforecast.methods.control:CartPoleNN',
-)
-
-method_register(
-    id='GPC',
-    entry_point='tigerforecast.methods.control:GPC',
-)
-
