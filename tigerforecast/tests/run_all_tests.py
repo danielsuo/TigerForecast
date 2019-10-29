@@ -2,11 +2,11 @@
 Run all tests for the TigerControl framework
 """
 
-from tigercontrol.utils.tests.run_all_tests import run_all_tests as utils_tests
-from tigercontrol.problems.tests.run_all_tests import run_all_tests as problems_tests
-from tigercontrol.methods.tests.run_all_tests import run_all_tests as methods_tests
-from tigercontrol.experiments.tests.run_all_tests import run_all_tests as experiments_tests
-from tigercontrol.tests.test_tigercontrol_functionality import test_tigercontrol_functionality
+from tigerforecast.utils.tests.run_all_tests import run_all_tests as utils_tests
+from tigerforecast.problems.tests.run_all_tests import run_all_tests as problems_tests
+from tigerforecast.methods.tests.run_all_tests import run_all_tests as methods_tests
+from tigerforecast.experiments.tests.run_all_tests import run_all_tests as experiments_tests
+from tigerforecast.tests.test_tigerforecast_functionality import test_tigerforecast_functionality
 
 # run all sub-level tests
 def run_all_tests(show_results=False):
@@ -17,7 +17,7 @@ def run_all_tests(show_results=False):
     experiments_tests(show=show_results)
     methods_tests(show=show_results)
     problems_tests(show=show_results)
-    test_tigercontrol_functionality()
+    test_tigerforecast_functionality()
 
     print("\n----- Tests done -----\n")
 

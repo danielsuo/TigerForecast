@@ -2,13 +2,13 @@
 Monthly values of control indices useful for predicting La Nina/El Nino
 """
 
-import tigercontrol
+import tigerforecast
 import os
 import jax.numpy as np
 import pandas as pd
-from tigercontrol.utils.dataset_registry import enso, get_tigercontrol_dir
-from tigercontrol.error import StepOutOfBounds
-from tigercontrol.problems.time_series import TimeSeriesProblem
+from tigerforecast.utils.dataset_registry import enso, get_tigerforecast_dir
+from tigerforecast.error import StepOutOfBounds
+from tigerforecast.problems.time_series import TimeSeriesProblem
 
 class ENSO(TimeSeriesProblem):
     """

@@ -1,6 +1,6 @@
 # test the CustomMethod class
 
-import tigercontrol
+import tigerforecast
 import jax.numpy as np
 import matplotlib.pyplot as plt
 
@@ -10,11 +10,11 @@ def test_custom_method(steps=1000, show_plot=True):
     T = steps 
     p, q = 3, 3
     loss = lambda y_true, y_pred: (y_true - y_pred)**2
-    problem = tigercontrol.problem("ARMA-v0")
+    problem = tigerforecast.problem("ARMA-v0")
     cur_x = problem.initialize(p, q)
 
     # simple LastValue custom method implementation
-    class Custom(tigercontrol.CustomMethod):
+    class Custom(tigerforecast.CustomMethod):
         def initialize(self):
             self.x = 0.0
         def predict(self, x):
@@ -24,12 +24,12 @@ def test_custom_method(steps=1000, show_plot=True):
             pass
 
     # try registering and calling the custom method
-    tigercontrol.register_custom_method(Custom, "TestCustomMethod")
-    custom_method = tigercontrol.method("TestCustomMethod")
+    tigerforecast.register_custom_method(Custom, "TestCustomMethod")
+    custom_method = tigerforecast.method("TestCustomMethod")
     custom_method.initialize()
 
     # regular LastValue method as sanity check
-    reg_method = tigercontrol.method("LastValue")
+    reg_method = tigerforecast.method("LastValue")
     reg_method.initialize()
  
     results = []

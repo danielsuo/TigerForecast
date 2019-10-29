@@ -2,8 +2,8 @@ import re
 import importlib
 import warnings
 
-from tigercontrol import error
-from tigercontrol.utils import Spec, Registry
+from tigerforecast import error
+from tigerforecast.utils import Spec, Registry
 
 # This format is true today, but it's *not* an official spec.
 # [username/](problem-name)-v(version)    problem-name is group 1, version is group 2

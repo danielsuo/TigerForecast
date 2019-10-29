@@ -5,11 +5,11 @@ Recurrent neural network method
 import jax
 import jax.numpy as np
 import jax.experimental.stax as stax
-import tigercontrol
-from tigercontrol.utils.random import generate_key
-from tigercontrol.methods.time_series import TimeSeriesMethod
-from tigercontrol.methods.optimizers import *
-from tigercontrol.methods.optimizers.losses import mse
+import tigerforecast
+from tigerforecast.utils.random import generate_key
+from tigerforecast.methods.time_series import TimeSeriesMethod
+from tigerforecast.methods.optimizers import *
+from tigerforecast.methods.optimizers.losses import mse
 
 class RNN(TimeSeriesMethod):
     """

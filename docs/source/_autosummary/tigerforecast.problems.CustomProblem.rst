@@ -1,0 +1,22 @@
+tigerforecast.problems.CustomProblem
+===================================
+
+.. currentmodule:: tigerforecast.problems
+
+.. autoclass:: CustomProblem
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CustomProblem.__init__
+   
+   
+
+   
+   
+   

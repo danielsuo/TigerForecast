@@ -1,17 +1,17 @@
 # test the Autogressor method class
 
-import tigercontrol
+import tigerforecast
 import jax.numpy as np
 import matplotlib.pyplot as plt
-from tigercontrol.methods.optimizers import *
+from tigerforecast.methods.optimizers import *
 
 def test_autoregressor(steps=1000, show_plot=True):
     T = steps 
     p, q = 3, 3
-    problem = tigercontrol.problem("ARMA-v0")
+    problem = tigerforecast.problem("ARMA-v0")
     cur_x = problem.initialize(p, q)
 
-    method = tigercontrol.method("AutoRegressor")
+    method = tigerforecast.method("AutoRegressor")
     #method.initialize(p, optimizer = ONS)
     method.initialize(p, optimizer = Adagrad)
     loss = lambda y_true, y_pred: np.sum((y_true - y_pred)**2)

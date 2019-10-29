@@ -1,17 +1,17 @@
 # test the RNN method class
 
-import tigercontrol
+import tigerforecast
 import jax.numpy as np
 import jax.random as random
 import matplotlib.pyplot as plt
-from tigercontrol.utils import generate_key
+from tigerforecast.utils import generate_key
 
 def test_rnn(steps=100, show_plot=True):
     T = steps 
     n, m, l, d = 4, 5, 10, 10
-    problem = tigercontrol.problem("LDS-Control-v0")
+    problem = tigerforecast.problem("LDS-Control-v0")
     y_true = problem.initialize(n, m, d)
-    method = tigercontrol.method("RNN")
+    method = tigerforecast.method("RNN")
     method.initialize(n, m, l, d)
     loss = lambda pred, true: np.sum((pred - true)**2)
  

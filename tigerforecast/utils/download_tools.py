@@ -4,20 +4,20 @@ from __future__ import print_function
 import os
 import sys
 import zipfile
-import tigercontrol
+import tigerforecast
 from urllib.error import URLError
 from urllib.request import urlretrieve
 
-def get_tigercontrol_dir():
+def get_tigerforecast_dir():
     """
     Description:
         Gets absolute path of package directory.
     Returns:
         Absolute path of package directory
     """
-    init_dir = os.path.abspath(tigercontrol.__file__)
-    tigercontrol_dir = init_dir.rsplit('/', 1)[0]
-    return tigercontrol_dir
+    init_dir = os.path.abspath(tigerforecast.__file__)
+    tigerforecast_dir = init_dir.rsplit('/', 1)[0]
+    return tigerforecast_dir
 
 def report_download_progress(chunk_number, chunk_size, file_size):
     """

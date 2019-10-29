@@ -1,13 +1,13 @@
 # test the Random problem class
 
-import tigercontrol
+import tigerforecast
 import jax.numpy as np
 import matplotlib.pyplot as plt
 
 
 def test_random(steps=1000, show_plot=False):
     T = steps
-    problem = tigercontrol.problem("Random-v0")
+    problem = tigerforecast.problem("Random-v0")
     problem.initialize()
     assert problem.T == 0
 

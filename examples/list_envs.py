@@ -1,3 +1,3 @@
-import tigercontrol
+import tigerforecast
 
 # empty file

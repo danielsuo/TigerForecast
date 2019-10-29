@@ -1,6 +1,6 @@
-import tigercontrol
-from tigercontrol.methods.optimizers.sgd import SGD
-from tigercontrol.methods.optimizers.losses import mse
+import tigerforecast
+from tigerforecast.methods.optimizers.sgd import SGD
+from tigerforecast.methods.optimizers.losses import mse
 import matplotlib.pyplot as plt
 
 def test_sgd(show=False):
@@ -9,16 +9,16 @@ def test_sgd(show=False):
     print("test_sgd passed")
 
 def test_sgd_lstm(show=False):
-    problem = tigercontrol.problem('ARMA-v0')
+    problem = tigerforecast.problem('ARMA-v0')
     x = problem.initialize(p=2,q=0)
 
-    method = tigercontrol.method('LSTM')
+    method = tigerforecast.method('LSTM')
     method.initialize(n=1, m=1, l=3, h=10, optimizer=SGD) # initialize with class
     method.predict(1.0) # call methods to verify it works
     method.update(1.0)
 
     optimizer = SGD(learning_rate=0.001)
-    method = tigercontrol.method('LSTM')
+    method = tigerforecast.method('LSTM')
     method.initialize(n=1, m=1, l=3, h=10, optimizer=optimizer) # reinitialize with instance
 
     loss = []
@@ -37,11 +37,11 @@ def test_sgd_lstm(show=False):
         plt.close()
 
 def test_sgd_autoregressor(show=False):
-    problem = tigercontrol.problem('ARMA-v0')
+    problem = tigerforecast.problem('ARMA-v0')
     x = problem.initialize(p=2,q=0)
 
     optimizer = SGD(learning_rate=0.0003)
-    method = tigercontrol.method('AutoRegressor')
+    method = tigerforecast.method('AutoRegressor')
     method.initialize(p=3, optimizer=optimizer) # reinitialize with instance
 
     loss = []

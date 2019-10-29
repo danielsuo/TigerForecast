@@ -3,15 +3,15 @@
 import os
 import re
 
-import tigercontrol
-from tigercontrol import error, problems
-from tigercontrol.utils.registration_tools import *
-from tigercontrol.problems.registration import ProblemRegistry
+import tigerforecast
+from tigerforecast import error, problems
+from tigerforecast.utils.registration_tools import *
+from tigerforecast.problems.registration import ProblemRegistry
 
 # run all registry tests
 def test_registration_tools(show=False):
     test_registry()
-    test_tigercontrol_problem()
+    test_tigerforecast_problem()
     test_missing_lookup()
     print("test_registration_tools passed")
 
@@ -21,9 +21,9 @@ def test_registry():
     regexp = re.compile(r'^([\w:.-]+)-v(\d+)$') # regular expression accepts "string"-v#
     test_registry = Registry(regexp)
 
-    test_registry.register(id='GoodID-v0', entry_point='tigercontrol.problems.time_series:Random')
+    test_registry.register(id='GoodID-v0', entry_point='tigerforecast.problems.time_series:Random')
     try:
-        test_registry.register(id='BadID', entry_point='tigercontrol.problems.time_series:Random')
+        test_registry.register(id='BadID', entry_point='tigerforecast.problems.time_series:Random')
         raise Exception("Registry successfully registered bad ID")
     except error.Error:
         pass
@@ -34,8 +34,8 @@ def test_registry():
     return
 
 
-def test_tigercontrol_problem():
-    problem = tigercontrol.problem('Random-v0')
+def test_tigerforecast_problem():
+    problem = tigerforecast.problem('Random-v0')
     assert problem.spec.id == 'Random-v0'
     return
 

@@ -1,9 +1,9 @@
 '''
 AdaGrad optimizer
 '''
-from tigercontrol.methods.optimizers.core import Optimizer
-from tigercontrol.methods.optimizers.losses import mse
-from tigercontrol import error
+from tigerforecast.methods.optimizers.core import Optimizer
+from tigerforecast.methods.optimizers.losses import mse
+from tigerforecast import error
 from jax import jit, grad
 import jax.numpy as np
 

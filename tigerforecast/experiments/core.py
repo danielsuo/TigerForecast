@@ -1,12 +1,12 @@
 # experiments core class
 
-import tigercontrol
-from tigercontrol.experiments import metrics as metrics_module
-from tigercontrol import error
+import tigerforecast
+from tigerforecast.experiments import metrics as metrics_module
+from tigerforecast import error
 import jax.numpy as np
-from tigercontrol.problems.time_series import TimeSeriesProblem
-from tigercontrol.methods.time_series import TimeSeriesMethod
-from tigercontrol.utils.random import set_key
+from tigerforecast.problems.time_series import TimeSeriesProblem
+from tigerforecast.methods.time_series import TimeSeriesMethod
+from tigerforecast.utils.random import set_key
 from tqdm import tqdm
 import inspect
 import time
@@ -95,7 +95,7 @@ def run_experiment(problem, method, metric = 'mse', key = 0, timesteps = None, v
     loss_fn = metrics[metric]
 
     # initialize problem
-    problem = tigercontrol.problem(problem_id)
+    problem = tigerforecast.problem(problem_id)
     if(problem_params is None):
         init = problem.initialize()
     else:
@@ -119,7 +119,7 @@ def run_experiment(problem, method, metric = 'mse', key = 0, timesteps = None, v
         x, y = init, problem.step()
 
     # initialize method
-    method = tigercontrol.method(method_id)
+    method = tigerforecast.method(method_id)
     
     if(method_params is None):
         method_params = {}

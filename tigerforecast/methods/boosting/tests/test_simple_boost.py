@@ -3,11 +3,11 @@ test SimpleBoost method
 note: n=3 seems to do consistently better than other n's...
 """
 import jax.numpy as np
-import tigercontrol
-from tigercontrol.methods.optimizers.ogd import OGD
-from tigercontrol.methods.optimizers.losses import mse
+import tigerforecast
+from tigerforecast.methods.optimizers.ogd import OGD
+from tigerforecast.methods.optimizers.losses import mse
 import matplotlib.pyplot as plt
-from tigercontrol.utils.random import set_key
+from tigerforecast.utils.random import set_key
 from tqdm import tqdm
 
 def avg_regret(loss):
@@ -40,17 +40,17 @@ def test_simple_boost_lstm(steps=500, show=True):
     methods = []
     Ns = [1, 3, 6]
     for n in Ns: # number of weak learners
-        method = tigercontrol.method("SimpleBoost")
+        method = tigerforecast.method("SimpleBoost")
         method.initialize(method_id, method_params, n, reg=1.0) # regularization
         methods.append(method)
 
     # regular AutoRegressor for comparison
-    autoreg = tigercontrol.method("AutoRegressor")
+    autoreg = tigerforecast.method("AutoRegressor")
     autoreg.initialize(p=4) # regularization
 
     # problem initialize
     p, q = 4, 0
-    problem = tigercontrol.problem("ARMA-v0")
+    problem = tigerforecast.problem("ARMA-v0")
     y_true = problem.initialize(p, q, noise_magnitude=0.1)
  
     # run all boosting method
@@ -105,7 +105,7 @@ def test_simple_boost_arma(steps=500, show=True):
     timelines = [6, 9, 12]
 
     # regular AutoRegressor for comparison
-    autoreg = tigercontrol.method("AutoRegressor")
+    autoreg = tigerforecast.method("AutoRegressor")
     autoreg.initialize(p=18, optimizer = OGD) 
 
     fig, ax = plt.subplots(nrows=1, ncols=3)
@@ -115,12 +115,12 @@ def test_simple_boost_arma(steps=500, show=True):
     for timeline in timelines:
 
         # problem initialize
-        problem = tigercontrol.problem("ENSO-v0")
+        problem = tigerforecast.problem("ENSO-v0")
         x, y_true = problem.initialize(input_signals = ['oni'], timeline = timeline)
         methods = []
 
         for n in Ns: # number of weak learners
-            method = tigercontrol.method("SimpleBoost")
+            method = tigerforecast.method("SimpleBoost")
             method.initialize(method_id, method_params, n, reg=0.0) # regularization
             methods.append(method)
 

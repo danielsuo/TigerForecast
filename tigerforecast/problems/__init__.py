@@ -1,53 +1,53 @@
 # problems init file
 
-from tigercontrol.problems.core import Problem
-from tigercontrol.problems.registration import problem_registry, problem_register, problem
-from tigercontrol.problems.time_series import TimeSeriesProblem
-from tigercontrol.problems.control import ControlProblem
-from tigercontrol.problems.custom import register_custom_problem, CustomProblem
+from tigerforecast.problems.core import Problem
+from tigerforecast.problems.registration import problem_registry, problem_register, problem
+from tigerforecast.problems.time_series import TimeSeriesProblem
+from tigerforecast.problems.control import ControlProblem
+from tigerforecast.problems.custom import register_custom_problem, CustomProblem
 
 
 # ---------- Control ----------
 
 problem_register(
     id='CartPole-v0',
-    entry_point='tigercontrol.problems.control:CartPole',
+    entry_point='tigerforecast.problems.control:CartPole',
 )
 
 problem_register(
     id='Pendulum-v0',
-    entry_point='tigercontrol.problems.control:Pendulum',
+    entry_point='tigerforecast.problems.control:Pendulum',
 )
 
 problem_register(
     id='DoublePendulum-v0',
-    entry_point='tigercontrol.problems.control:DoublePendulum',
+    entry_point='tigerforecast.problems.control:DoublePendulum',
 )
 
 
 problem_register(
     id='LDS-v0',
-    entry_point='tigercontrol.problems.control:LDS',
+    entry_point='tigerforecast.problems.control:LDS',
 )
 
 problem_register(
     id='LDS-Control-v0',
-    entry_point='tigercontrol.problems.control:LDS_Control',
+    entry_point='tigerforecast.problems.control:LDS_Control',
 )
 
 problem_register(
     id='RNN-Control-v0',
-    entry_point='tigercontrol.problems.control:RNN_Control',
+    entry_point='tigerforecast.problems.control:RNN_Control',
 )
 
 problem_register(
     id='LSTM-Control-v0',
-    entry_point='tigercontrol.problems.control:LSTM_Control',
+    entry_point='tigerforecast.problems.control:LSTM_Control',
 )
 
 problem_register(
     id='PlanarQuadrotor-v0',
-    entry_point='tigercontrol.problems.control:PlanarQuadrotor',
+    entry_point='tigerforecast.problems.control:PlanarQuadrotor',
 )
 
 
@@ -56,57 +56,57 @@ problem_register(
 
 problem_register(
     id='Random-v0',
-    entry_point='tigercontrol.problems.time_series:Random',
+    entry_point='tigerforecast.problems.time_series:Random',
 )
 
 problem_register(
     id='MyProblem-v0',
-    entry_point='tigercontrol.problems.time_series:MyProblem',
+    entry_point='tigerforecast.problems.time_series:MyProblem',
 )
 
 problem_register(
     id='ARMA-v0',
-    entry_point='tigercontrol.problems.time_series:ARMA',
+    entry_point='tigerforecast.problems.time_series:ARMA',
 )
 
 problem_register(
     id='SP500-v0',
-    entry_point='tigercontrol.problems.time_series:SP500',
+    entry_point='tigerforecast.problems.time_series:SP500',
 )
 
 problem_register(
     id='UCI-Indoor-v0',
-    entry_point='tigercontrol.problems.time_series:UCI_Indoor',
+    entry_point='tigerforecast.problems.time_series:UCI_Indoor',
 )
 
 problem_register(
     id='Crypto-v0',
-    entry_point='tigercontrol.problems.time_series:Crypto',
+    entry_point='tigerforecast.problems.time_series:Crypto',
 )
 
 problem_register(
     id='Unemployment-v0',
-    entry_point='tigercontrol.problems.time_series:Unemployment',
+    entry_point='tigerforecast.problems.time_series:Unemployment',
 )
 
 problem_register(
     id='ENSO-v0',
-    entry_point='tigercontrol.problems.time_series:ENSO',
+    entry_point='tigerforecast.problems.time_series:ENSO',
 )
 
 problem_register(
     id='LDS-TimeSeries-v0',
-    entry_point='tigercontrol.problems.time_series:LDS_TimeSeries',
+    entry_point='tigerforecast.problems.time_series:LDS_TimeSeries',
 )
 
 problem_register(
     id='RNN-TimeSeries-v0',
-    entry_point='tigercontrol.problems.time_series:RNN_TimeSeries',
+    entry_point='tigerforecast.problems.time_series:RNN_TimeSeries',
 )
 
 problem_register(
     id='LSTM-TimeSeries-v0',
-    entry_point='tigercontrol.problems.time_series:LSTM_TimeSeries',
+    entry_point='tigerforecast.problems.time_series:LSTM_TimeSeries',
 )
 
 
@@ -115,52 +115,52 @@ problem_register(
 
 problem_register(
     id='PyBullet-Obstacles-v0',
-    entry_point='tigercontrol.problems.pybullet:Obstacles'
+    entry_point='tigerforecast.problems.pybullet:Obstacles'
 )
 
 problem_register(
     id='PyBullet-CartPole-v0',
-    entry_point='tigercontrol.problems.pybullet:CartPole'
+    entry_point='tigerforecast.problems.pybullet:CartPole'
 )
 
 problem_register(
     id='PyBullet-CartPoleSwingup-v0',
-    entry_point='tigercontrol.problems.pybullet:CartPoleSwingup'
+    entry_point='tigerforecast.problems.pybullet:CartPoleSwingup'
 )
 
 problem_register(
     id='PyBullet-CartPoleDouble-v0',
-    entry_point='tigercontrol.problems.pybullet:CartPoleDouble'
+    entry_point='tigerforecast.problems.pybullet:CartPoleDouble'
 )
 
 problem_register(
     id='PyBullet-Kuka-v0',
-    entry_point='tigercontrol.problems.pybullet:Kuka'
+    entry_point='tigerforecast.problems.pybullet:Kuka'
 )
 
 problem_register(
     id='PyBullet-KukaDiverse-v0',
-    entry_point='tigercontrol.problems.pybullet:KukaDiverse'
+    entry_point='tigerforecast.problems.pybullet:KukaDiverse'
 )
 
 problem_register(
     id='PyBullet-Minitaur-v0',
-    entry_point='tigercontrol.problems.pybullet:Minitaur'
+    entry_point='tigerforecast.problems.pybullet:Minitaur'
 )
 
 problem_register(
     id='PyBullet-HalfCheetah-v0',
-    entry_point='tigercontrol.problems.pybullet:HalfCheetah'
+    entry_point='tigerforecast.problems.pybullet:HalfCheetah'
 )
 
 problem_register(
     id='PyBullet-Ant-v0',
-    entry_point='tigercontrol.problems.pybullet:Ant'
+    entry_point='tigerforecast.problems.pybullet:Ant'
 )
 
 problem_register(
     id='PyBullet-Humanoid-v0',
-    entry_point='tigercontrol.problems.pybullet:Humanoid'
+    entry_point='tigerforecast.problems.pybullet:Humanoid'
 )
 
 

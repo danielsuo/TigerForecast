@@ -1,9 +1,9 @@
 # Problem class
 # Author: John Hallman
 
-from tigercontrol import error
-from tigercontrol.problems import Problem
-from tigercontrol.problems.registration import problem_registry
+from tigerforecast import error
+from tigerforecast.problems import Problem
+from tigerforecast.problems.registration import problem_registry
 
  
 class CustomProblem(object):

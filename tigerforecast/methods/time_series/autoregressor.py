@@ -2,14 +2,14 @@
 AR(p): Linear combination of previous values
 """
 
-import tigercontrol
+import tigerforecast
 import jax
 import jax.numpy as np
 import jax.experimental.stax as stax
-from tigercontrol.utils.random import generate_key
-from tigercontrol.methods.time_series import TimeSeriesMethod
-from tigercontrol.methods.optimizers import *
-from tigercontrol.methods.optimizers.losses import mse
+from tigerforecast.utils.random import generate_key
+from tigerforecast.methods.time_series import TimeSeriesMethod
+from tigerforecast.methods.optimizers import *
+from tigerforecast.methods.optimizers.losses import mse
 
 class AutoRegressor(TimeSeriesMethod):
     """

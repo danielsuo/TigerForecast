@@ -1,12 +1,12 @@
 # test the LSTM method class
 
-import tigercontrol
+import tigerforecast
 import numpy as onp
 import jax.numpy as np
 import jax.random as random
 import matplotlib.pyplot as plt
-from tigercontrol.utils import generate_key
-from tigercontrol.utils.download_tools import get_tigercontrol_dir
+from tigerforecast.utils import generate_key
+from tigerforecast.utils.download_tools import get_tigerforecast_dir
 import os
 import pandas as pd
 import ast
@@ -15,14 +15,14 @@ import ast
 def test_flood_FL(steps=61, show_plot=True):
     T = steps 
     n, m, l, d = 6, 1, 3, 10
-    # problem = tigercontrol.problem("LDS-Control-v0")
+    # problem = tigerforecast.problem("LDS-Control-v0")
     # y_true = problem.initialize(n, m, d)
-    tigercontrol_dir = get_tigercontrol_dir()
-    data_path = os.path.join(tigercontrol_dir, 'data/FL_train.csv')
+    tigerforecast_dir = get_tigerforecast_dir()
+    data_path = os.path.join(tigerforecast_dir, 'data/FL_train.csv')
     df = pd.read_csv(data_path).head()
     # print(df['static:drain_area_log2'].head())
     # arr_results = onp.load(data_path, encoding='bytes')
-    method = tigercontrol.method("LSTM")
+    method = tigerforecast.method("LSTM")
     method.initialize(n, m, l, d)
     loss = lambda pred, true: np.sum(((pred - true)/true)**2)
     # num_batches = len(arr_results)
@@ -107,9 +107,9 @@ def test_flood_FL(steps=61, show_plot=True):
 def test_lstm(steps=100, show_plot=True):
     T = steps 
     n, m, l, d = 4, 5, 10, 10
-    problem = tigercontrol.problem("LDS-Control-v0")
+    problem = tigerforecast.problem("LDS-Control-v0")
     y_true = problem.initialize(n, m, d)
-    method = tigercontrol.method("LSTM")
+    method = tigerforecast.method("LSTM")
     method.initialize(n, m, l, d)
     loss = lambda pred, true: np.sum((pred - true)**2)
  

@@ -1,16 +1,16 @@
 # test the LeastSquares method class
 
-import tigercontrol
+import tigerforecast
 import jax.numpy as np
 import matplotlib.pyplot as plt
-from tigercontrol.methods.optimizers import *
+from tigerforecast.methods.optimizers import *
 
 def test_least_squares(steps=1000, show_plot=True):
     T = steps 
-    problem = tigercontrol.problem("ENSO-v0")
+    problem = tigerforecast.problem("ENSO-v0")
     x, y = problem.initialize(input_signals = ['nino12', 'nino34', 'nino4'])
 
-    method = tigercontrol.method("LeastSquares")
+    method = tigerforecast.method("LeastSquares")
     method.initialize(x, y, reg = 10.0 * steps)
     loss = lambda y_true, y_pred: np.sum((y_true - y_pred)**2)
  

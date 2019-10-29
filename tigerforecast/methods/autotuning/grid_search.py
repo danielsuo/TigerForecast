@@ -2,8 +2,8 @@
 Hyperparameter tuning using (optionally random) Grid Search.
 """
 
-import tigercontrol
-from tigercontrol.utils.random import generate_key
+import tigerforecast
+from tigerforecast.utils.random import generate_key
 import jax.numpy as np
 import jax
 from jax import jit, grad, random
@@ -73,9 +73,9 @@ class GridSearch:
         # initialize problem and method
         if verbose:
             print("Currently testing parameters: " + str(method_params))
-        method = tigercontrol.method(self.method_id)
+        method = tigerforecast.method(self.method_id)
         method.initialize(**method_params)
-        problem = tigercontrol.problem(self.problem_id)
+        problem = tigerforecast.problem(self.problem_id)
         if problem.has_regressors:
             x, y_true = problem.initialize(**self.problem_params)
         else:

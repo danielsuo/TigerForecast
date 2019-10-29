@@ -1,8 +1,8 @@
 '''
 SGD optimizer
 '''
-from tigercontrol.methods.optimizers.core import Optimizer
-from tigercontrol.methods.optimizers.losses import mse
+from tigerforecast.methods.optimizers.core import Optimizer
+from tigerforecast.methods.optimizers.losses import mse
 
 class SGD(Optimizer):
     """

@@ -2,8 +2,8 @@ import re
 import importlib
 import warnings
 
-from tigercontrol import error
-from tigercontrol.utils import Spec, Registry
+from tigerforecast import error
+from tigerforecast.utils import Spec, Registry
 import copy
 
 # This format is true today, but it's *not* an official spec.
@@ -29,7 +29,7 @@ class MethodSpec(Spec):
 
 class MethodRegistry(Registry):
     """Register an method by ID. IDs remain stable over time and can
-    be called via tigercontrol.method("ID").
+    be called via tigerforecast.method("ID").
     """
 
     def __str__(self):

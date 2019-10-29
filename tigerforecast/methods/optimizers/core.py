@@ -4,8 +4,8 @@ Core class for optimizers
 
 import inspect
 from jax import jit, grad
-from tigercontrol.methods.optimizers.losses import mse
-from tigercontrol import error
+from tigerforecast.methods.optimizers.losses import mse
+from tigerforecast import error
 
 class Optimizer():
     """

@@ -4,10 +4,10 @@ LSTM neural network method
 import jax
 import jax.numpy as np
 import jax.experimental.stax as stax
-import tigercontrol
-from tigercontrol.utils.random import generate_key
-from tigercontrol.methods.time_series import TimeSeriesMethod
-from tigercontrol.methods.optimizers import *
+import tigerforecast
+from tigerforecast.utils.random import generate_key
+from tigerforecast.methods.time_series import TimeSeriesMethod
+from tigerforecast.methods.optimizers import *
 
 
 class LSTM(TimeSeriesMethod):

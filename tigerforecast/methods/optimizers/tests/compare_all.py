@@ -1,7 +1,7 @@
 
-import tigercontrol
-from tigercontrol.methods.optimizers import *
-from tigercontrol.methods.optimizers.losses import mse
+import tigerforecast
+from tigerforecast.methods.optimizers import *
+from tigerforecast.methods.optimizers.losses import mse
 import matplotlib.pyplot as plt
 import time
 from tqdm import tqdm
@@ -16,27 +16,27 @@ def avg_regret(loss):
 
 def test_ons(show=False):
 
-    #tigercontrol.set_key(0) # consistent randomness
+    #tigerforecast.set_key(0) # consistent randomness
 
-    problem = tigercontrol.problem('ARMA-v0')
+    problem = tigerforecast.problem('ARMA-v0')
     x, y_true = problem.initialize()
 
     methods = []
     labels = ['OGD', 'ONS', 'Adam'] # don't run deprecated ONS
 
-    method = tigercontrol.method('LSTM')
+    method = tigerforecast.method('LSTM')
     method.initialize(n = 1, m = 1, optimizer=OGD) # initialize with class
     methods.append(method)
 
-    #method = tigercontrol.method('AutoRegressor')
+    #method = tigerforecast.method('AutoRegressor')
     #method.initialize(optimizer=Adagrad) # initialize with class
     #methods.append(method)
 
-    method = tigercontrol.method('LSTM')
+    method = tigerforecast.method('LSTM')
     method.initialize(n = 1, m = 1, optimizer=ONS) # initialize with class
     methods.append(method)
 
-    #method = tigercontrol.method('AutoRegressor')
+    #method = tigerforecast.method('AutoRegressor')
     #method.initialize(optimizer=Adam) # initialize with class
     #methods.append(method)
 

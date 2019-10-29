@@ -1,8 +1,8 @@
-from tigercontrol.methods.optimizers.tests.test_adagrad import test_adagrad
-from tigercontrol.methods.optimizers.tests.test_sgd import test_sgd
-from tigercontrol.methods.optimizers.tests.test_ogd import test_ogd
-from tigercontrol.methods.optimizers.tests.test_adam import test_adam
-from tigercontrol.methods.optimizers.tests.test_ons import test_ons
+from tigerforecast.methods.optimizers.tests.test_adagrad import test_adagrad
+from tigerforecast.methods.optimizers.tests.test_sgd import test_sgd
+from tigerforecast.methods.optimizers.tests.test_ogd import test_ogd
+from tigerforecast.methods.optimizers.tests.test_adam import test_adam
+from tigerforecast.methods.optimizers.tests.test_ons import test_ons
 
 
 # run all optimizers tests

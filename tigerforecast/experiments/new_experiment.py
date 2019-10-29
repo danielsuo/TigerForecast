@@ -1,7 +1,7 @@
 # NewExperiment class
 
-from tigercontrol import error
-from tigercontrol.experiments.core import to_dict, run_experiments, create_full_problem_to_methods
+from tigerforecast import error
+from tigerforecast.experiments.core import to_dict, run_experiments, create_full_problem_to_methods
 
 class NewExperiment(object):
     ''' Description: class for implementing algorithms with enforced modularity '''

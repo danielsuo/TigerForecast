@@ -1,15 +1,15 @@
 # test the PredictZero method class
 
-import tigercontrol
+import tigerforecast
 import jax.numpy as np
 import matplotlib.pyplot as plt
 
 def test_predict_zero(steps=1000, show_plot=True):
     T = steps 
     p, q = 3, 3
-    problem = tigercontrol.problem("ARMA-v0")
+    problem = tigerforecast.problem("ARMA-v0")
     cur_x = problem.initialize(p, q)
-    method = tigercontrol.method("PredictZero")
+    method = tigerforecast.method("PredictZero")
     method.initialize()
     loss = lambda y_true, y_pred: (y_true - y_pred)**2
  

@@ -1,6 +1,6 @@
-# tigercontrol.help() method
+# tigerforecast.help() method
 
-from tigercontrol import problem_registry, method_registry
+from tigerforecast import problem_registry, method_registry
 
 
 def help():
@@ -18,12 +18,12 @@ global_help_string = """
 Welcome to TigerControl!
 
 If this is your first time using TigerControl, you might want to read more about it in 
-detail at github.com/johnhallman/tigercontrol, or documentation at tigercontrol.readthedocs.io.
+detail at github.com/johnhallman/tigerforecast, or documentation at tigerforecast.readthedocs.io.
 
 If you're looking for a specific Problem or Method, you can call it via the 
-tigercontrol.problem and tigercontrol.method methods respectively, such as:
+tigerforecast.problem and tigerforecast.method methods respectively, such as:
 
-    problem = tigercontrol.problem("nameOfMethod")
+    problem = tigerforecast.problem("nameOfMethod")
 
 Below is the list of all currently avaliable problems and methods:
 

@@ -6,9 +6,9 @@ import jax
 import jax.numpy as np
 import jax.random as random
 
-import tigercontrol
-from tigercontrol.utils import generate_key
-from tigercontrol.problems.time_series import TimeSeriesProblem
+import tigerforecast
+from tigerforecast.utils import generate_key
+from tigerforecast.problems.time_series import TimeSeriesProblem
 
 
 class ARMA(TimeSeriesProblem):

@@ -1,20 +1,20 @@
-import tigercontrol
-from tigercontrol.methods.optimizers.ogd import OGD
-from tigercontrol.methods.optimizers.losses import mse
+import tigerforecast
+from tigerforecast.methods.optimizers.ogd import OGD
+from tigerforecast.methods.optimizers.losses import mse
 import matplotlib.pyplot as plt
 
 def test_ogd(show=False):
     
-    problem = tigercontrol.problem('ARMA-v0')
+    problem = tigerforecast.problem('ARMA-v0')
     x = problem.initialize(p=2,q=0)
 
-    method = tigercontrol.method('LSTM')
+    method = tigerforecast.method('LSTM')
     method.initialize(n=1, m=1, l=5, h=10, optimizer=OGD) # initialize with class
     method.predict(1.0) # call methods to verify it works
     method.update(1.0)
 
     optimizer = OGD(learning_rate=0.001)
-    method = tigercontrol.method('LSTM')
+    method = tigerforecast.method('LSTM')
     method.initialize(n=1, m=1, l=3, h=10, optimizer=optimizer) # reinitialize with instance
 
     loss = []

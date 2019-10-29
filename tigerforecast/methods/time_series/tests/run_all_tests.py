@@ -1,8 +1,8 @@
-from tigercontrol.methods.time_series.tests.test_last_value import test_last_value
-from tigercontrol.methods.time_series.tests.test_predict_zero import test_predict_zero
-from tigercontrol.methods.time_series.tests.test_autoregressor import test_autoregressor
-from tigercontrol.methods.time_series.tests.test_rnn import test_rnn
-from tigercontrol.methods.time_series.tests.test_lstm import test_lstm
+from tigerforecast.methods.time_series.tests.test_last_value import test_last_value
+from tigerforecast.methods.time_series.tests.test_predict_zero import test_predict_zero
+from tigerforecast.methods.time_series.tests.test_autoregressor import test_autoregressor
+from tigerforecast.methods.time_series.tests.test_rnn import test_rnn
+from tigerforecast.methods.time_series.tests.test_lstm import test_lstm
 
 def run_all_tests(steps=1000, show=False):
     print("\nrunning all time series methods tests...\n")

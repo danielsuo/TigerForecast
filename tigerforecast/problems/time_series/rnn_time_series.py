@@ -5,9 +5,9 @@ import jax
 import jax.numpy as np
 import jax.random as random
 import jax.experimental.stax as stax
-import tigercontrol
-from tigercontrol.utils.random import generate_key
-from tigercontrol.problems.control import ControlProblem
+import tigerforecast
+from tigerforecast.utils.random import generate_key
+from tigerforecast.problems.control import ControlProblem
 
 class RNN_TimeSeries(ControlProblem):
     """

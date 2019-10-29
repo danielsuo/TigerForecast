@@ -1,10 +1,10 @@
 import jax 
 import jax.numpy as np
-import tigercontrol as tc
+import tigerforecast as tc
 import numpy.random as random
 import matplotlib.pyplot as plt
 from scipy.linalg import solve_discrete_are as dare
-from tigercontrol.methods.control import ControlMethod
+from tigerforecast.methods.control import ControlMethod
 
 T, H, M, lr = 200, 10, 10, 0.001
 n, m, A, B = 2, 1, np.array([[1., 1.], [0., 1.]]), np.array([[0.], [1.]])

@@ -1,13 +1,13 @@
 # test the crypto problem class
 
-import tigercontrol
+import tigerforecast
 import jax.numpy as np
 import matplotlib.pyplot as plt
 
 
 def test_unemployment(steps=1000, show_plot=False, verbose=False):
     T = steps if steps < 800 else 800 # short time-series
-    problem = tigercontrol.problem("Unemployment-v0")
+    problem = tigerforecast.problem("Unemployment-v0")
     problem.initialize()
     assert problem.T == 0
 

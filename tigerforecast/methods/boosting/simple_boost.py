@@ -2,10 +2,10 @@
 AR(p): Linear combination of previous values
 """
 
-import tigercontrol
+import tigerforecast
 import jax
 import jax.numpy as np
-from tigercontrol.methods.optimizers.losses import mse
+from tigerforecast.methods.optimizers.losses import mse
 
 class SimpleBoost:
     """
@@ -40,7 +40,7 @@ class SimpleBoost:
         method_params['n'] = n
         method_params['m'] = m
         for _ in range(N):
-            new_method = tigercontrol.method(method_id)
+            new_method = tigerforecast.method(method_id)
             new_method.initialize(**method_params)
             new_method.optimizer.set_loss(proxy_loss) # proxy loss
             self.methods.append(new_method)

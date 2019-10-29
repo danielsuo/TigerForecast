@@ -18,11 +18,11 @@ Installation
 Clone the directory and use pip or pip3 to set up a minimal installation of TigerControl, which excludes PyBullet control problems.
 
 ```
-    git clone https://github.com/MinRegret/tigercontrol.git
-    pip install -e tigercontrol
+    git clone https://github.com/MinRegret/tigerforecast.git
+    pip install -e tigerforecast
 ```
 
-You can now use TigerControl in your Python code by calling `import tigercontrol` in your files. 
+You can now use TigerControl in your Python code by calling `import tigerforecast` in your files. 
 
 
 ### Full install (including PyBullet)
@@ -37,19 +37,19 @@ Before installing TigerControl's dependencies, create a new conda environment in
 Next, clone the GitHub repository and install the full package.
 
 ```
-    git clone https://github.com/MinRegret/tigercontrol.git
-    pip install -e 'tigercontrol[all]'
+    git clone https://github.com/MinRegret/tigerforecast.git
+    pip install -e 'tigerforecast[all]'
 ```
 
 Finally, run a demo to verify that the installation was successful!
 
 ```
-    python tigercontrol/problems/control/tests/test_minitaur.py
+    python tigerforecast/problems/control/tests/test_minitaur.py
 ```
 
 
 For more information
 ====================
 
-To learn more about TigerControl and how to incorporate it into your research, check out the Quickstart guide in the ```tigercontrol/tutorials``` folder. Alternatively, check out our [readthedocs](https://tigercontrol.readthedocs.io/en/latest/) page for more documentation and APIs.
+To learn more about TigerControl and how to incorporate it into your research, check out the Quickstart guide in the ```tigerforecast/tutorials``` folder. Alternatively, check out our [readthedocs](https://tigerforecast.readthedocs.io/en/latest/) page for more documentation and APIs.
 

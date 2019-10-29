@@ -1,6 +1,6 @@
 # run all experiments tests
 
-from tigercontrol.experiments.tests.test_precomputed import test_precomputed
+from tigerforecast.experiments.tests.test_precomputed import test_precomputed
 
 # add all unit tests in dataset_registry
 def run_all_tests(show=False):

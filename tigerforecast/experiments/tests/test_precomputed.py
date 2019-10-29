@@ -1,6 +1,6 @@
-import tigercontrol
-from tigercontrol.experiments.experiment import Experiment
-from tigercontrol.methods.optimizers import *
+import tigerforecast
+from tigerforecast.experiments.experiment import Experiment
+from tigerforecast.methods.optimizers import *
 
 def test_precomputed(steps=100, show=0):
     exp = Experiment()

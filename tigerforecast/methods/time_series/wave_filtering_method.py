@@ -5,9 +5,9 @@ Last observed value
 import jax
 import jax.numpy as np
 import jax.random as rand
-import tigercontrol
-from tigercontrol.methods.time_series import TimeSeriesMethod
-from tigercontrol.utils import generate_key
+import tigerforecast
+from tigerforecast.methods.time_series import TimeSeriesMethod
+from tigerforecast.utils import generate_key
 import scipy.linalg as la
 import numpy as onp
 

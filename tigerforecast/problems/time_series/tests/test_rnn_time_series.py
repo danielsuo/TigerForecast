@@ -2,15 +2,15 @@
 
 import jax.numpy as np
 import jax.random as random
-import tigercontrol
+import tigerforecast
 import matplotlib.pyplot as plt
-from tigercontrol.utils.random import generate_key
+from tigerforecast.utils.random import generate_key
 
 
 def test_rnn_time_series(steps=1000, show_plot=False, verbose=False):
     T = steps
     n, m, d = 5, 3, 10
-    problem = tigercontrol.problem("RNN-TimeSeries-v0")
+    problem = tigerforecast.problem("RNN-TimeSeries-v0")
     problem.initialize(n, m, d)
 
     x_output = []

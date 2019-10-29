@@ -1,10 +1,10 @@
 # Method class
 # Author: John Hallman
 
-from tigercontrol import error
-from tigercontrol.methods import Method
-from tigercontrol.methods.registration import method_registry
-from tigercontrol.methods.optimizers import Optimizer
+from tigerforecast import error
+from tigerforecast.methods import Method
+from tigerforecast.methods.registration import method_registry
+from tigerforecast.methods.optimizers import Optimizer
 
 
 # class for implementing algorithms with enforced modularity

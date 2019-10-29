@@ -1,8 +1,8 @@
 # Experiment class
 
-from tigercontrol.experiments.core import run_experiments, get_ids, to_dict
-from tigercontrol.experiments.new_experiment import NewExperiment
-from tigercontrol.experiments import precomputed
+from tigerforecast.experiments.core import run_experiments, get_ids, to_dict
+from tigerforecast.experiments.new_experiment import NewExperiment
+from tigerforecast.experiments import precomputed
 import csv
 import jax.numpy as np
 import matplotlib.pyplot as plt

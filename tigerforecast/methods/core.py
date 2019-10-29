@@ -1,8 +1,8 @@
 # Method class
 # Author: John Hallman
 
-from tigercontrol import error
-from tigercontrol.methods.optimizers import Optimizer
+from tigerforecast import error
+from tigerforecast.methods.optimizers import Optimizer
 
 # class for implementing algorithms with enforced modularity
 class Method(object):

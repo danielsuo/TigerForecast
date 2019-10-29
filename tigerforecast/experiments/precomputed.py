@@ -1,8 +1,8 @@
 ''' Precompute '''
 
-from tigercontrol.utils.random import set_key
-from tigercontrol.experiments.core import run_experiments, create_full_problem_to_methods
-from tigercontrol.utils.download_tools import get_tigercontrol_dir
+from tigerforecast.utils.random import set_key
+from tigerforecast.experiments.core import run_experiments, create_full_problem_to_methods
+from tigerforecast.utils.download_tools import get_tigerforecast_dir
 import jax.numpy as np
 import os
 import csv
@@ -53,9 +53,9 @@ def recompute(verbose = False, load_bar = False):
     for metric in all_metrics:
         for problem_id in all_problems:
             # datapath for current metric and problem
-            tigercontrol_dir = get_tigercontrol_dir()
+            tigerforecast_dir = get_tigerforecast_dir()
             datapath = 'data/precomputed_results/' + metric + '_' + problem_id[:-3] + '.csv'
-            datapath = os.path.join(tigercontrol_dir, datapath)
+            datapath = os.path.join(tigerforecast_dir, datapath)
 
             with open(datapath, 'w') as csvfile:
                 writer = csv.writer(csvfile)
@@ -72,9 +72,9 @@ def recompute(verbose = False, load_bar = False):
     ''' Store time and memory usage '''
     for problem_id in all_problems:
         # datapath for current metric and problem
-        tigercontrol_dir = get_tigercontrol_dir()
+        tigerforecast_dir = get_tigerforecast_dir()
         datapath = 'data/precomputed_results/time_memory' + '_' + problem_id[:-3] + '.csv'
-        datapath = os.path.join(tigercontrol_dir, datapath)
+        datapath = os.path.join(tigerforecast_dir, datapath)
 
         with open(datapath, 'w') as csvfile:
             writer = csv.writer(csvfile)
@@ -117,9 +117,9 @@ def load_prob_method_to_result(problem_ids = all_problems, method_ids = all_meth
     for metric in metrics:
         for problem_id in problem_ids:
             # datapath for current metric and problem
-            tigercontrol_dir = get_tigercontrol_dir()
+            tigerforecast_dir = get_tigerforecast_dir()
             datapath = 'data/precomputed_results/' + metric + '_' + problem_id[:-3] + '.csv'
-            datapath = os.path.join(tigercontrol_dir, datapath)
+            datapath = os.path.join(tigerforecast_dir, datapath)
 
             with open(datapath) as csvfile:
                 reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)
@@ -133,9 +133,9 @@ def load_prob_method_to_result(problem_ids = all_problems, method_ids = all_meth
     ''' Get time and memory usage '''
     for problem_id in problem_ids:
         # datapath for current metric and problem
-        tigercontrol_dir = get_tigercontrol_dir()
+        tigerforecast_dir = get_tigerforecast_dir()
         datapath = 'data/precomputed_results/time_memory' + '_' + problem_id[:-3] + '.csv'
-        datapath = os.path.join(tigercontrol_dir, datapath)
+        datapath = os.path.join(tigerforecast_dir, datapath)
 
         with open(datapath) as csvfile:
             reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)

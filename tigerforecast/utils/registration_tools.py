@@ -2,7 +2,7 @@ import re
 import importlib
 import warnings
 from difflib import get_close_matches
-from tigercontrol import error
+from tigerforecast import error
 
 # This format is true today, but it's *not* an official spec.
 # [username/](problem-name)-v(version)    problem-name is group 1, version is group 2

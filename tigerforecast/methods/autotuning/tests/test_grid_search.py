@@ -2,9 +2,9 @@
 unit tests for GridSearch class
 """
 
-import tigercontrol
-from tigercontrol.methods.autotuning import GridSearch
-from tigercontrol.methods.optimizers import *
+import tigerforecast
+from tigerforecast.methods.autotuning import GridSearch
+from tigerforecast.methods.optimizers import *
 import jax.numpy as np
 import matplotlib.pyplot as plt
 import itertools
@@ -38,9 +38,9 @@ def test_grid_search_arma(show=False):
         print("optimal params: ", optimal_params)
 
     # test resulting method params
-    method = tigercontrol.method(method_id)
+    method = tigerforecast.method(method_id)
     method.initialize(**optimal_params)
-    problem = tigercontrol.problem(problem_id)
+    problem = tigerforecast.problem(problem_id)
     x = problem.initialize(**problem_params)
     loss = []
     if show:

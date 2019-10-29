@@ -2,9 +2,9 @@
 Online Least Squares
 """
 
-import tigercontrol
+import tigerforecast
 import jax.numpy as np
-from tigercontrol.methods.time_series import TimeSeriesMethod
+from tigerforecast.methods.time_series import TimeSeriesMethod
 
 class LeastSquares(TimeSeriesMethod):
     """

@@ -1,0 +1,6 @@
+tigerforecast.utils.uci\_indoor
+==============================
+
+.. currentmodule:: tigerforecast.utils
+
+.. autofunction:: uci_indoor

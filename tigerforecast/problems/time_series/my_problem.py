@@ -1,14 +1,14 @@
-import tigercontrol
+import tigerforecast
 import os
 import jax.numpy as np
 import pandas as pd
-from tigercontrol.utils.dataset_registry import dataset_to_problem, get_tigercontrol_dir
-from tigercontrol.error import StepOutOfBounds
-from tigercontrol.problems.time_series import TimeSeriesProblem
+from tigerforecast.utils.dataset_registry import dataset_to_problem, get_tigerforecast_dir
+from tigerforecast.error import StepOutOfBounds
+from tigerforecast.problems.time_series import TimeSeriesProblem
 
 class MyProblem(TimeSeriesProblem):
     """
-    Description: Make dataset into tigercontrol problem class.
+    Description: Make dataset into tigerforecast problem class.
     """
 
     compatibles = set(['TimeSeries'])

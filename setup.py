@@ -6,7 +6,7 @@ import setuptools
 version = '0.1'
 
 setuptools.setup(
-    name='tigercontrol',
+    name='tigerforecast',
     url='https://github.com/MinRegret/TigerForecast',
     author='Google AI Princeton',
     author_email='johnolof@gmail.com',

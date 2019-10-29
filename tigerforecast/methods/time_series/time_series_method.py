@@ -1,8 +1,8 @@
 # TimeSeriesMethod class
 # Author: John Hallman
 
-from tigercontrol import error
-from tigercontrol.methods import Method
+from tigerforecast import error
+from tigerforecast.methods import Method
 
 class TimeSeriesMethod(Method):
     ''' Description: class for implementing algorithms with enforced modularity '''
