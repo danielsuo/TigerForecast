@@ -8,7 +8,7 @@ import jax.numpy as np
 import jax.experimental.stax as stax
 from tigerforecast.utils.random import generate_key
 from tigerforecast.methods.time_series import TimeSeriesMethod
-from tigerforecast.methods.optimizers import *
+from tigerforecast.methods.optimizers import * 
 from tigerforecast.methods.optimizers.losses import mse
 
 class AutoRegressor(TimeSeriesMethod):

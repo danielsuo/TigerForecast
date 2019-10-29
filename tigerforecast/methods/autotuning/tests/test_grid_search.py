@@ -1,6 +1,6 @@
 """
 unit tests for GridSearch class
-"""
+""" 
 
 import tigerforecast
 from tigerforecast.methods.autotuning import GridSearch
@@ -21,17 +21,16 @@ def test_grid_search_arma(show=False):
     method_params = {}
     loss = lambda a, b: np.sum((a-b)**2)
     search_space = {'p': [1,2,3,4,5], 'optimizer':[]} # parameters for ARMA method
-    #opts = [Adam, Adagrad, ONS, OGD]
-    opts = [Adam, Adagrad]
+    opts = [Adam, Adagrad, ONS, OGD]
     lr_start, lr_stop = 0, -4 # search learning rates from 10^start to 10^stop 
     learning_rates = np.logspace(lr_start, lr_stop, 1+2*np.abs(lr_start - lr_stop))
     for opt, lr in itertools.product(opts, learning_rates):
         search_space['optimizer'].append(opt(learning_rate=lr)) # create instance and append
 
-    trials = 15
+    trials, min_steps = 15, 1000
     hpo = GridSearch() # hyperparameter optimizer
     optimal_params, optimal_loss = hpo.search(method_id, method_params, problem_id, problem_params, loss, 
-        search_space, trials=trials, smoothing=10, start_steps=100, verbose=show)
+        search_space, trials=trials, smoothing=10, min_steps=min_steps, verbose=show) # run each model at least 1000 steps
 
     if show:
         print("optimal loss: ", optimal_loss)

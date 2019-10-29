@@ -6,7 +6,6 @@ from tigerforecast.methods.optimizers import Optimizer
 
 # class for implementing algorithms with enforced modularity
 class Method(object):
-    spec = None
 
     def initialize(self, **kwargs):
         # initializes method parameters
@@ -35,10 +34,7 @@ class Method(object):
         raise NotImplementedError
 
     def __str__(self):
-        if self.spec is None:
-            return '<{} instance>'.format(type(self).__name__)
-        else:
-            return '<{}<{}>>'.format(type(self).__name__, self.spec.id)
+        return '<{} instance>'.format(type(self).__name__)
 
     def __enter__(self):
         return self
