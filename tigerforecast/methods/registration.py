@@ -24,7 +24,7 @@ class MethodSpec(Spec):
         id (str): The official problem ID
     """
     def __str__(self):
-        return "<TigerControl Method Spec>"
+        return "<TigerForecast Method Spec>"
 
 
 class MethodRegistry(Registry):
@@ -33,7 +33,7 @@ class MethodRegistry(Registry):
     """
 
     def __str__(self):
-        return "<TigerControl Method Registry>"
+        return "<TigerForecast Method Registry>"
 
 # Have a global method_registry
 method_registry = MethodRegistry(method_id_re)

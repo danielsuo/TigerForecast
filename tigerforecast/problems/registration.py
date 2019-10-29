@@ -27,7 +27,7 @@ class ProblemSpec(Spec):
         id (str): The official problem ID
     """
     def __str__(self):
-        return "<TigerControl Problem Spec>"
+        return "<TigerForecast Problem Spec>"
 
 
 class ProblemRegistry(Registry):
@@ -38,7 +38,7 @@ class ProblemRegistry(Registry):
     code that was running.
     """
     def __str__(self):
-        return "<TigerControl Problem Registry>"
+        return "<TigerForecast Problem Registry>"
 
 
 

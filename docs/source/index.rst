@@ -3,11 +3,11 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-TigerControl reference documentation
+TigerForecast reference documentation
 ====================================
 
-For an introduction to TigerControl, start at the
-`TigerControl GitHub page <https://github.com/johnhallman/tigerforecast>`_.
+For an introduction to TigerForecast, start at the
+`TigerForecast GitHub page <https://github.com/johnhallman/tigerforecast>`_.
 
 .. toctree::
    :maxdepth: 3

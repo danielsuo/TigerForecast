@@ -1,15 +1,15 @@
-# TigerControl Tutorials
+# TigerForecast Tutorials
 ****************
 
-Below you will find links to Google Colab notebooks that contain tutorials that should help you get going with TigerControl. A good place to start for beginners is **QuickStart** ([Google Colab](https://colab.research.google.com/github/johnhallman/tigerforecast/blob/master/tutorials/notebooks/QuickStart.ipynb), [NBViewer](https://nbviewer.jupyter.org/github/johnhallman/tigerforecast/blob/master/tutorials/notebooks/QuickStart.ipynb)), which will guide you through the basics of the framework. Due to occasional GitHub-Colab compatibility issues, we also provide links to our tutorials on [nbviewer.jupyter.org](https://nbviewer.jupyter.org/), an open-source tool for rendering notebooks.
+Below you will find links to Google Colab notebooks that contain tutorials that should help you get going with TigerForecast. A good place to start for beginners is **QuickStart** ([Google Colab](https://colab.research.google.com/github/johnhallman/tigerforecast/blob/master/tutorials/notebooks/QuickStart.ipynb), [NBViewer](https://nbviewer.jupyter.org/github/johnhallman/tigerforecast/blob/master/tutorials/notebooks/QuickStart.ipynb)), which will guide you through the basics of the framework. Due to occasional GitHub-Colab compatibility issues, we also provide links to our tutorials on [nbviewer.jupyter.org](https://nbviewer.jupyter.org/), an open-source tool for rendering notebooks.
 
 
 List of Tutorials
 =================
 
-Below is a list of notebooks and a brief explanation of what they cover. If you wish to implement custom methods or problems you may want to read up on [Google JAX](https://github.com/google/jax) — a NumPy-based auto-differentiation package which TigerControl depends heavily on.
+Below is a list of notebooks and a brief explanation of what they cover. If you wish to implement custom methods or problems you may want to read up on [Google JAX](https://github.com/google/jax) — a NumPy-based auto-differentiation package which TigerForecast depends heavily on.
 
-- **Quickstart** - A brief overview of TigerControl ([Google Colab](https://colab.research.google.com/github/johnhallman/tigerforecast/blob/master/tutorials/notebooks/QuickStart.ipynb),
+- **Quickstart** - A brief overview of TigerForecast ([Google Colab](https://colab.research.google.com/github/johnhallman/tigerforecast/blob/master/tutorials/notebooks/QuickStart.ipynb),
 [NBViewer](https://nbviewer.jupyter.org/github/johnhallman/tigerforecast/blob/master/tutorials/notebooks/QuickStart.ipynb))
 - **Problems** - Load different tasks ([Google Colab](https://colab.research.google.com/github/johnhallman/tigerforecast/blob/master/tutorials/notebooks/Problems.ipynb), [NBViewer](https://nbviewer.jupyter.org/github/johnhallman/tigerforecast/blob/master/tutorials/notebooks/Problems.ipynb))
 - **Methods** - Pre-implemented algorithms for solving problems ([Google Colab](https://colab.research.google.com/github/johnhallman/tigerforecast/blob/master/tutorials/notebooks/Methods.ipynb), [NBViewer](https://nbviewer.jupyter.org/github/johnhallman/tigerforecast/blob/master/tutorials/notebooks/Methods.ipynb))

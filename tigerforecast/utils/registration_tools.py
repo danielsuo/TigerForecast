@@ -84,7 +84,7 @@ class Spec(object):
         return "{} Spec({})".format(str(self), self.id)
 
     def __str__(self):
-        return "<TigerControl Spec>"
+        return "<TigerForecast Spec>"
 
 class Registry(object):
     """Register object by ID. IDs remain stable over time and are

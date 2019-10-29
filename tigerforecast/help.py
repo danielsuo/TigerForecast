@@ -15,9 +15,9 @@ def help():
 
 global_help_string = """
 
-Welcome to TigerControl!
+Welcome to TigerForecast!
 
-If this is your first time using TigerControl, you might want to read more about it in 
+If this is your first time using TigerForecast, you might want to read more about it in 
 detail at github.com/johnhallman/tigerforecast, or documentation at tigerforecast.readthedocs.io.
 
 If you're looking for a specific Problem or Method, you can call it via the 
@@ -35,7 +35,7 @@ Below is the list of all currently avaliable problems and methods:
     ---------
     {}
 
-Good luck exploring TigerControl!
+Good luck exploring TigerForecast!
 
 """
 

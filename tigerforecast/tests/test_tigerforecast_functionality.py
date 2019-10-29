@@ -1,5 +1,5 @@
 """
-Run all tests for the TigerControl framework
+Run all tests for the TigerForecast framework
 """
 
 import tigerforecast

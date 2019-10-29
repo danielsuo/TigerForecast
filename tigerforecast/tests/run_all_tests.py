@@ -1,5 +1,5 @@
 """
-Run all tests for the TigerControl framework
+Run all tests for the TigerForecast framework
 """
 
 from tigerforecast.utils.tests.run_all_tests import run_all_tests as utils_tests
@@ -11,7 +11,7 @@ from tigerforecast.tests.test_tigerforecast_functionality import test_tigerforec
 # run all sub-level tests
 def run_all_tests(show_results=False):
 
-    print("\n----- Running all TigerControl tests! -----\n")
+    print("\n----- Running all TigerForecast tests! -----\n")
 
     utils_tests(show=show_results)
     experiments_tests(show=show_results)
