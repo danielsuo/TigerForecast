@@ -104,7 +104,7 @@ class GridSearch:
                 self._add_to_list(losses, smooth_loss)
                 if self._halting_rule(losses, smooth_loss) and t >= min_steps: break
         if verbose:
-            print("Final loss: ", smooth_loss)
+            print("Time taken: {}, final loss: {}".format(t, smooth_loss))
         return smooth_loss
 
 
