@@ -55,47 +55,5 @@ class NewExperiment(object):
 
         return prob_method_to_result
 
-    def help(self):
-        '''
-        Description: Prints information about this class and its methods.
-        '''
-        print(NewExperiment_help)
-
     def __str__(self):
         return "<NewExperiment Method>"
-
-# string to print when calling help() method
-NewExperiment_help = """
-
--------------------- *** --------------------
-
-Methods:
-
-    initialize()
-        Description: Initializes the new experiment instance. 
-
-        Args:     
-            problems (dict): map of the form problem_id -> hyperparameters for problem 
-            methods (dict): map of the form method_id -> hyperparameters for method
-            problem_to_methods (dict) : map of the form problem_id -> list of method_id.
-                                       If None, then we assume that the user wants to
-                                       test every method in method_to_params against every
-                                       problem in problem_to_params
-
-    def run_all_experiments():
-        Descripton: Runs all experiments and returns results
-
-        Args:
-            None
-
-        Returns:
-            prob_method_to_result (dict): Dictionary containing results for all specified metrics and performance
-                                         (time and memory usage) for all problem-method associations.
-
-
-    help()
-        Description: Prints information about this class and its methods
-
--------------------- *** --------------------
-
-"""
