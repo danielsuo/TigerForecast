@@ -27,7 +27,7 @@ def test_grid_search_lstm(show=False):
     for opt, lr in itertools.product(opts, learning_rates):
         search_space['optimizer'].append(opt(learning_rate=lr)) # create instance and append
 
-    trials, min_steps = 5, 100
+    trials, min_steps = 10, 100
     hpo = GridSearch() # hyperparameter optimizer
     optimal_params, optimal_loss = hpo.search(method_id, method_params, problem_id, problem_params, loss, 
         search_space, trials=trials, smoothing=10, min_steps=min_steps, verbose=show) # run each model at least 1000 steps

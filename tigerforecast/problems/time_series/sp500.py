@@ -34,15 +34,27 @@ class SP500(TimeSeriesProblem):
             The first S&P 500 value
         """
         self.initialized = True
+        self.has_regressors = False
         self.normalization = normalization
         if normalization != None:
             assert normalization in ['return', 'log_return'], "normalization must be either None, return, or log_return"
         self.T = 0
-        self.df = sp500() # get data
-        self.max_T = self.df.shape[0]
-        self.has_regressors = False
-        self.x_prev = self.df.iloc[self.T, 1]
-        return self.df.iloc[self.T, 1]
+        df = sp500() # get data
+        self.max_T = df.shape[0]
+        data = (df['value'].values.tolist())
+        if normalization == 'return':
+            data = np.array([(data[i+1]-data[i])/data[i] for i in range(len(data)-1)])
+            self.std = np.std(data)
+            data /= self.std
+        elif normalization == 'log_return':
+            data = np.array([np.log(data[i+1]/data[i]) for i in range(len(data)-1)])
+            self.std = np.std(data)
+            data /= self.std
+        else:
+            data = np.array(data)
+            self.std = np.std(data)
+        self.data = data
+        return self.data[self.T]
 
     def step(self):
         """
@@ -56,30 +68,8 @@ class SP500(TimeSeriesProblem):
         self.T += 1
         if self.T == self.max_T: 
             raise StepOutOfBounds("Number of steps exceeded length of dataset ({})".format(self.max_T))
+        return self.data[self.T]
 
-        x_curr = self.df.iloc[self.T, 1]
-        if self.normalization == 'return': r = (x_curr - self.x_prev) / self.x_prev
-        elif self.normalization == 'log_return': r = log(x_curr / self.x_prev)
-        else: r = x_curr
-        self.x_prev = x_curr
-        return r
-
-    def hidden(self):
-        """
-        Description: Return the date corresponding to the last value of the S&P 500 that was returned
-        Args:
-            None
-        Returns:
-            Date (string)
-        """
-        assert self.initialized
-        return "Timestep: {} out of {}, date: ".format(self.T+1, self.max_T) + self.df.iloc[self.T, 0]
-
-    def close(self):
-        """
-        Not implemented
-        """
-        pass
 
     def __str__(self):
         return "<SP500 Problem>"

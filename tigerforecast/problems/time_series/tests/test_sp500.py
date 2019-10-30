@@ -17,18 +17,15 @@ def test_sp500(steps=1000, show_plot=False, verbose=False):
 
     assert problem.T == T
     
-    info = problem.hidden()
-    if verbose:
-        print(info)
     if show_plot:
         plt.plot(test_output)
         plt.title("S&P 500")
         plt.show(block=False)
-        plt.pause(1)
+        plt.pause(5)
         plt.close()
     print("test_sp500 passed")
     return
 
 
 if __name__=="__main__":
-    test_sp500()
+    test_sp500(show_plot=True)
