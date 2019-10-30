@@ -1,7 +1,7 @@
-tigerforecast.methods.optimizers.Adam
+tigerforecast.utils.optimizers.Adam
 ===================================
 
-.. currentmodule:: tigerforecast.methods.optimizers
+.. currentmodule:: tigerforecast.utils.optimizers
 
 .. autoclass:: Adam
 

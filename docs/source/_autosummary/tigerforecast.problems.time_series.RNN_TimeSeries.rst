@@ -1,7 +1,7 @@
 tigerforecast.problems.time\_series.RNN\_TimeSeries
 ==================================================
 
-.. currentmodule:: tigerforecast.problems.time_series
+.. currentmodule:: tigerforecast.problems
 
 .. autoclass:: RNN_TimeSeries
 

@@ -1,7 +1,7 @@
-tigerforecast.methods.optimizers.Optimizer
+tigerforecast.utils.optimizers.Optimizer
 ========================================
 
-.. currentmodule:: tigerforecast.methods.optimizers
+.. currentmodule:: tigerforecast.utils.optimizers
 
 .. autoclass:: Optimizer
 

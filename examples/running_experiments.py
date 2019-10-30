@@ -1,7 +1,7 @@
 import tigerforecast
 from tigerforecast.experiments import Experiment
 from tigerforecast.utils.download_tools import get_tigerforecast_dir
-from tigerforecast.methods.optimizers import *
+from tigerforecast.utils.optimizers import *
 import os
 
 def test_new_experiment(steps=5000, show=False):

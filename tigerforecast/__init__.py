@@ -8,7 +8,7 @@ import tigerforecast
 from tigerforecast import error
 from tigerforecast.problems import problem, CustomProblem, problem_registry, register_custom_problem
 from tigerforecast.methods import method, CustomMethod, method_registry, register_custom_method
-from tigerforecast.methods.optimizers import losses
+from tigerforecast.utils.optimizers import losses
 from tigerforecast.help import help
 from tigerforecast.utils import set_key
 from tigerforecast.experiments import Experiment

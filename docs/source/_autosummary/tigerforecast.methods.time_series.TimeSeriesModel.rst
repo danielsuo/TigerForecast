@@ -1,9 +1,9 @@
-tigerforecast.methods.time\_series.TimeSeriesMethod
+tigerforecast.methods.time\_series.Method
 ================================================
 
-.. currentmodule:: tigerforecast.methods.time_series
+.. currentmodule:: tigerforecast.methods
 
-.. autoclass:: TimeSeriesMethod
+.. autoclass:: Method
 
    
    .. automethod:: __init__
@@ -13,11 +13,11 @@ tigerforecast.methods.time\_series.TimeSeriesMethod
 
    .. autosummary::
    
-      ~TimeSeriesMethod.__init__
-      ~TimeSeriesMethod.help
-      ~TimeSeriesMethod.initialize
-      ~TimeSeriesMethod.predict
-      ~TimeSeriesMethod.update
+      ~Method.__init__
+      ~Method.help
+      ~Method.initialize
+      ~Method.predict
+      ~Method.update
    
    
 
@@ -27,6 +27,6 @@ tigerforecast.methods.time\_series.TimeSeriesMethod
 
    .. autosummary::
    
-      ~TimeSeriesMethod.spec
+      ~Method.spec
    
    

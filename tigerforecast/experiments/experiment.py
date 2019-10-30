@@ -7,8 +7,8 @@ import csv
 import jax.numpy as np
 import matplotlib.pyplot as plt
 from prettytable import PrettyTable
-from tigerforecast.methods.optimizers import *
-from tigerforecast.methods.autotuning import GridSearch
+from tigerforecast.utils.optimizers import *
+from tigerforecast.utils.autotuning import GridSearch
 
 class Experiment(object):
     ''' Description: Streamlines the process of performing experiments and comparing results of methods across

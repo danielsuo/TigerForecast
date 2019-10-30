@@ -4,7 +4,7 @@
 from tigerforecast import error
 from tigerforecast.methods import Method
 from tigerforecast.methods.registration import method_registry
-from tigerforecast.methods.optimizers import Optimizer
+from tigerforecast.utils.optimizers import Optimizer
 
 
 # class for implementing algorithms with enforced modularity

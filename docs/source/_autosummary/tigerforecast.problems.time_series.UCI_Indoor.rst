@@ -1,7 +1,7 @@
 tigerforecast.problems.time\_series.UCI\_Indoor
 ==============================================
 
-.. currentmodule:: tigerforecast.problems.time_series
+.. currentmodule:: tigerforecast.problems
 
 .. autoclass:: UCI_Indoor
 

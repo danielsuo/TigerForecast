@@ -1,7 +1,7 @@
 tigerforecast.problems.time\_series.Random
 =========================================
 
-.. currentmodule:: tigerforecast.problems.time_series
+.. currentmodule:: tigerforecast.problems
 
 .. autoclass:: Random
 

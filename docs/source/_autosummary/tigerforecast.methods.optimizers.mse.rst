@@ -1,6 +1,6 @@
-tigerforecast.methods.optimizers.mse
+tigerforecast.utils.optimizers.mse
 ==================================
 
-.. currentmodule:: tigerforecast.methods.optimizers
+.. currentmodule:: tigerforecast.utils.optimizers
 
 .. autofunction:: mse

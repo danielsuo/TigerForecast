@@ -31,13 +31,13 @@ time_series
 .. autosummary::
   :toctree: _autosummary
 
-   tigerforecast.methods.time_series.TimeSeriesMethod
-   tigerforecast.methods.time_series.AutoRegressor
-   tigerforecast.methods.time_series.LastValue
-   tigerforecast.methods.time_series.PredictZero
-   tigerforecast.methods.time_series.RNN
-   tigerforecast.methods.time_series.LSTM
-   tigerforecast.methods.time_series.LeastSquares
+   tigerforecast.methods.Method
+   tigerforecast.methods.AutoRegressor
+   tigerforecast.methods.LastValue
+   tigerforecast.methods.PredictZero
+   tigerforecast.methods.RNN
+   tigerforecast.methods.LSTM
+   tigerforecast.methods.LeastSquares
 
 optimizers
 ----------
@@ -45,14 +45,14 @@ optimizers
 .. autosummary::
   :toctree: _autosummary
 
-   tigerforecast.methods.optimizers.Optimizer
-   tigerforecast.methods.optimizers.Adagrad
-   tigerforecast.methods.optimizers.Adam
-   tigerforecast.methods.optimizers.ONS
-   tigerforecast.methods.optimizers.SGD
-   tigerforecast.methods.optimizers.OGD
-   tigerforecast.methods.optimizers.mse
-   tigerforecast.methods.optimizers.cross_entropy
+   tigerforecast.utils.optimizers.Optimizer
+   tigerforecast.utils.optimizers.Adagrad
+   tigerforecast.utils.optimizers.Adam
+   tigerforecast.utils.optimizers.ONS
+   tigerforecast.utils.optimizers.SGD
+   tigerforecast.utils.optimizers.OGD
+   tigerforecast.utils.optimizers.mse
+   tigerforecast.utils.optimizers.cross_entropy
 
 boosting
 --------
@@ -60,4 +60,4 @@ boosting
 .. autosummary::
   :toctree: _autosummary
 
-  tigerforecast.methods.boosting.SimpleBoost
+  tigerforecast.utils.boosting.SimpleBoost

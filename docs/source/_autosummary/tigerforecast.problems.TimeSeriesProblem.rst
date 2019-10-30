@@ -1,9 +1,9 @@
-tigerforecast.problems.TimeSeriesProblem
+tigerforecast.problems.Problem
 =======================================
 
 .. currentmodule:: tigerforecast.problems
 
-.. autoclass:: TimeSeriesProblem
+.. autoclass:: Problem
 
    
    .. automethod:: __init__
@@ -13,11 +13,11 @@ tigerforecast.problems.TimeSeriesProblem
 
    .. autosummary::
    
-      ~TimeSeriesProblem.__init__
-      ~TimeSeriesProblem.close
-      ~TimeSeriesProblem.help
-      ~TimeSeriesProblem.initialize
-      ~TimeSeriesProblem.step
+      ~Problem.__init__
+      ~Problem.close
+      ~Problem.help
+      ~Problem.initialize
+      ~Problem.step
    
    
 
@@ -27,6 +27,6 @@ tigerforecast.problems.TimeSeriesProblem
 
    .. autosummary::
    
-      ~TimeSeriesProblem.spec
+      ~Problem.spec
    
    

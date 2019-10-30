@@ -1,7 +1,7 @@
 tigerforecast.methods.time\_series.LeastSquares
 =============================================
 
-.. currentmodule:: tigerforecast.methods.time_series
+.. currentmodule:: tigerforecast.methods
 
 .. autoclass:: LeastSquares
 
