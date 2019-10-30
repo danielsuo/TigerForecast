@@ -103,14 +103,14 @@ def run_experiment(problem, method, metric = 'mse', key = 0, timesteps = None, v
 
     if(timesteps is None):
         if(problem.max_T == -1):
-            print("WARNING: On simulated problem, the number of timesteps should be specified. Will default to 10000.")
-            timesteps = 10000
+            print("WARNING: On simulated problem, the number of timesteps should be specified. Will default to 5000.")
+            timesteps = 5000
         else:
-            timesteps = problem.max_T - 1
+            timesteps = problem.max_T - 2
     elif(problem.max_T != -1):
-        if(timesteps > problem.max_T - 1):
-            print("WARNING: Number of specified timesteps exceeds the length of the dataset. Will run %d timesteps instead." % problem.max_T - 1)
-        timesteps = min(timesteps, problem.max_T - 1)
+        if(timesteps > problem.max_T - 2):
+            print("WARNING: Number of specified timesteps exceeds the length of the dataset. Will run %d timesteps instead." % problem.max_T - 2)
+        timesteps = min(timesteps, problem.max_T - 2)
 
     # get first x and y
     if(problem.has_regressors):
@@ -120,17 +120,17 @@ def run_experiment(problem, method, metric = 'mse', key = 0, timesteps = None, v
 
     # initialize method
     method = tigerforecast.method(method_id)
-    
+
     if(method_params is None):
         method_params = {}
-    if(len(x.shape) == 0):
-        method_params['n'] = 1
-    else:
+    try:
         method_params['n'] = x.shape[0]
-    if(len(y.shape) == 0):
-        method_params['m'] = 1
-    else:
+    except:
+        method_params['n'] = 1
+    try:
         method_params['m'] = y.shape[0]
+    except:
+        method_params['m'] = 1
 
     method.initialize(**method_params)
 

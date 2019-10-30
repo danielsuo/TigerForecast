@@ -64,7 +64,7 @@ def recompute(verbose = False, load_bar = False):
                         loss, _, _ = run_experiments((problem_id, None), (method_id, None), metric, \
                                                              n_runs = n_runs, timesteps = timesteps)
                     except:
-                        loss = np.zeros(timesteps)
+                        loss = 0.0
                     # save results for current problem #
                     writer.writerow(loss)
             csvfile.close()

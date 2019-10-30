@@ -7,6 +7,8 @@ import csv
 import jax.numpy as np
 import matplotlib.pyplot as plt
 from prettytable import PrettyTable
+from tigerforecast.methods.optimizers import *
+from tigerforecast.methods.autotuning import GridSearch
 
 class Experiment(object):
     ''' Description: Streamlines the process of performing experiments and comparing results of methods across
@@ -65,7 +67,32 @@ class Experiment(object):
             # map of the form [metric][problem][method] -> loss series + time + memory
             self.prob_method_to_result = self.new_experiment.run_all_experiments()
 
-    def add_method(self, method_id, method_params = None, name = None):
+    def add_all_method_variants(self, method_id, method_params = {}, include_boosting = True, lr_tuning = False):
+        optimizers = [OGD, Adagrad, Adam, ONS]
+        for optimizer in optimizers:
+            method_params['optimizer'] = optimizer
+            self.add_method(method_id, method_params, lr_tuning = lr_tuning)
+            if(include_boosting):
+                self.add_method('SimpleBoost', {'method_id' : method_id, 'method_params' : method_params},\
+                    name = method_id + '-' + method_params['optimizer'].__name__)
+
+    def lr_tuning(self, method_id, method_params, problem_id, problem_params):
+        print("Learning Rate Tuning not yet available!")
+        return method_params
+        '''loss = lambda a, b: np.sum((a-b)**2)
+        optimizer = method_params['optimizer']
+        search_space = {'optimizer':[]} # parameters for ARMA method
+        lr_start, lr_stop = 0, -4 # search learning rates from 10^start to 10^stop 
+        learning_rates = np.logspace(lr_start, lr_stop, 1+2*np.abs(lr_start - lr_stop))
+        for lr in learning_rates:
+            search_space['optimizer'].append(optimizer(learning_rate=lr)) # create instance and append
+        trials, min_steps = 15, 1000
+        hpo = GridSearch() # hyperparameter optimizer
+        optimal_params, optimal_loss = hpo.search(method_id, method_params, problem_id, problem_params, loss, 
+            search_space, trials=trials, smoothing=10, min_steps=min_steps, verbose = 1) # run each model at least 1000 steps
+        return optimal_params'''
+
+    def add_method(self, method_id, method_params = None, lr_tuning = False, name = None):
         '''
         Description: Add a new method to the experiment instance.
         
@@ -102,6 +129,8 @@ class Experiment(object):
 
                     ''' If method is compatible with problem, run experiment and store results. '''
                     try:
+                        if(lr_tuning):
+                            method_params = self.lr_tuning(method_id, method_params, problem_id, problem_params)
                         loss, time, memory = run_experiments((problem_id, problem_params), \
                             (method_id, method_params), metric = metric, n_runs = self.n_runs, \
                             timesteps = self.timesteps, verbose = self.verbose)
@@ -173,7 +202,7 @@ class Experiment(object):
                     f.write(",%s" % str(item))
                 f.write('\n')
 
-    def scoreboard(self, metric = 'mse', start_time = 0, n_digits = 3, truncate_ids = True, verbose = True, save_as = None):
+    def scoreboard(self, metric = 'mse', start_time = 0, n_digits = 3, save_as = None):
         '''
         Description: Show a scoreboard for the results of the experiments for specified metric.
 
@@ -187,10 +216,7 @@ class Experiment(object):
             print("WARNING: Time comparison between precomputed methods and" + \
                   "any added method may be irrelevant due to hardware differences.")
 
-        if(verbose and metric in self.metrics):
-            print("Average " + metric + ":")
-        else:
-            print(metric + ":")
+        print("Average " + metric + ":")
             
         table = PrettyTable()
         table_dict = {}
@@ -202,10 +228,7 @@ class Experiment(object):
 
         field_names = ['Method\Problems']
         for problem_id in problem_ids:
-            if(truncate_ids and len(problem_id) > 9):
-                field_names.append(problem_id[:4] + '..' + problem_id[-3:])
-            else:
-                field_names.append(problem_id)
+            field_names.append(problem_id)
 
         table.field_names = field_names
 
@@ -213,8 +236,7 @@ class Experiment(object):
             method_scores = [method_id]
             # get scores for each problem
             for problem_id in problem_ids:
-                score = np.mean((self.prob_method_to_result\
-                    [(metric, problem_id, method_id)])[start_time:self.timesteps])
+                score = np.mean(self.prob_method_to_result[(metric, problem_id, method_id)][start_time:])
                 score = round(float(score), n_digits)
                 if(score == 0.0):
                     score = '—'
@@ -237,14 +259,13 @@ class Experiment(object):
 
     def _plot(self, ax, problem, problem_result_plus_method, n_problems, metric, \
                 avg_regret, start_time, cutoffs, yscale, show_legend = True):
-
         for (loss, method) in problem_result_plus_method:
             if(avg_regret):
-                ax.plot(self.avg_regret(loss[start_time:self.timesteps]), label=str(method))
+                ax.plot(self.avg_regret(loss[start_time:]), label=str(method))
             else:
-                ax.plot(loss, label=str(method))
+                ax.plot(loss[start_time:], label=str(method))
         if(show_legend):
-            ax.legend(loc="upper right", fontsize=5 + 5//n_problems)
+            ax.legend(loc="upper right", fontsize=5 + 6//(n_problems+2))
         ax.set_title("Problem:" + str(problem))
         #ax.set_xlabel("timesteps")
         ax.set_ylabel(metric)
@@ -294,7 +315,7 @@ class Experiment(object):
         ncols = n_problems // nrows + n_problems % nrows
 
         fig, ax = plt.subplots(figsize = (ncols * size, nrows * size), nrows=nrows, ncols=ncols)
-        fig.canvas.set_window_title('TigerSeries')
+        fig.canvas.set_window_title('TigerForecast')
 
         if n_problems == 1:
             (problem, problem_result_plus_method, method_list) = all_problem_info[0]
@@ -340,90 +361,5 @@ class Experiment(object):
         else:
             plt.show()
 
-    def help(self):
-        '''
-        Description: Prints information about this class and its methods.
-        '''
-        print(Experiment_help)
-
     def __str__(self):
         return "<Experiment Method>"
-
-# string to print when calling help() method
-Experiment_help = """
-
--------------------- *** --------------------
-
-Description: Streamlines the process of performing experiments and comparing results of methods across
-             a range of problems.
-
-Methods:
-
-    initialize(problems = None, methods = None, problem_to_methods = None, metrics = ['mse'],
-               use_precomputed = True, timesteps = 100, verbose = True, load_bar = True):
-
-        Description: Initializes the experiment instance. 
-
-        Args:
-            problems (dict/list): map of the form problem_id -> hyperparameters for problem or list of problem ids;
-                                  in the latter case, default parameters will be used for initialization
-
-            methods (dict/list): map of the form method_id -> hyperparameters for method or list of method ids;
-                                in the latter case, default parameters will be used for initialization
-
-            problem_to_methods (dict) : map of the form problem_id -> list of method_id.
-                                       If None, then we assume that the user wants to
-                                       test every method in method_to_params against every
-                                       problem in problem_to_params
-
-            metrics (list): Specifies metrics we are interested in evaluating.
-
-            use_precomputed (boolean): Specifies whether to use precomputed results.
-
-            timesteps (int): Number of time steps to run experiment for
-
-            verbose (boolean): Specifies whether to print what experiment is currently running.
-
-            load_bar (boolean): Specifies whether to show a loading bar while the experiments are running.
-
-
-    add_method(method_id, method_params = None):
-
-        Description: Add a new method to the experiment instance.
-        
-        Args:
-            method_id (string): ID of new method.
-
-            method_params: Parameters to use for initialization of new method.
-
-
-    scoreboard(save_as = None, metric = 'mse'):
-
-        Description: Show a scoreboard for the results of the experiments for specified metric.
-
-        Args:
-            save_as (string): If not None, datapath to save results as csv file.
-
-            metric (string): Metric to compare results
-
-            verbose (boolean): Specifies whether to print the description of the scoreboard entries
-
-
-    graph(save_as = None, metric = 'mse', time = 5):
-
-        Description: Show a graph for the results of the experiments for specified metric.
-
-        Args:
-            save_as (string): If not None, datapath to save the figure containing the plots
-
-            metric (string): Metric to compare results
-            
-            time (float): Specifies how long the graph should display for
-
-    help()
-
-        Description: Prints information about this class and its methods
-
--------------------- *** --------------------
-
-"""
