@@ -1,7 +1,7 @@
-tigerforecast.methods.boosting.SimpleBoost
+tigerforecast.utils.boosting.SimpleBoost
 ========================================
 
-.. currentmodule:: tigerforecast.methods.boosting
+.. currentmodule:: tigerforecast.utils.boosting
 
 .. autoclass:: SimpleBoost
 

@@ -4,8 +4,8 @@ import tigerforecast
 from tigerforecast.experiments import metrics as metrics_module
 from tigerforecast import error
 import jax.numpy as np
-from tigerforecast.problems.time_series import TimeSeriesProblem
-from tigerforecast.methods.time_series import TimeSeriesMethod
+from tigerforecast.problems import Problem
+from tigerforecast.methods import Method
 from tigerforecast.utils.random import set_key
 from tqdm import tqdm
 import inspect

@@ -1,7 +1,7 @@
 tigerforecast.problems.time\_series.LSTM\_TimeSeries
 ===================================================
 
-.. currentmodule:: tigerforecast.problems.time_series
+.. currentmodule:: tigerforecast.problems
 
 .. autoclass:: LSTM_TimeSeries
 

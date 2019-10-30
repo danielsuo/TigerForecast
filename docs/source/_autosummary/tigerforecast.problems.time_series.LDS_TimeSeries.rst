@@ -1,7 +1,7 @@
 tigerforecast.problems.time\_series.LDS\_TimeSeries
 ==================================================
 
-.. currentmodule:: tigerforecast.problems.time_series
+.. currentmodule:: tigerforecast.problems
 
 .. autoclass:: LDS_TimeSeries
 

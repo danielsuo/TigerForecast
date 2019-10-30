@@ -47,17 +47,17 @@ time_series
 .. autosummary::
   :toctree: _autosummary
 
-   tigerforecast.problems.TimeSeriesProblem
-   tigerforecast.problems.time_series.SP500
-   tigerforecast.problems.time_series.UCI_Indoor
-   tigerforecast.problems.time_series.ENSO
-   tigerforecast.problems.time_series.Crypto
-   tigerforecast.problems.time_series.Random
-   tigerforecast.problems.time_series.ARMA
-   tigerforecast.problems.time_series.Unemployment
-   tigerforecast.problems.time_series.LDS_TimeSeries
-   tigerforecast.problems.time_series.LSTM_TimeSeries
-   tigerforecast.problems.time_series.RNN_TimeSeries
+   tigerforecast.problems.Problem
+   tigerforecast.problems.SP500
+   tigerforecast.problems.UCI_Indoor
+   tigerforecast.problems.ENSO
+   tigerforecast.problems.Crypto
+   tigerforecast.problems.Random
+   tigerforecast.problems.ARMA
+   tigerforecast.problems.Unemployment
+   tigerforecast.problems.LDS_TimeSeries
+   tigerforecast.problems.LSTM_TimeSeries
+   tigerforecast.problems.RNN_TimeSeries
 
 pybullet
 --------

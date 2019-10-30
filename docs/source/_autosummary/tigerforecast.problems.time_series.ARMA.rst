@@ -1,7 +1,7 @@
 tigerforecast.problems.time\_series.ARMA
 =======================================
 
-.. currentmodule:: tigerforecast.problems.time_series
+.. currentmodule:: tigerforecast.problems
 
 .. autoclass:: ARMA
 

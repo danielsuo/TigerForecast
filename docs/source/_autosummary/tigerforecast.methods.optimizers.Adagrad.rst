@@ -1,7 +1,7 @@
-tigerforecast.methods.optimizers.Adagrad
+tigerforecast.utils.optimizers.Adagrad
 ======================================
 
-.. currentmodule:: tigerforecast.methods.optimizers
+.. currentmodule:: tigerforecast.utils.optimizers
 
 .. autoclass:: Adagrad
 

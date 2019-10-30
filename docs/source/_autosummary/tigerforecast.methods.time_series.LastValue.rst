@@ -1,7 +1,7 @@
 tigerforecast.methods.time\_series.LastValue
 ==========================================
 
-.. currentmodule:: tigerforecast.methods.time_series
+.. currentmodule:: tigerforecast.methods
 
 .. autoclass:: LastValue
 

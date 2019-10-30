@@ -2,7 +2,7 @@
 # Author: John Hallman
 
 from tigerforecast import error
-from tigerforecast.methods.optimizers import Optimizer
+from tigerforecast.utils.optimizers import Optimizer
 
 # class for implementing algorithms with enforced modularity
 class Method(object):
@@ -29,13 +29,9 @@ class Method(object):
             return
         raise error.InvalidInput("Optimizer input cannot be stored")
 
-    def help(self):
-        # prints information about this class and its methods
-        raise NotImplementedError
-
     def __str__(self):
         return '<{} instance>'.format(type(self).__name__)
 
-    def __enter__(self):
-        return self
+    def __repr__(self):
+        return self.__str__()
 

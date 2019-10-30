@@ -1,7 +1,7 @@
 import argparse
 import tigerforecast
 from tigerforecast.experiments import Experiment
-from tigerforecast.methods.optimizers import *
+from tigerforecast.utils.optimizers import *
 
 def test_all_methods(problem_name, filename, verbose = 1, lr_tuning = False):
 	exp = Experiment()

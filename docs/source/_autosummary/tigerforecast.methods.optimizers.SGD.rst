@@ -1,7 +1,7 @@
-tigerforecast.methods.optimizers.SGD
+tigerforecast.utils.optimizers.SGD
 ==================================
 
-.. currentmodule:: tigerforecast.methods.optimizers
+.. currentmodule:: tigerforecast.utils.optimizers
 
 .. autoclass:: SGD
 

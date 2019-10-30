@@ -1,7 +1,7 @@
-tigerforecast.methods.optimizers.ONS
+tigerforecast.utils.optimizers.ONS
 ==================================
 
-.. currentmodule:: tigerforecast.methods.optimizers
+.. currentmodule:: tigerforecast.utils.optimizers
 
 .. autoclass:: ONS
 

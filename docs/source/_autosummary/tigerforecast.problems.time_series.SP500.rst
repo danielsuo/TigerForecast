@@ -1,7 +1,7 @@
 tigerforecast.problems.time\_series.SP500
 ========================================
 
-.. currentmodule:: tigerforecast.problems.time_series
+.. currentmodule:: tigerforecast.problems
 
 .. autoclass:: SP500
 
