@@ -8,6 +8,7 @@ from tigerforecast.methods.predict_zero import PredictZero
 from tigerforecast.methods.rnn import RNN
 from tigerforecast.methods.lstm import LSTM
 from tigerforecast.methods.wave_filtering import WaveFiltering
+from tigerforecast.methods.boosting.simple_boost import SimpleBoost
 
 # registration tools
 from tigerforecast.methods.registration import method_registry, method_register, method

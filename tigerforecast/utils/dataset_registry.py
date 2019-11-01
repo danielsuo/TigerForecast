@@ -208,6 +208,63 @@ def crypto(verbose=True):
         bdf.to_csv(path_crypto_csv)
     return pd.read_csv(path_crypto_csv)
 
+def FL_flood(verbose=True):
+    tigerforecast_dir = get_tigerforecast_dir()
+    data_path = os.path.join(tigerforecast_dir, 'data/FL_train.csv')
+    df = pd.read_csv(data_path).head()
+    # print(df['static:drain_area_log2'].head())
+    # arr_results = onp.load(data_path, encoding='bytes')
+    method = tigerforecast.method("LSTM")
+    method.initialize(n, m, l, d)
+    loss = lambda pred, true: np.sum(((pred - true)/true)**2)
+    # num_batches = len(arr_results)
+    # for i in range(num_batches):
+    #    print("num_measurements:" + str(len(arr_results[i][2])))
+    static_features_to_use=[
+        ('static:drain_area_log2', False),
+        ('train:site:mean:USGS:discharge_mean', False),
+        ('train:site:std:USGS:discharge_mean', False),
+    ]
+
+    sequence_features_to_use=[
+        ('sequence:GSMAP_MERGED:hourlyPrecipRate', False),
+        ('sequence:GLDAS21:Tair_f_inst', True),
+        ('sequence:AQUA_VI:NDVI', True)
+    ]
+
+    label_feature_name = 'label:USGS:discharge_mean'
+    past_sequence_label_feature_name = 'sequence:USGS:discharge_mean'
+    
+    # print("num_batches: " + str(num_batches))
+    feature_list = []
+    # sequence_length = df['sequence:USGS:discharge_mean_shape']
+    # print("type(sequence_length):" + str(type(sequence_length)))
+    # print("sequence length: " + sequence_length)
+    sequence_length = 61
+    label_list = []
+
+    all_df_rows = []
+    refined_df = {}
+    for i in range(5):
+        for j in range(sequence_length):
+            feature = []
+            feature_row = {}
+            for (seq_feat, b) in sequence_features_to_use:
+                # print("seq_feat: " + seq_feat)
+                # print("df[seq_feat].shape: " + str(df[seq_feat].shape))
+                # print(df[seq_feat])
+                # print(type(df[seq_feat].iloc[i]))
+                # print(ast.literal_eval(df[seq_feat].iloc[i]))
+                feature.append(ast.literal_eval(df[seq_feat].iloc[i])[j])
+                feature_row[seq_feat] = ast.literal_eval(df[seq_feat].iloc[i])[j]
+            for (stat_feat, c) in static_features_to_use:
+                feature.append(ast.literal_eval(df[stat_feat].iloc[0])[0])
+                feature_row[stat_feat] = ast.literal_eval(df[stat_feat].iloc[0])[0]
+            feature_list.append(feature)
+
+            label_list.append(ast.literal_eval(df[label_feature_name].iloc[0])[0])
+
+
 
 def enso(input_signals, include_month, output_signals, history, timeline):
     """

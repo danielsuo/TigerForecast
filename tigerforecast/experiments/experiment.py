@@ -128,6 +128,7 @@ class Experiment(object):
                 for (new_problem_id, problem_params) in self.problems[problem_id]:
 
                     ''' If method is compatible with problem, run experiment and store results. '''
+                    
                     try:
                         if(lr_tuning):
                             method_params = self.lr_tuning(method_id, method_params, problem_id, problem_params)
@@ -179,13 +180,16 @@ class Experiment(object):
         for metric in self.metrics:
             for method_id in self.methods.keys():
                 for (new_method_id, method_params) in self.methods[method_id]:
-
+                    loss, time, memory = run_experiments((problem_id, problem_params), \
+                            (method_id, method_params), metric = metric, n_runs = self.n_runs, \
+                            timesteps = self.timesteps, verbose = self.verbose)
                     ''' If method is compatible with problem, run experiment and store results. '''
                     try:
                         loss, time, memory = run_experiments((problem_id, problem_params), \
                             (method_id, method_params), metric = metric, n_runs = self.n_runs, \
                             timesteps = self.timesteps, verbose = self.verbose)
-                    except:
+                    except Exception as e:
+                        print(e)
                         print("ERROR: Could not run %s on %s. Please make sure method and problem are compatible." % (method_id, problem_id))
                         loss, time, memory = 0.0, 0.0, 0.0
 
