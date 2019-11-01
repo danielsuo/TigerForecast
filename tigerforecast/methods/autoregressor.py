@@ -8,8 +8,8 @@ import jax.numpy as np
 import jax.experimental.stax as stax
 from tigerforecast.utils.random import generate_key
 from tigerforecast.methods import Method
-from tigerforecast.methods.optimizers import * 
-from tigerforecast.methods.optimizers.losses import mse
+from tigerforecast.utils.optimizers import * 
+from tigerforecast.utils.optimizers.losses import mse
 
 class AutoRegressor(Method):
     """
