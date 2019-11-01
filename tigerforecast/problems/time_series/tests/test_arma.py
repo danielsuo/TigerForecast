@@ -8,13 +8,15 @@ import matplotlib.pyplot as plt
 def test_arma(steps=1000, show_plot=True, verbose=False):
     T = steps
     p, q = 3, 3
+    n = 1
     problem = tigerforecast.problem("ARMA-v0")
-    problem.initialize(p,q)
+    problem.initialize(p,q, n = n)
     assert problem.T == 0
 
     test_output = []
     for t in range(T):
         test_output.append(problem.step())
+        #print(test_output[t].shape)
 
     info = problem.hidden()
     if verbose:

@@ -23,7 +23,7 @@ class AutoRegressor(TimeSeriesMethod):
         self.initialized = False
         self.uses_regressors = False
 
-    def initialize(self, n = None, m = None, p = 3, optimizer = OGD):
+    def initialize(self, n = 1, m = None, p = 3, optimizer = OGD):
         """
         Description: Initializes autoregressive method parameters
 
@@ -34,18 +34,19 @@ class AutoRegressor(TimeSeriesMethod):
             lr (float): learning rate for update
         """
         self.initialized = True
-        self.past = np.zeros(p)
+        self.n = n
+        self.past = np.zeros((p, self.n))
         glorot_init = stax.glorot() # returns a function that initializes weights
-        self.params = glorot_init(generate_key(), (p+1,1)).squeeze()
+        self.params = glorot_init(generate_key(), (p+1,1))
 
         def _update_past(self_past, x):
-            new_past = np.roll(self_past, 1)
+            new_past = np.roll(self_past, self.n)
             new_past = jax.ops.index_update(new_past, 0, x)
             return new_past
         self._update_past = jax.jit(_update_past)
 
         def _predict(params, x):
-            return np.dot(params, np.append(1.0, x))
+            return np.dot(np.hstack((np.ones((self.n,1)), x)), params).squeeze()
         self._predict = jax.jit(_predict)
 
         self._store_optimizer(optimizer, self._predict)
@@ -59,8 +60,6 @@ class AutoRegressor(TimeSeriesMethod):
             Predicted value for the next time-step
         """
         assert self.initialized, "ERROR: Method not initialized!"
-
-        if(type(x) is not float): x = x.squeeze()
 
         self.past = self._update_past(self.past, x) # squeeze to remove extra dimensions
         return self._predict(self.params, self.past)

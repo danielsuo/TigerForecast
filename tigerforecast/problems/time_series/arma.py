@@ -22,7 +22,7 @@ class ARMA(TimeSeriesProblem):
         self.initialized = False
         self.has_regressors = False
 
-    def initialize(self, p=3, q=3, noise_list = None, c=None, noise_magnitude=0.1, noise_distribution = 'normal'):
+    def initialize(self, p=3, q=3, n = 1, noise_list = None, c=0, noise_magnitude=0.1, noise_distribution = 'normal'):
         """
         Description: Randomly initialize the hidden dynamics of the system.
         Args:
@@ -32,6 +32,7 @@ class ARMA(TimeSeriesProblem):
             q (int/numpy.ndarray): Moving-average dynamics. If type int then randomly
                 initializes a Gaussian length-q vector (no bound on norm). If p is a
                 1-dimensional numpy.ndarray then uses it as dynamics vector.
+            n (int): Dimension of values.
             c (float): Default value follows a normal distribution. The ARMA dynamics 
                 follows the equation x_t = c + AR-part + MA-part + noise, and thus tends 
                 to be centered around mean c.
@@ -41,6 +42,7 @@ class ARMA(TimeSeriesProblem):
         self.initialized = True
         self.T = 0
         self.max_T = -1
+        self.n = n
         if type(p) == int:
             phi = random.normal(generate_key(), shape=(p,))
             self.phi = 0.99 * phi / np.linalg.norm(phi, ord=1)
@@ -59,16 +61,19 @@ class ARMA(TimeSeriesProblem):
         else:
             self.q = self.psi.shape[0]
         self.noise_magnitude, self.noise_distribution = noise_magnitude, noise_distribution
-        self.c = random.normal(generate_key()) if c == None else c
-        self.x = random.normal(generate_key(), shape=(self.p,))
+        self.c = random.normal(generate_key(), shape=(self.n,)) if c == None else c
+        self.x = random.normal(generate_key(), shape=(self.p, self.n)) if n > 1 \
+                else random.normal(generate_key(), shape=(self.p,))
         self.noise_list = None
         if(noise_list is not None):
             self.noise_list = noise_list
             self.noise = np.array(noise_list[0:self.q])
         elif(noise_distribution == 'normal'):
-            self.noise = self.noise_magnitude * random.normal(generate_key(), shape=(self.q,))
+            self.noise = self.noise_magnitude * random.normal(generate_key(), shape=(self.q, self.n)) if n > 1 else \
+                         self.noise_magnitude * random.normal(generate_key(), shape=(self.q,))
         elif(noise_distribution == 'unif'):
-            self.noise = self.noise_magnitude * random.uniform(generate_key(), shape=(self.q,), minval=-1., maxval=1.)
+            self.noise = self.noise_magnitude * random.uniform(generate_key(), shape=(self.q, self.n), \
+                minval=-1., maxval=1.) if n > 1 else self.noise_magnitude * random.uniform(generate_key(), shape=(self.q,))
 
         def _step(x, noise, eps):
 
@@ -84,8 +89,8 @@ class ARMA(TimeSeriesProblem):
 
             x_new = self.c + x_ar + x_ma + eps
 
-            next_x = np.roll(x, 1) 
-            next_noise = np.roll(noise, 1)
+            next_x = np.roll(x, self.n) 
+            next_noise = np.roll(noise, self.n)
 
             next_x = jax.ops.index_update(next_x, 0, x_new) # equivalent to self.x[0] = x_new
             next_noise = jax.ops.index_update(next_noise, 0, eps) # equivalent to self.noise[0] = eps  
@@ -110,10 +115,10 @@ class ARMA(TimeSeriesProblem):
         else:
             if(self.noise_distribution == 'normal'):
                 self.x, self.noise, x_new = self._step(self.x, self.noise, \
-                    self.noise_magnitude * random.normal(generate_key()))
+                    self.noise_magnitude * random.normal(generate_key(), shape=(self.n,)))
             elif(self.noise_distribution == 'unif'):
                 self.x, self.noise, x_new = self._step(self.x, self.noise, \
-                    self.noise_magnitude * random.uniform(generate_key(), minval=-1., maxval=1.))
+                    self.noise_magnitude * random.uniform(generate_key(), shape=(self.n,), minval=-1., maxval=1.))
         return x_new
 
     def hidden(self):
