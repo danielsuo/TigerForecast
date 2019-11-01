@@ -71,10 +71,10 @@ class Experiment(object):
         optimizers = [OGD, Adagrad, Adam, ONS]
         for optimizer in optimizers:
             method_params['optimizer'] = optimizer
-            self.add_method(method_id, method_params, lr_tuning = lr_tuning)
+            self.add_method(method_id, method_params, lr_tuning = lr_tuning, name = optimizer.__name__)
             if(include_boosting):
                 self.add_method('SimpleBoost', {'method_id' : method_id, 'method_params' : method_params},\
-                    name = method_id + '-' + method_params['optimizer'].__name__)
+                    name = method_id + '-' + optimizer.__name__)
 
     def lr_tuning(self, method_id, method_params, problem_id, problem_params):
         print("Learning Rate Tuning not yet available!")
@@ -102,7 +102,7 @@ class Experiment(object):
         '''
         assert method_id is not None, "ERROR: No Method ID given."
 
-        if name is None and 'optimizer' in method_params:
+        if name is None and method_params is not None and 'optimizer' in method_params:
             name = method_params['optimizer'].__name__
 
         new_id = ''
