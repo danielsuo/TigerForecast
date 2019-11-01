@@ -8,7 +8,7 @@ from tigerforecast.utils.optimizers import *
 def test_autoregressor(steps=100, show_plot=True):
     T = steps 
     p, q = 3, 3
-    n = 1
+    n = 3
     problem = tigerforecast.problem("ARMA-v0")
     cur_x = problem.initialize(p, q, n = n)
 
