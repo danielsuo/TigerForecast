@@ -5,11 +5,12 @@ import jax.numpy as np
 import matplotlib.pyplot as plt
 from tigerforecast.utils.optimizers import *
 
-def test_autoregressor(steps=1000, show_plot=True):
+def test_autoregressor(steps=100, show_plot=True):
     T = steps 
     p, q = 3, 3
+    n = 1
     problem = tigerforecast.problem("ARMA-v0")
-    cur_x = problem.initialize(p, q)
+    cur_x = problem.initialize(p, q, n = n)
 
     method = tigerforecast.method("AutoRegressor")
     #method.initialize(p, optimizer = ONS)
@@ -20,6 +21,7 @@ def test_autoregressor(steps=1000, show_plot=True):
 
     for i in range(T):
         cur_y_pred = method.predict(cur_x)
+        #print(cur_y_pred.shape)
         #method.forecast(cur_x, 3)
         cur_y_true = problem.step()
         cur_loss = loss(cur_y_true, cur_y_pred)
