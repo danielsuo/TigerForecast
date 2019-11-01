@@ -18,37 +18,37 @@ from tigerforecast.methods.custom import CustomMethod, register_custom_method
 
 method_register(
     id='WaveFiltering',
-    entry_point='tigerforecast.methods.time_series:WaveFiltering',
+    entry_point='tigerforecast.methods:WaveFiltering',
 )
 
 method_register(
     id='LastValue',
-    entry_point='tigerforecast.methods.time_series:LastValue',
+    entry_point='tigerforecast.methods:LastValue',
 )
 
 method_register(
     id='LeastSquares',
-    entry_point='tigerforecast.methods.time_series:LeastSquares',
+    entry_point='tigerforecast.methods:LeastSquares',
 )
 
 method_register(
     id='AutoRegressor',
-    entry_point='tigerforecast.methods.time_series:AutoRegressor',
+    entry_point='tigerforecast.methods:AutoRegressor',
 )
 
 method_register(
     id='PredictZero',
-    entry_point='tigerforecast.methods.time_series:PredictZero',
+    entry_point='tigerforecast.methods:PredictZero',
 )
 
 method_register(
     id='RNN',
-    entry_point='tigerforecast.methods.time_series:RNN',
+    entry_point='tigerforecast.methods:RNN',
 )
 
 method_register(
     id='LSTM',
-    entry_point='tigerforecast.methods.time_series:LSTM',
+    entry_point='tigerforecast.methods:LSTM',
 )
 
 
