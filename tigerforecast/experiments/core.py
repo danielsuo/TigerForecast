@@ -134,7 +134,7 @@ def run_experiment(problem, method, metric = 'mse', key = 0, timesteps = None, v
 
     method.initialize(**method_params)
 
-    if(verbose):
+    if(verbose and key == 0):
         print("Running %s on %s..." % (method_id, problem_id))
 
     loss = []
@@ -145,7 +145,7 @@ def run_experiment(problem, method, metric = 'mse', key = 0, timesteps = None, v
         load_bar = True
 
     # get loss series
-    for i in tqdm(range(timesteps), disable = (not load_bar)):
+    for i in tqdm(range(timesteps), disable = (not load_bar or key != 0)):
         # get loss and update method
         cur_loss = float(loss_fn(y, method.predict(x)))
         loss.append(cur_loss)
