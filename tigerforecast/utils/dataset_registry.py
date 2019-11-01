@@ -236,18 +236,18 @@ def FL_flood(verbose=True):
     past_sequence_label_feature_name = 'sequence:USGS:discharge_mean'
     
     # print("num_batches: " + str(num_batches))
-    feature_list = []
+    # feature_list = []
     # sequence_length = df['sequence:USGS:discharge_mean_shape']
     # print("type(sequence_length):" + str(type(sequence_length)))
     # print("sequence length: " + sequence_length)
     sequence_length = 61
-    label_list = []
+    # label_list = []
 
     all_df_rows = []
     refined_df = {}
     for i in range(5):
         for j in range(sequence_length):
-            feature = []
+            # feature = []
             feature_row = {}
             for (seq_feat, b) in sequence_features_to_use:
                 # print("seq_feat: " + seq_feat)
@@ -255,14 +255,19 @@ def FL_flood(verbose=True):
                 # print(df[seq_feat])
                 # print(type(df[seq_feat].iloc[i]))
                 # print(ast.literal_eval(df[seq_feat].iloc[i]))
-                feature.append(ast.literal_eval(df[seq_feat].iloc[i])[j])
+                # feature.append(ast.literal_eval(df[seq_feat].iloc[i])[j])
                 feature_row[seq_feat] = ast.literal_eval(df[seq_feat].iloc[i])[j]
             for (stat_feat, c) in static_features_to_use:
-                feature.append(ast.literal_eval(df[stat_feat].iloc[0])[0])
+                # feature.append(ast.literal_eval(df[stat_feat].iloc[0])[0])
                 feature_row[stat_feat] = ast.literal_eval(df[stat_feat].iloc[0])[0]
-            feature_list.append(feature)
+            # feature_list.append(feature)
 
-            label_list.append(ast.literal_eval(df[label_feature_name].iloc[0])[0])
+            # label_list.append(ast.literal_eval(df[label_feature_name].iloc[0])[0])
+            feature_row[label_feature_name] = ast.literal_eval(df[label_feature_name].iloc[0])[0]
+            all_df_rows.append(feature_row)
+
+    return pd.Dataframe(all_df_rows)
+
 
 
 
