@@ -8,8 +8,8 @@ import jax.numpy as np
 import jax.experimental.stax as stax
 from tigerforecast.utils.random import generate_key
 from tigerforecast.methods import Method
-from tigerforecast.utils.optimizers import * 
-from tigerforecast.utils.optimizers.losses import mse
+from tigerforecast.methods.optimizers import * 
+from tigerforecast.methods.optimizers.losses import mse
 
 class AutoRegressor(Method):
     """
@@ -35,9 +35,18 @@ class AutoRegressor(Method):
         """
         self.initialized = True
         self.n = n
-        self.past = np.zeros((p, self.n))
+        self.p = p
+
+        if(self.n > 1):
+            self.past = np.zeros((p, self.n))
+        else:
+            self.past = np.zeros(p)
+
         glorot_init = stax.glorot() # returns a function that initializes weights
+
         self.params = glorot_init(generate_key(), (p+1,1))
+        if(self.n == 1):
+            self.params = self.params.squeeze()
 
         def _update_past(self_past, x):
             new_past = np.roll(self_past, self.n)
@@ -46,7 +55,11 @@ class AutoRegressor(Method):
         self._update_past = jax.jit(_update_past)
 
         def _predict(params, x):
-            return np.dot(np.hstack((np.ones((self.n,1)), x)), params).squeeze()
+            if(self.n > 1):
+                x_plus_bias = np.reshape(np.hstack((np.ones((self.n,1)), x)), (self.n, self.p + 1))
+            else:
+                x_plus_bias = np.hstack((np.ones(1), x))
+            return np.dot(x_plus_bias, params)
         self._predict = jax.jit(_predict)
 
         self._store_optimizer(optimizer, self._predict)
@@ -62,7 +75,7 @@ class AutoRegressor(Method):
         assert self.initialized, "ERROR: Method not initialized!"
 
         self.past = self._update_past(self.past, x) # squeeze to remove extra dimensions
-        return self._predict(self.params, self.past)
+        return self._predict(self.params, self.past).squeeze()
 
     def forecast(self, x, timeline = 1):
         """
