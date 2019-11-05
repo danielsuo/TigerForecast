@@ -77,9 +77,9 @@ class Experiment(object):
                     name = method_id + '-' + optimizer.__name__)
 
     def lr_tuning(self, method_id, method_params, problem_id, problem_params):
-        print("Learning Rate Tuning not yet available!")
-        return method_params
-        '''loss = lambda a, b: np.sum((a-b)**2)
+        #print("Learning Rate Tuning not yet available!")
+        #return method_params
+        loss = lambda a, b: np.sum((a-b)**2)
         optimizer = method_params['optimizer']
         search_space = {'optimizer':[]} # parameters for ARMA method
         lr_start, lr_stop = 0, -4 # search learning rates from 10^start to 10^stop 
@@ -90,7 +90,7 @@ class Experiment(object):
         hpo = GridSearch() # hyperparameter optimizer
         optimal_params, optimal_loss = hpo.search(method_id, method_params, problem_id, problem_params, loss, 
             search_space, trials=trials, smoothing=10, min_steps=min_steps, verbose = 1) # run each model at least 1000 steps
-        return optimal_params'''
+        return optimal_params
 
     def add_method(self, method_id, method_params = None, lr_tuning = False, name = None):
         '''
