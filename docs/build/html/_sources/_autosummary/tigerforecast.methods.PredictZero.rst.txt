@@ -1,0 +1,32 @@
+tigerforecast.methods.PredictZero
+=================================
+
+.. currentmodule:: tigerforecast.methods
+
+.. autoclass:: PredictZero
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~PredictZero.__init__
+      ~PredictZero.forecast
+      ~PredictZero.initialize
+      ~PredictZero.predict
+      ~PredictZero.update
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~PredictZero.compatibles
+   
+   
