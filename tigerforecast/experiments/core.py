@@ -11,6 +11,7 @@ from tqdm import tqdm
 import inspect
 import time
 import operator
+from tigerforecast.utils.autotuning import GridSearch
 
 metrics = {'mse': metrics_module.mse, 'cross_entropy': metrics_module.cross_entropy}
 
@@ -72,7 +73,23 @@ def create_full_problem_to_methods(problems_ids, method_ids):
 
     return full_problem_to_methods
 
-def run_experiment(problem, method, metric = 'mse', key = 0, timesteps = None, verbose = 0):
+def tune_lr(method_id, method_params, problem_id, problem_params):
+        #print("Learning Rate Tuning not yet available!")
+        #return method_params
+        loss = lambda a, b: np.sum((a-b)**2)
+        optimizer = method_params['optimizer']
+        search_space = {'optimizer':[]} # parameters for ARMA method
+        lr_start, lr_stop = -1, -3 # search learning rates from 10^start to 10^stop 
+        learning_rates = np.logspace(lr_start, lr_stop, 1+2*np.abs(lr_start - lr_stop))
+        for lr in learning_rates:
+            search_space['optimizer'].append(optimizer(learning_rate=lr)) # create instance and append
+        trials, min_steps = None, 100
+        hpo = GridSearch() # hyperparameter optimizer
+        optimal_params, optimal_loss = hpo.search(method_id, method_params, problem_id, problem_params, loss, 
+            search_space, trials=trials, smoothing=10, min_steps=min_steps, verbose = 0) # run each model at least 1000 steps
+        return optimal_params
+
+def run_experiment(problem, method, metric = 'mse', lr_tuning = True, key = 0, timesteps = None, verbose = 0):
     '''
     Description: Initializes the experiment instance.
     
@@ -132,6 +149,9 @@ def run_experiment(problem, method, metric = 'mse', key = 0, timesteps = None, v
     except:
         method_params['m'] = 1
 
+    if(lr_tuning):
+        method_params = tune_lr(method_id, method_params, problem_id, problem_params)
+
     method.initialize(**method_params)
 
     if(verbose and key == 0):
@@ -159,7 +179,7 @@ def run_experiment(problem, method, metric = 'mse', key = 0, timesteps = None, v
 
     return np.array(loss), time.time() - time_start, memory
 
-def run_experiments(problem, method, metric = 'mse', n_runs = 1, timesteps = None, verbose = 0):
+def run_experiments(problem, method, metric = 'mse', lr_tuning = True, n_runs = 1, timesteps = None, verbose = 0):
     
     '''
     Description: Initializes the experiment instance.
@@ -177,11 +197,11 @@ def run_experiments(problem, method, metric = 'mse', n_runs = 1, timesteps = Non
     '''
 
     results = tuple((1 / n_runs) * result for result in run_experiment(problem, method, metric = metric, \
-        key = 0, timesteps = timesteps, verbose = verbose))
+        lr_tuning = lr_tuning, key = 0, timesteps = timesteps, verbose = verbose))
 
     for i in range(1, n_runs):
         new_results = tuple((1 / n_runs) * result for result in run_experiment(problem, method, metric = metric, \
-        key = i, timesteps = timesteps, verbose = verbose))
+        lr_tuning = lr_tuning, key = i, timesteps = timesteps, verbose = verbose))
         results = tuple(map(operator.add, results, new_results))
 
     return results

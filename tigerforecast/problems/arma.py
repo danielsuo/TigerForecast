@@ -62,30 +62,28 @@ class ARMA(Problem):
             self.q = self.psi.shape[0]
         self.noise_magnitude, self.noise_distribution = noise_magnitude, noise_distribution
         self.c = random.normal(generate_key(), shape=(self.n,)) if c == None else c
-        self.x = random.normal(generate_key(), shape=(self.p, self.n)) if n > 1 \
-                else random.normal(generate_key(), shape=(self.p,))
+        self.x = random.normal(generate_key(), shape=(self.p, self.n)) 
         self.noise_list = None
         if(noise_list is not None):
             self.noise_list = noise_list
             self.noise = np.array(noise_list[0:self.q])
         elif(noise_distribution == 'normal'):
-            self.noise = self.noise_magnitude * random.normal(generate_key(), shape=(self.q, self.n)) if n > 1 else \
-                         self.noise_magnitude * random.normal(generate_key(), shape=(self.q,))
+            self.noise = self.noise_magnitude * random.normal(generate_key(), shape=(self.q, self.n)) 
         elif(noise_distribution == 'unif'):
             self.noise = self.noise_magnitude * random.uniform(generate_key(), shape=(self.q, self.n), \
-                minval=-1., maxval=1.) if n > 1 else self.noise_magnitude * random.uniform(generate_key(), shape=(self.q,))
+                minval=-1., maxval=1.)
 
         def _step(x, noise, eps):
 
             if(type(self.phi) is list):
-                x_ar = np.dot(x, self.phi[self.T])
+                x_ar = np.dot(x.T, self.phi[self.T])
             else:
-                x_ar = np.dot(x, self.phi)
+                x_ar = np.dot(x.T, self.phi)
 
             if(type(self.psi) is list):
-                x_ma = np.dot(noise, self.psi[self.T])
+                x_ma = np.dot(noise.T, self.psi[self.T])
             else:
-                x_ma = np.dot(noise, self.psi)
+                x_ma = np.dot(noise.T, self.psi)
 
             x_new = self.c + x_ar + x_ma + eps
 

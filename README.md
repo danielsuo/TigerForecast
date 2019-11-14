@@ -2,6 +2,7 @@
 **********
 
 **TigerForecast** is an open-source framework for benchmarking time-series algorithms in simulated and real settings, and is available for anyone to download and use. By reducing algorithms to a set of standard APIs, TigerForecast allows the user to quickly switch between methods and tasks while running experiments and plotting results on the go, and for quick and simple comparison between method performances. TigerForecast also comes with built-in standard time-series algorithms for comparison or other use.
+The *main algorithmic innovation* is boosting: TigerForcast allows you to take any forcasting method (including third party) and improve its accuracy using the techniques developed in https://arxiv.org/abs/1906.08720. 
 
 
 Overview

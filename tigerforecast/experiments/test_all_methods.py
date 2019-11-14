@@ -5,12 +5,12 @@ from tigerforecast.utils.optimizers import *
 
 def test_all_methods(problem_name, filename, verbose = 1, lr_tuning = False):
 	exp = Experiment()
-	exp.initialize(methods = ['PredictZero', 'LastValue'], timesteps = 100, n_runs = 3, verbose = verbose)
+	exp.initialize(n_runs = 3, verbose = verbose)
 	exp.add_problem('MyProblem-v0', {'file' : filename}, name = problem_name)
-	exp.add_all_method_variants('AutoRegressor')
-	exp.add_all_method_variants('LSTM')
-	exp.scoreboard(start_time = -50)
-	exp.graph(start_time = -50, size = 6)
+	exp.add_all_method_variants('AutoRegressor', lr_tuning = lr_tuning)
+	exp.add_all_method_variants('LSTM', lr_tuning = lr_tuning)
+	exp.scoreboard()
+	exp.graph(size = 6)
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()

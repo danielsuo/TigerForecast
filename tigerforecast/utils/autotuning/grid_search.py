@@ -44,7 +44,7 @@ class GridSearch:
         param_list = list(itertools.product(*[v for k, v in search_space.items()]))
         index = np.arange(len(param_list)) # np.random.shuffle doesn't work directly on non-JAX objects
         shuffled_index = random.shuffle(generate_key(), index)
-        param_order = [param_list[i] for i in shuffled_index] # shuffle order of elements
+        param_order = [param_list[int(i)] for i in shuffled_index] # shuffle order of elements
 
         # helper method
         def _update_smoothing(l, val):
