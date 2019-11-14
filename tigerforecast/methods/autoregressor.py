@@ -50,7 +50,7 @@ class AutoRegressor(Method):
         self._update_past = jax.jit(_update_past)
 
         def _predict(params, x):
-            x_plus_bias = np.vstack((np.ones((self.n,1)), x))
+            x_plus_bias = np.vstack((np.ones((1, self.n)), x))
             return np.dot(x_plus_bias.T, params).squeeze()
         self._predict = jax.jit(_predict)
 
