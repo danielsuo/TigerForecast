@@ -16,7 +16,7 @@ def test_arma(steps=1000, show_plot=False, verbose=False):
     test_output = []
     for t in range(T):
         test_output.append(problem.step())
-        #print(test_output[t].shape)
+        #print(float(test_output[t]))
 
     info = problem.hidden()
     if verbose:
