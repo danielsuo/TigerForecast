@@ -59,7 +59,7 @@ class AutoRegressor(Method):
                 x_plus_bias = np.reshape(np.hstack((np.ones((self.n,1)), x)), (self.n, self.p + 1))
             else:
                 x_plus_bias = np.hstack((np.ones(1), x))
-            return np.dot(x_plus_bias, params)
+            return np.dot(x_plus_bias, params).squeeze()
         self._predict = jax.jit(_predict)
 
         self._store_optimizer(optimizer, self._predict)
@@ -75,7 +75,7 @@ class AutoRegressor(Method):
         assert self.initialized, "ERROR: Method not initialized!"
 
         self.past = self._update_past(self.past, x) # squeeze to remove extra dimensions
-        return self._predict(self.params, self.past).squeeze()
+        return self._predict(self.params, self.past)
 
     def forecast(self, x, timeline = 1):
         """

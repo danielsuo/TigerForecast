@@ -25,8 +25,8 @@ class LSTM(Method):
         """
         Description: Randomly initialize the LSTM.
         Args:
-            n (int): Input dimension.
-            m (int): Observation/output dimension.
+            n (int): Observation/output dimension.
+            m (int): Input action dimension.
             l (int): Length of memory for update step purposes.
             h (int): Default value 64. Hidden dimension of LSTM.
             optimizer (class): optimizer choice
@@ -47,10 +47,11 @@ class LSTM(Method):
         self.params = [W_hh, W_xh, W_out, b_h]
         self.hid = np.zeros(h)
         self.cell = np.zeros(h)
-        self.x = np.zeros((l, n))
+        self.x = np.zeros((l, m))
+
 
         """ private helper methods"""
-        @jax.jit
+        #@jax.jit
         def _update_x(self_x, x):
             new_x = np.roll(self_x, -self.n)
             new_x = jax.ops.index_update(new_x, jax.ops.index[-1,:], x)

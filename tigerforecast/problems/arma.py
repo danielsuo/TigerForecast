@@ -78,14 +78,14 @@ class ARMA(Problem):
         def _step(x, noise, eps):
 
             if(type(self.phi) is list):
-                x_ar = np.dot(x, self.phi[self.T])
+                x_ar = np.dot(x.T, self.phi[self.T])
             else:
-                x_ar = np.dot(x, self.phi)
+                x_ar = np.dot(x.T, self.phi)
 
             if(type(self.psi) is list):
-                x_ma = np.dot(noise, self.psi[self.T])
+                x_ma = np.dot(noise.T, self.psi[self.T])
             else:
-                x_ma = np.dot(noise, self.psi)
+                x_ma = np.dot(noise.T, self.psi)
 
             x_new = self.c + x_ar + x_ma + eps
 

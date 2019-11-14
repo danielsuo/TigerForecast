@@ -1,6 +1,6 @@
 # Experiment class
 
-from tigerforecast.experiments.core import run_experiments, get_ids, to_dict
+from tigerforecast.experiments.core import run_experiments, get_ids, to_dict, create_full_problem_to_methods
 from tigerforecast.experiments.new_experiment import NewExperiment
 from tigerforecast.experiments import precomputed
 import csv
@@ -8,7 +8,6 @@ import jax.numpy as np
 import matplotlib.pyplot as plt
 from prettytable import PrettyTable
 from tigerforecast.utils.optimizers import *
-from tigerforecast.utils.autotuning import GridSearch
 
 class Experiment(object):
     ''' Description: Streamlines the process of performing experiments and comparing results of methods across
@@ -44,6 +43,9 @@ class Experiment(object):
 
         self.n_problems, self.n_methods = {}, {}
 
+        if(problem_to_methods is None):
+            self.problem_to_methods = create_full_problem_to_methods(self.problems.keys(), self.methods.keys())
+
         if(use_precomputed):
 
             if(timesteps > precomputed.get_timesteps()):
@@ -59,7 +61,6 @@ class Experiment(object):
             self.prob_method_to_result = precomputed.load_prob_method_to_result(\
                 problem_ids = list(self.problems.keys()), method_ids = list(self.methods.keys()), \
                 problem_to_methods = problem_to_methods, metrics = metrics)
-
         else:
             self.new_experiment = NewExperiment()
             self.new_experiment.initialize(self.problems, self.methods, problem_to_methods, \
@@ -75,22 +76,6 @@ class Experiment(object):
             if(include_boosting):
                 self.add_method('SimpleBoost', {'method_id' : method_id, 'method_params' : method_params},\
                     name = method_id + '-' + optimizer.__name__)
-
-    def lr_tuning(self, method_id, method_params, problem_id, problem_params):
-        print("Learning Rate Tuning not yet available!")
-        return method_params
-        '''loss = lambda a, b: np.sum((a-b)**2)
-        optimizer = method_params['optimizer']
-        search_space = {'optimizer':[]} # parameters for ARMA method
-        lr_start, lr_stop = 0, -4 # search learning rates from 10^start to 10^stop 
-        learning_rates = np.logspace(lr_start, lr_stop, 1+2*np.abs(lr_start - lr_stop))
-        for lr in learning_rates:
-            search_space['optimizer'].append(optimizer(learning_rate=lr)) # create instance and append
-        trials, min_steps = 15, 1000
-        hpo = GridSearch() # hyperparameter optimizer
-        optimal_params, optimal_loss = hpo.search(method_id, method_params, problem_id, problem_params, loss, 
-            search_space, trials=trials, smoothing=10, min_steps=min_steps, verbose = 1) # run each model at least 1000 steps
-        return optimal_params'''
 
     def add_method(self, method_id, method_params = None, lr_tuning = False, name = None):
         '''
@@ -126,16 +111,13 @@ class Experiment(object):
         for metric in self.metrics:
             for problem_id in self.problems.keys():
                 for (new_problem_id, problem_params) in self.problems[problem_id]:
-
                     ''' If method is compatible with problem, run experiment and store results. '''
-                    
                     try:
-                        if(lr_tuning):
-                            method_params = self.lr_tuning(method_id, method_params, problem_id, problem_params)
                         loss, time, memory = run_experiments((problem_id, problem_params), \
-                            (method_id, method_params), metric = metric, n_runs = self.n_runs, \
-                            timesteps = self.timesteps, verbose = self.verbose)
-                    except:
+                            (method_id, method_params), metric = metric, lr_tuning = lr_tuning, \
+                            n_runs = self.n_runs, timesteps = self.timesteps, verbose = self.verbose)
+                    except Exception as e:
+                        print(e)
                         print("ERROR: Could not run %s on %s." % (method_id, problem_id) + \
                             " Please make sure method and problem are compatible.")
                         loss, time, memory = 0, 0.0, 0.0
@@ -180,9 +162,6 @@ class Experiment(object):
         for metric in self.metrics:
             for method_id in self.methods.keys():
                 for (new_method_id, method_params) in self.methods[method_id]:
-                    loss, time, memory = run_experiments((problem_id, problem_params), \
-                            (method_id, method_params), metric = metric, n_runs = self.n_runs, \
-                            timesteps = self.timesteps, verbose = self.verbose)
                     ''' If method is compatible with problem, run experiment and store results. '''
                     try:
                         loss, time, memory = run_experiments((problem_id, problem_params), \
