@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import itertools
 
 def test_grid_search(show=False):
-    test_grid_search_lstm(show=show)
     test_grid_search_arma(show=show)
+    test_grid_search_lstm(show=show)
     print("test_grid_search passed")
 
 def test_grid_search_lstm(show=False):

@@ -76,7 +76,7 @@ class Experiment(object):
             if(include_boosting):
                 self.add_method('SimpleBoost', {'method_id' : method_id, 'method_params' : method_params},\
                     name = method_id + '-' + optimizer.__name__)
-
+                
     def add_method(self, method_id, method_params = None, lr_tuning = False, name = None):
         '''
         Description: Add a new method to the experiment instance.
