@@ -20,7 +20,6 @@ tigerforecast.experiments.Experiment
       ~Experiment.avg_regret
       ~Experiment.graph
       ~Experiment.initialize
-      ~Experiment.lr_tuning
       ~Experiment.scoreboard
       ~Experiment.to_csv
    
