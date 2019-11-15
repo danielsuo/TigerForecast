@@ -14,9 +14,9 @@ class NewExperiment(object):
         Description: Initializes the new experiment instance. 
 
         Args:     
-            problems (dict): map of the form problem_id -> hyperparameters for problem 
-            methods (dict): map of the form method_id -> hyperparameters for method
-            problem_to_methods (dict) : map of the form problem_id -> list of method_id.
+            problems (dict): map of the form problem_cls -> hyperparameters for problem 
+            methods (dict): map of the form method_cls -> hyperparameters for method
+            problem_to_methods (dict) : map of the form problem_cls -> list of method_cls.
                                        If None, then we assume that the user wants to
                                        test every method in method_to_params against every
                                        problem in problem_to_params
@@ -43,15 +43,15 @@ class NewExperiment(object):
         '''
         prob_method_to_result = {}
         for metric in self.metrics:
-            for problem_id in self.problems.keys():
-                for (new_problem_id, problem_params) in self.problems[problem_id]:
-                    for method_id in self.problem_to_methods[problem_id]:
-                        for (new_method_id, method_params) in self.methods[method_id]:
-                            loss, time, memory = run_experiments((problem_id, problem_params), (method_id, method_params), \
+            for problem_cls in self.problems.keys():
+                for (new_problem_cls, problem_params) in self.problems[problem_cls]:
+                    for method_cls in self.problem_to_methods[problem_cls]:
+                        for (new_method_cls, method_params) in self.methods[method_cls]:
+                            loss, time, memory = run_experiments((problem_cls, problem_params), (method_cls, method_params), \
                                 metric, n_runs = self.n_runs, timesteps = self.timesteps, verbose = self.verbose)
-                            prob_method_to_result[(metric, problem_id, method_id)] = loss
-                            prob_method_to_result[('time', problem_id, method_id)] = time
-                            prob_method_to_result[('memory', problem_id, method_id)] = memory
+                            prob_method_to_result[(metric, problem_cls, method_cls)] = loss
+                            prob_method_to_result[('time', problem_cls, method_cls)] = time
+                            prob_method_to_result[('memory', problem_cls, method_cls)] = memory
 
         return prob_method_to_result
 

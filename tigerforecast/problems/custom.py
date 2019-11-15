@@ -3,8 +3,6 @@
 
 from tigerforecast import error
 from tigerforecast.problems import Problem
-from tigerforecast.problems.registration import problem_registry
-
  
 class CustomProblem(object):
     ''' 
@@ -25,15 +23,4 @@ def _verify_valid_problem(problem_class):
         if not callable(getattr(problem_class, f, None)):
             raise error.InvalidClass("CustomProblem is missing required method \'{}\'".format(f))
 
-def register_custom_problem(custom_problem_class, custom_problem_id):
-    '''
-    Description: global custom problem method
-    '''
-    assert type(custom_problem_id) == str
-    _verify_valid_problem(custom_problem_class)
-
-    problem_registry.register_custom(
-        id=custom_problem_id,
-        custom_class=custom_problem_class,
-    )
 

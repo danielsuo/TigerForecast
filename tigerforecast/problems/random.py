@@ -55,3 +55,6 @@ class Random(Problem):
         """
         pass
 
+    def __str__(self):
+        return "<Random Problem>"
+

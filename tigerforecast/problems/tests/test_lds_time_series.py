@@ -10,7 +10,7 @@ from tigerforecast.utils.random import generate_key
 def test_lds_time_series(steps=1000, show_plot=False, verbose=False):
     T = steps
     n, m, d = 5, 3, 10
-    problem = tigerforecast.problem("LDS-TimeSeries-v0")
+    problem = tigerforecast.problems.LDS_TimeSeries()
     problem.initialize(n, m, d)
 
     x_output = []

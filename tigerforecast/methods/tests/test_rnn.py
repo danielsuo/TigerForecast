@@ -9,9 +9,9 @@ from tigerforecast.utils import generate_key
 def test_rnn(steps=100, show_plot=True):
     T = steps 
     n, m, l, d = 4, 5, 10, 10
-    problem = tigerforecast.problem("LDS-Control-v0")
+    problem = tigerforecast.problems.LDS_TimeSeries()
     y_true = problem.initialize(n, m, d)
-    method = tigerforecast.method("RNN")
+    method = tigerforecast.methods.RNN()
     method.initialize(n, m, l, d)
     loss = lambda pred, true: np.sum((pred - true)**2)
  
@@ -19,7 +19,7 @@ def test_rnn(steps=100, show_plot=True):
     for i in range(T):
         u = random.normal(generate_key(), (n,))
         y_pred = method.predict(u)
-        y_true = problem.step(u)
+        _, y_true = problem.step()
         results.append(loss(y_true, y_pred))
         method.update(y_true)
 

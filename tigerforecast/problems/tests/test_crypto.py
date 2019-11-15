@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 def test_crypto(steps=1000, show_plot=False, verbose=False):
     T = steps
-    problem = tigerforecast.problem("Crypto-v0")
+    problem = tigerforecast.problems.Crypto()
     problem.initialize()
     assert problem.T == 0
 

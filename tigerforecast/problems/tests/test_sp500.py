@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 def test_sp500(steps=1000, show_plot=False, verbose=False):
     T = steps
-    problem = tigerforecast.problem("SP500-v0")
+    problem = tigerforecast.problems.SP500()
     problem.initialize()
     assert problem.T == 0
 

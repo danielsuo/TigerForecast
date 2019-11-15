@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 def test_unemployment(steps=1000, show_plot=False, verbose=False):
     T = steps if steps < 800 else 800 # short time-series
-    problem = tigerforecast.problem("Unemployment-v0")
+    problem = tigerforecast.problems.Unemployment()
     problem.initialize()
     assert problem.T == 0
 
