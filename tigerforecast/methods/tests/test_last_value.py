@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 def test_last_value(steps=1000, show_plot=True):
     T = steps 
     p, q = 3, 3
-    problem = tigerforecast.problem("ARMA-v0")
+    problem = tigerforecast.problems.ARMA()
     cur_x = problem.initialize(p, q)
-    method = tigerforecast.method("LastValue")
+    method = tigerforecast.methods.LastValue()
     method.initialize()
     loss = lambda y_true, y_pred: (y_true - y_pred)**2
  

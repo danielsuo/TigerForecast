@@ -21,9 +21,7 @@ def test_custom_problem(steps=1000, show=True):
             self.T += 1
             return 2 * (self.T % 2) - 1
 
-    # try registering and calling the custom problem
-    tigerforecast.register_custom_problem(Custom, "TestCustomProblem")
-    custom_problem = tigerforecast.problem("TestCustomProblem")
+    custom_problem = Custom()
     cur_x = custom_problem.initialize()
  
     results = []

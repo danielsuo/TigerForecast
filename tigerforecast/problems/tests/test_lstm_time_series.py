@@ -10,7 +10,7 @@ from tigerforecast.utils.random import generate_key
 def test_lstm_time_series(steps=1000, show_plot=False, verbose=False):
     T = steps
     n, m, d = 5, 1, 10
-    problem = tigerforecast.problem("LSTM-TimeSeries-v0")
+    problem = tigerforecast.problems.LSTM_TimeSeries()
     problem.initialize(n, m, d)
 
     x_output = []

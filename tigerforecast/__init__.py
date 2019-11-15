@@ -6,10 +6,9 @@ import warnings
 
 import tigerforecast
 from tigerforecast import error
-from tigerforecast.problems import problem, CustomProblem, problem_registry, register_custom_problem
-from tigerforecast.methods import method, CustomMethod, method_registry, register_custom_method
+from tigerforecast.problems import CustomProblem
+from tigerforecast.methods import CustomMethod
 from tigerforecast.utils.optimizers import losses
-from tigerforecast.help import help
 from tigerforecast.utils import set_key
 from tigerforecast.experiments import Experiment
 
@@ -20,13 +19,8 @@ GLOBAL_RANDOM_KEY = random.PRNGKey(0)
 set_key()
 
 
-__all__ = [
-	"problem", 
-	"method", 
+__all__ = [ 
 	"CustomMethod", 
 	"Experiment", 
-	"register_custom_method", 
-	"register_custom_problem", 
-	"help", 
 	"set_key"
 ]

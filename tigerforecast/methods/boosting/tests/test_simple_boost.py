@@ -50,7 +50,7 @@ def test_simple_boost_lstm(steps=500, show=True):
 
     # problem initialize
     p, q = 4, 0
-    problem = tigerforecast.problem("ARMA-v0")
+    problem = tigerforecast.problems.ARMA()
     y_true = problem.initialize(p, q, noise_magnitude=0.1)
  
     # run all boosting method
