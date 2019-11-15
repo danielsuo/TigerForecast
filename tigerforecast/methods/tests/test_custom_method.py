@@ -10,7 +10,7 @@ def test_custom_method(steps=1000, show_plot=True):
     T = steps 
     p, q = 3, 3
     loss = lambda y_true, y_pred: (y_true - y_pred)**2
-    problem = tigerforecast.problems.ARMA()
+    problem = tigerforecast.problem("ARMA-v0")
     cur_x = problem.initialize(p, q)
 
     # simple LastValue custom method implementation
@@ -23,11 +23,13 @@ def test_custom_method(steps=1000, show_plot=True):
         def update(self, y):
             pass
 
-    custom_method = Custom()
+    # try registering and calling the custom method
+    tigerforecast.register_custom_method(Custom, "TestCustomMethod")
+    custom_method = tigerforecast.method("TestCustomMethod")
     custom_method.initialize()
 
     # regular LastValue method as sanity check
-    reg_method = tigerforecast.methods.LastValue()
+    reg_method = tigerforecast.method("LastValue")
     reg_method.initialize()
  
     results = []

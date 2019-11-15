@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 def test_enso(steps=1000, show_plot=False, verbose=False):
     T = steps
-    problem = tigerforecast.problems.ENSO()
+    problem = tigerforecast.problem("ENSO-v0")
     problem.initialize(input_signals = ['oni'])
     assert problem.T == 0
 

@@ -10,7 +10,7 @@ from tigerforecast.utils.random import generate_key
 def test_rnn_time_series(steps=1000, show_plot=False, verbose=False):
     T = steps
     n, m, d = 5, 3, 10
-    problem = tigerforecast.problems.RNN_TimeSeries()
+    problem = tigerforecast.problem("RNN-TimeSeries-v0")
     problem.initialize(n, m, d)
 
     x_output = []

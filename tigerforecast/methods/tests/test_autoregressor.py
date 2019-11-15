@@ -9,10 +9,10 @@ def test_autoregressor(steps=100, show_plot=True):
     T = steps 
     p, q = 3, 3
     n = 3
-    problem = tigerforecast.problems.ARMA()
+    problem = tigerforecast.problem("ARMA-v0")
     cur_x = problem.initialize(p, q, n = n)
 
-    method = tigerforecast.methods.AutoRegressor()
+    method = tigerforecast.method("AutoRegressor")
     #method.initialize(p, optimizer = ONS)
     method.initialize(p, optimizer = Adagrad)
     loss = lambda y_true, y_pred: np.sum((y_true - y_pred)**2)

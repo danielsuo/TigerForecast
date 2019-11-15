@@ -12,8 +12,6 @@ import pandas as pd
 import ast
 from tigerforecast.utils.optimizers import *
 
-# https://cnsviewer.corp.google.com/cns/jn-d/home/floods/hydro_method/datasets/processed/full/
-
 static_features_to_use=[
         ('static:drain_area_log2', False),
         ('train:site:mean:USGS:discharge_mean', False),
@@ -45,7 +43,7 @@ def plot_loss_site_2231000(show_plot=True):
 def test_lstm(show_plot=True):
     n, m, l, h = 7, 1, 3, 10
 
-    method = tigerforecast.methods.LSTM()
+    method = tigerforecast.method("LSTM")
     method.initialize(n, m, l, h, optimizer=Adam)
     loss = lambda pred, true: (pred - true)**2
 
@@ -90,7 +88,7 @@ def test_autoregressor(show_plot=True):
         label_series += ast.literal_eval(df_site_2231000[past_sequence_label_feature_name].iloc[61*i])
 
 
-    method = tigerforecast.methods.AutoRegressor()
+    method = tigerforecast.method("AutoRegressor")
     #method.initialize(p, optimizer = ONS)
     method.initialize(p=3, n=1)
     loss = lambda y_true, y_pred: (y_true - y_pred)**2

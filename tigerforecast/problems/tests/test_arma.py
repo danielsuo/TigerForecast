@@ -9,7 +9,7 @@ def test_arma(steps=1000, show_plot=False, verbose=False):
     T = steps
     p, q = 3, 3
     n = 1
-    problem = tigerforecast.problems.ARMA()
+    problem = tigerforecast.problem("ARMA-v0")
     problem.initialize(p,q, n = n)
     assert problem.T == 0
 

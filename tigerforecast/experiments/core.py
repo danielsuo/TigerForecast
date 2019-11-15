@@ -54,26 +54,26 @@ def get_ids(x):
     else:
         return x
 
-def create_full_problem_to_methods(problems_ids, method_clss):
+def create_full_problem_to_methods(problems_ids, method_ids):
     '''
     Description: Associate all given problems to all given methods.
 
     Args:
-        problem_clss (list): list of problem names
-        method_clss (list): list of method names
+        problem_ids (list): list of problem names
+        method_ids (list): list of method names
     Returns:
         full_problem_to_methods (dict): association problem -> method
     '''
     full_problem_to_methods = {}
 
-    for problem_cls in problems_ids:
-        full_problem_to_methods[problem_cls] = []
-        for method_cls in method_clss:
-            full_problem_to_methods[problem_cls].append(method_cls)
+    for problem_id in problems_ids:
+        full_problem_to_methods[problem_id] = []
+        for method_id in method_ids:
+            full_problem_to_methods[problem_id].append(method_id)
 
     return full_problem_to_methods
 
-def tune_lr(method_cls, method_params, problem_cls, problem_params):
+def tune_lr(method_id, method_params, problem_id, problem_params):
         #print("Learning Rate Tuning not yet available!")
         #return method_params
         loss = lambda a, b: np.sum((a-b)**2)
@@ -85,17 +85,17 @@ def tune_lr(method_cls, method_params, problem_cls, problem_params):
             search_space['optimizer'].append(optimizer(learning_rate=lr)) # create instance and append
         trials, min_steps = None, 100
         hpo = GridSearch() # hyperparameter optimizer
-        optimal_params, optimal_loss = hpo.search(method_cls, method_params, problem_cls, problem_params, loss, 
+        optimal_params, optimal_loss = hpo.search(method_id, method_params, problem_id, problem_params, loss, 
             search_space, trials=trials, smoothing=10, min_steps=min_steps, verbose = 0) # run each model at least 1000 steps
         return optimal_params
 
-def run_experiment(problem, method, metric = 'mse', lr_tuning = False, key = 0, timesteps = None, verbose = 0):
+def run_experiment(problem, method, metric = 'mse', lr_tuning = True, key = 0, timesteps = None, verbose = 0):
     '''
     Description: Initializes the experiment instance.
     
     Args:
-        problem (tuple): (problem id, parameters) to initialize the specific problem instance with
-        method (tuple): (method id, parameters) to initialize the specific method instance with
+        problem (tuple): problem id and parameters to initialize the specific problem instance with
+        method (tuple): method id and parameters to initialize the specific method instance with
         metric (string): metric we are interesting in computing for current experiment
         key (int): for reproducibility
         timesteps(int): number of time steps to run experiment for
@@ -107,14 +107,12 @@ def run_experiment(problem, method, metric = 'mse', lr_tuning = False, key = 0, 
     set_key(key)
 
     # extract specifications
-    (problem_cls, problem_params) = problem
-    (method_cls, method_params) = method
+    (problem_id, problem_params) = problem
+    (method_id, method_params) = method
     loss_fn = metrics[metric]
 
     # initialize problem
-    # problem = tigerforecast.problem(problem_cls)
-    problem = problem_cls()
-
+    problem = tigerforecast.problem(problem_id)
     if(problem_params is None):
         init = problem.initialize()
     else:
@@ -138,8 +136,7 @@ def run_experiment(problem, method, metric = 'mse', lr_tuning = False, key = 0, 
         x, y = init, problem.step()
 
     # initialize method
-    # method = tigerforecast.method(method_cls)
-    method = method_cls()
+    method = tigerforecast.method(method_id)
 
     if(method_params is None):
         method_params = {}
@@ -153,12 +150,12 @@ def run_experiment(problem, method, metric = 'mse', lr_tuning = False, key = 0, 
         method_params['m'] = 1
 
     if(lr_tuning):
-        method_params = tune_lr(method_cls, method_params, problem_cls, problem_params)
+        method_params = tune_lr(method_id, method_params, problem_id, problem_params)
 
     method.initialize(**method_params)
 
     if(verbose and key == 0):
-        print("Running %s on %s..." % (method_cls, problem_cls))
+        print("Running %s on %s..." % (method_id, problem_id))
 
     loss = []
     time_start = time.time()
@@ -182,7 +179,7 @@ def run_experiment(problem, method, metric = 'mse', lr_tuning = False, key = 0, 
 
     return np.array(loss), time.time() - time_start, memory
 
-def run_experiments(problem, method, metric = 'mse', lr_tuning = False, n_runs = 1, timesteps = None, verbose = 0):
+def run_experiments(problem, method, metric = 'mse', lr_tuning = True, n_runs = 1, timesteps = None, verbose = 0):
     
     '''
     Description: Initializes the experiment instance.

@@ -43,12 +43,12 @@ def test_wave_filtering(show_plot=False):
 		h = A.dot(h) + B.dot(X[:,t]) + rand.truncated_normal(generate_key(), 0, 0.1, shape=(hidden_state_dim,))
 	Y = np.array(Y).T # list to numpy matrix
 	
-	method = tigerforecast.methods.WaveFiltering()
+	method = tigerforecast.method("WaveFiltering")
 	method.initialize(n, m, k, T, eta, R_M)
 	# loss = lambda y_true, y_pred: (y_true - y_pred)**2
 	loss = lambda y_true, y_pred: (np.linalg.norm(y_true - y_pred))**2
 
-	lastvalue_method = tigerforecast.methods.LastValue()
+	lastvalue_method = tigerforecast.method("LastValue")
 	lastvalue_method.initialize()
  
 	results = []

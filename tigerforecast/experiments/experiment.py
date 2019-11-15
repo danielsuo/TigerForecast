@@ -21,11 +21,11 @@ class Experiment(object):
         Description: Initializes the experiment instance. 
 
         Args:
-            problems (dict/list): map of the form problem class -> hyperparameters for problem or list of problem ids;
+            problems (dict/list): map of the form problem_id -> hyperparameters for problem or list of problem ids;
                                   in the latter case, default parameters will be used for initialization
-            methods (dict/list): map of the form method class -> hyperparameters for method or list of method ids;
+            methods (dict/list): map of the form method_id -> hyperparameters for method or list of method ids;
                                 in the latter case, default parameters will be used for initialization
-            problem_to_methods (dict) : map of the form problem class -> list of method class.
+            problem_to_methods (dict) : map of the form problem_id -> list of method_id.
                                        If None, then we assume that the user wants to
                                        test every method in method_to_params against every
                                        problem in problem_to_params
@@ -59,7 +59,7 @@ class Experiment(object):
 
             # map of the form [metric][problem][method] -> loss series + time + memory
             self.prob_method_to_result = precomputed.load_prob_method_to_result(\
-                problem_clss = list(self.problems.keys()), method_clss = list(self.methods.keys()), \
+                problem_ids = list(self.problems.keys()), method_ids = list(self.methods.keys()), \
                 problem_to_methods = problem_to_methods, metrics = metrics)
         else:
             self.new_experiment = NewExperiment()
@@ -68,113 +68,113 @@ class Experiment(object):
             # map of the form [metric][problem][method] -> loss series + time + memory
             self.prob_method_to_result = self.new_experiment.run_all_experiments()
 
-    def add_all_method_variants(self, method_cls, method_params = {}, include_boosting = True, lr_tuning = False):
+    def add_all_method_variants(self, method_id, method_params = {}, include_boosting = True, lr_tuning = False):
         optimizers = [OGD, Adagrad, Adam, ONS]
         for optimizer in optimizers:
             method_params['optimizer'] = optimizer
-            self.add_method(method_cls, method_params, lr_tuning = lr_tuning, name = optimizer.__name__)
+            self.add_method(method_id, method_params, lr_tuning = lr_tuning, name = optimizer.__name__)
             if(include_boosting):
-                self.add_method('SimpleBoost', {'method_cls' : method_cls, 'method_params' : method_params},\
-                    name = method_cls + '-' + optimizer.__name__)
+                self.add_method('SimpleBoost', {'method_id' : method_id, 'method_params' : method_params},\
+                    name = method_id + '-' + optimizer.__name__)
                 
-    def add_method(self, method_cls, method_params = None, lr_tuning = False, name = None):
+    def add_method(self, method_id, method_params = None, lr_tuning = False, name = None):
         '''
         Description: Add a new method to the experiment instance.
         
         Args:
-            method_cls (string): ID of new method.
+            method_id (string): ID of new method.
             method_params (dict): Parameters to use for initialization of new method.
         '''
-        assert method_cls is not None, "ERROR: No Method ID given."
+        assert method_id is not None, "ERROR: No Method ID given."
 
         if name is None and method_params is not None and 'optimizer' in method_params:
             name = method_params['optimizer'].__name__
 
         new_id = ''
-        if(method_cls in self.methods):
-            if(method_cls not in self.n_methods):
-                self.n_methods[method_cls] = 0
-            self.n_methods[method_cls] += 1
+        if(method_id in self.methods):
+            if(method_id not in self.n_methods):
+                self.n_methods[method_id] = 0
+            self.n_methods[method_id] += 1
             if(name is not None):
-                new_id = method_cls + '-' + name
+                new_id = method_id + '-' + name
             else:
-                new_id = method_cls + '-' + str(self.n_methods[method_cls])
-            self.methods[method_cls].append((new_id, method_params))
+                new_id = method_id + '-' + str(self.n_methods[method_id])
+            self.methods[method_id].append((new_id, method_params))
         else:
-            new_id = method_cls
+            new_id = method_id
             if(name is not None):
                 new_id += '-' + name
-            self.methods[method_cls] = [(new_id, method_params)]
-            self.n_methods[method_cls] = 1
+            self.methods[method_id] = [(new_id, method_params)]
+            self.n_methods[method_id] = 1
 
         ''' Evaluate performance of new method on all problems '''
         for metric in self.metrics:
-            for problem_cls in self.problems.keys():
-                for (new_problem_cls, problem_params) in self.problems[problem_cls]:
+            for problem_id in self.problems.keys():
+                for (new_problem_id, problem_params) in self.problems[problem_id]:
                     ''' If method is compatible with problem, run experiment and store results. '''
                     try:
-                        loss, time, memory = run_experiments((problem_cls, problem_params), \
-                            (method_cls, method_params), metric = metric, lr_tuning = lr_tuning, \
+                        loss, time, memory = run_experiments((problem_id, problem_params), \
+                            (method_id, method_params), metric = metric, lr_tuning = lr_tuning, \
                             n_runs = self.n_runs, timesteps = self.timesteps, verbose = self.verbose)
                     except Exception as e:
                         print(e)
-                        print("ERROR: Could not run %s on %s." % (method_cls, problem_cls) + \
+                        print("ERROR: Could not run %s on %s." % (method_id, problem_id) + \
                             " Please make sure method and problem are compatible.")
                         loss, time, memory = 0, 0.0, 0.0
 
-                    self.prob_method_to_result[(metric, new_problem_cls, new_id)] = loss
-                    self.prob_method_to_result[('time', new_problem_cls, new_id)] = time
-                    self.prob_method_to_result[('memory', new_problem_cls, new_id)] = memory
+                    self.prob_method_to_result[(metric, new_problem_id, new_id)] = loss
+                    self.prob_method_to_result[('time', new_problem_id, new_id)] = time
+                    self.prob_method_to_result[('memory', new_problem_id, new_id)] = memory
 
-    def add_problem(self, problem_cls, problem_params = None, name = None):
+    def add_problem(self, problem_id, problem_params = None, name = None):
         '''
         Description: Add a new problem to the experiment instance.
         
         Args:
-            problem_cls (string): ID of new method.
+            problem_id (string): ID of new method.
             problem_params (dict): Parameters to use for initialization of new method.
         '''
-        assert problem_cls is not None, "ERROR: No Problem ID given."
+        assert problem_id is not None, "ERROR: No Problem ID given."
 
         new_id = ''
 
         # AN INSTANCE OF THE PROBLEM ALREADY EXISTS
-        if(problem_cls in self.problems):
+        if(problem_id in self.problems):
             # COUNT NUMBER OF INSTANCES OF SAME MAIN PROBLEM
-            if(problem_cls not in self.n_problems):
-                self.n_problems[problem_cls] = 0
-            self.n_problems[problem_cls] += 1
+            if(problem_id not in self.n_problems):
+                self.n_problems[problem_id] = 0
+            self.n_problems[problem_id] += 1
             # GET ID OF PROBLEM INSTANCE
             if(name is not None):
                 new_id = name
             else:
-                new_id = problem_cls[:-2] + str(self.n_problems[problem_cls])
-            self.problems[problem_cls].append((new_id, problem_params))
+                new_id = problem_id[:-2] + str(self.n_problems[problem_id])
+            self.problems[problem_id].append((new_id, problem_params))
         # NO INSTANCE OF THE PROBLEM EXISTS
         else:
-            new_id = problem_cls[:-3]
+            new_id = problem_id[:-3]
             if(name is not None):
                 new_id = name
-            self.problems[problem_cls] = [(new_id, problem_params)]
-            self.n_problems[problem_cls] = 1
+            self.problems[problem_id] = [(new_id, problem_params)]
+            self.n_problems[problem_id] = 1
 
         ''' Evaluate performance of new method on all problems '''
         for metric in self.metrics:
-            for method_cls in self.methods.keys():
-                for (new_method_cls, method_params) in self.methods[method_cls]:
+            for method_id in self.methods.keys():
+                for (new_method_id, method_params) in self.methods[method_id]:
                     ''' If method is compatible with problem, run experiment and store results. '''
                     try:
-                        loss, time, memory = run_experiments((problem_cls, problem_params), \
-                            (method_cls, method_params), metric = metric, n_runs = self.n_runs, \
+                        loss, time, memory = run_experiments((problem_id, problem_params), \
+                            (method_id, method_params), metric = metric, n_runs = self.n_runs, \
                             timesteps = self.timesteps, verbose = self.verbose)
                     except Exception as e:
                         print(e)
-                        print("ERROR: Could not run %s on %s. Please make sure method and problem are compatible." % (method_cls, problem_cls))
+                        print("ERROR: Could not run %s on %s. Please make sure method and problem are compatible." % (method_id, problem_id))
                         loss, time, memory = 0.0, 0.0, 0.0
 
-                    self.prob_method_to_result[(metric, new_id, new_method_cls)] = loss
-                    self.prob_method_to_result[('time', new_id, new_method_cls)] = time
-                    self.prob_method_to_result[('memory', new_id, new_method_cls)] = memory
+                    self.prob_method_to_result[(metric, new_id, new_method_id)] = loss
+                    self.prob_method_to_result[('time', new_id, new_method_id)] = time
+                    self.prob_method_to_result[('memory', new_id, new_method_id)] = memory
 
     def to_csv(self, table_dict, save_as):
         ''' Save to csv file '''
@@ -204,30 +204,28 @@ class Experiment(object):
         table = PrettyTable()
         table_dict = {}
 
-        problem_clss = get_ids(self.problems)
-        method_clss = get_ids(self.methods)
+        problem_ids = get_ids(self.problems)
+        method_ids = get_ids(self.methods)
 
-        table_dict['Problems'] = problem_clss
+        table_dict['Problems'] = problem_ids
 
         field_names = ['Method\Problems']
-        for problem_cls in problem_clss:
-            field_names.append(str(problem_cls()))
+        for problem_id in problem_ids:
+            field_names.append(problem_id)
 
         table.field_names = field_names
 
-        for method_cls in method_clss:
-            method_scores = [str(method_cls())]
+        for method_id in method_ids:
+            method_scores = [method_id]
             # get scores for each problem
-            for problem_cls in problem_clss:
-                # print("self.prob_method_to_result")
-                # print(self.prob_method_to_result)
-                score = np.mean(self.prob_method_to_result[(metric, problem_cls, method_cls)][start_time:])
+            for problem_id in problem_ids:
+                score = np.mean(self.prob_method_to_result[(metric, problem_id, method_id)][start_time:])
                 score = round(float(score), n_digits)
                 if(score == 0.0):
                     score = '—'
                 method_scores.append(score)
             table.add_row(method_scores)
-            table_dict[method_cls] = method_scores[1:]
+            table_dict[method_id] = method_scores[1:]
 
         print(table)
 
@@ -246,12 +244,12 @@ class Experiment(object):
                 avg_regret, start_time, cutoffs, yscale, show_legend = True):
         for (loss, method) in problem_result_plus_method:
             if(avg_regret):
-                ax.plot(self.avg_regret(loss[start_time:]), label=str(method()))
+                ax.plot(self.avg_regret(loss[start_time:]), label=str(method))
             else:
                 ax.plot(loss[start_time:], label=str(method))
         if(show_legend):
             ax.legend(loc="upper right", fontsize=5 + 6//(n_problems+2))
-        ax.set_title("Problem:" + str(problem()))
+        ax.set_title("Problem:" + str(problem))
         #ax.set_xlabel("timesteps")
         ax.set_ylabel(metric)
 
@@ -263,8 +261,8 @@ class Experiment(object):
 
         return ax
 
-    def graph(self, problem_clss = None, metric = 'mse', avg_regret = True, start_time = 0, \
-            cutoffs = None, yscale = None, time = 1000, save_as = None, size = 3, dpi = 100):
+    def graph(self, problem_ids = None, metric = 'mse', avg_regret = True, start_time = 0, \
+            cutoffs = None, yscale = None, time = 20, save_as = None, size = 3, dpi = 100):
 
         '''
         Description: Show a graph for the results of the experiments for specified metric.
@@ -279,22 +277,22 @@ class Experiment(object):
         assert metric in self.metrics
 
         # get problem and method ids
-        if(problem_clss is None):
-            problem_clss = get_ids(self.problems)
-        method_clss = get_ids(self.methods)
+        if(problem_ids is None):
+            problem_ids = get_ids(self.problems)
+        method_ids = get_ids(self.methods)
 
         # get number of problems
-        n_problems = len(problem_clss)
+        n_problems = len(problem_ids)
 
         all_problem_info = []
 
-        for problem_cls in problem_clss:
+        for problem_id in problem_ids:
             problem_result_plus_method = []
             method_list = []
-            for method_cls in method_clss:
-                method_list.append(method_cls)
-                problem_result_plus_method.append((self.prob_method_to_result[(metric, problem_cls, method_cls)], method_cls))
-            all_problem_info.append((problem_cls, problem_result_plus_method, method_list))
+            for method_id in method_ids:
+                method_list.append(method_id)
+                problem_result_plus_method.append((self.prob_method_to_result[(metric, problem_id, method_id)], method_id))
+            all_problem_info.append((problem_id, problem_result_plus_method, method_list))
 
         nrows = max(int(np.sqrt(n_problems)), 1)
         ncols = n_problems // nrows + n_problems % nrows
@@ -318,8 +316,8 @@ class Experiment(object):
 
                     if(cur_pb == n_problems):
                         legend = []
-                        for method_cls in method_clss:
-                            legend.append((0, str(method_cls())))
+                        for method_id in method_ids:
+                            legend.append((0, method_id))
                         ax[i, j] = self._plot(ax[i, j], 'LEGEND', legend,\
                                 n_problems, metric, False, cutoffs, None, show_legend = True)
                         continue

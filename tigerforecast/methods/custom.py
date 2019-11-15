@@ -3,6 +3,7 @@
 
 from tigerforecast import error
 from tigerforecast.methods import Method
+from tigerforecast.methods.registration import method_registry
 from tigerforecast.utils.optimizers import Optimizer
 
 
@@ -34,5 +35,13 @@ def verify_valid_method(method_class):
         if not callable(getattr(method_class, f, None)):
             raise error.InvalidClass("CustomMethod is missing required method \'{}\'".format(f))
 
+# global custom method method
+def register_custom_method(custom_method_class, custom_method_id):
+    assert type(custom_method_id) == str
+    verify_valid_method(custom_method_class)
 
+    method_registry.register_custom(
+        id=custom_method_id,
+        custom_class=custom_method_class,
+    )
 

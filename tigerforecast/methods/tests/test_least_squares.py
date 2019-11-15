@@ -7,10 +7,10 @@ from tigerforecast.utils.optimizers import *
 
 def test_least_squares(steps=1000, show_plot=True):
     T = steps 
-    problem = tigerforecast.problems.ENSO()
+    problem = tigerforecast.problem("ENSO-v0")
     x, y = problem.initialize(input_signals = ['nino12', 'nino34', 'nino4'])
 
-    method = tigerforecast.methods.LeastSquares()
+    method = tigerforecast.method("LeastSquares")
     method.initialize(x, y, reg = 10.0 * steps)
     loss = lambda y_true, y_pred: np.sum((y_true - y_pred)**2)
  

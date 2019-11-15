@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 def test_random(steps=1000, show_plot=False):
     T = steps
-    problem = tigerforecast.problems.Random()
+    problem = tigerforecast.problem("Random-v0")
     problem.initialize()
     assert problem.T == 0
 

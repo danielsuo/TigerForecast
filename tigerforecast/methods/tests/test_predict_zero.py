@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 def test_predict_zero(steps=1000, show_plot=True):
     T = steps 
     p, q = 3, 3
-    problem = tigerforecast.problems.ARMA()
+    problem = tigerforecast.problem("ARMA-v0")
     cur_x = problem.initialize(p, q)
-    method = tigerforecast.methods.PredictZero()
+    method = tigerforecast.method("PredictZero")
     method.initialize()
     loss = lambda y_true, y_pred: (y_true - y_pred)**2
  
