@@ -196,6 +196,11 @@ def run_experiments(problem, method, metric = 'mse', lr_tuning = True, n_runs = 
         time (float): time elapsed
         memory (float): memory used
     '''
+    
+    return run_experiment(problem, method, metric = metric, \
+        lr_tuning = lr_tuning, key = 0, timesteps = timesteps, verbose = verbose)
+
+
 
     results = tuple((1 / n_runs) * result for result in run_experiment(problem, method, metric = metric, \
         lr_tuning = lr_tuning, key = 0, timesteps = timesteps, verbose = verbose))
