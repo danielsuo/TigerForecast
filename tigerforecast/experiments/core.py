@@ -178,7 +178,7 @@ def run_experiment(problem, method, metric = 'mse', lr_tuning = True, key = 0, t
         else:
             x, y = y, new
 
-    return np.array(loss), time.time() - time_start, memory
+    return loss, time.time() - time_start, memory
 
 def run_experiments(problem, method, metric = 'mse', lr_tuning = True, n_runs = 1, timesteps = None, verbose = 0):
     
