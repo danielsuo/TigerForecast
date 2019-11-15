@@ -3,6 +3,7 @@
 import tigerforecast
 from tigerforecast.experiments import metrics as metrics_module
 from tigerforecast import error
+import jax
 import jax.numpy as np
 from tigerforecast.problems import Problem
 from tigerforecast.methods import Method
@@ -157,7 +158,7 @@ def run_experiment(problem, method, metric = 'mse', lr_tuning = True, key = 0, t
     if(verbose and key == 0):
         print("Running %s on %s..." % (method_id, problem_id))
 
-    loss = []
+    loss = np.zeros(timesteps)
     time_start = time.time()
     memory = 0
     load_bar = False
@@ -168,7 +169,7 @@ def run_experiment(problem, method, metric = 'mse', lr_tuning = True, key = 0, t
     for i in tqdm(range(timesteps), disable = (not load_bar or key != 0)):
         # get loss and update method
         cur_loss = float(loss_fn(y, method.predict(x)))
-        loss.append(cur_loss)
+        loss = jax.ops.index_update(loss, i, cur_loss)
         method.update(y)
         # get new pair of observation and label
         new = problem.step()

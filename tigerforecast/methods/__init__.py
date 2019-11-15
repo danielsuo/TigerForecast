@@ -9,7 +9,7 @@ from tigerforecast.methods.rnn import RNN
 from tigerforecast.methods.lstm import LSTM
 from tigerforecast.methods.wave_filtering import WaveFiltering
 from tigerforecast.methods.boosting.simple_boost import SimpleBoost
-from tigerforecast.methods.prophet import Prophet
+#from tigerforecast.methods.prophet import Prophet
 
 # registration tools
 from tigerforecast.methods.registration import method_registry, method_register, method
