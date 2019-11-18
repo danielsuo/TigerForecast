@@ -16,8 +16,10 @@ FEATURES = ['__site_id',
     'train:site:mean:USGS:discharge_mean',
     'train:site:std:USGS:discharge_mean']
 
+NORMALIZE_INDICES = [2,3]
+
 class USGSDataLoader:
-    def __init__(self, path, seq_length=61, site_idx=None): 
+    def __init__(self, path, seq_length=61, site_idx=None, normalize_source=None):
         self.seq_length = seq_length
         self.target_lag = 1
 
@@ -38,6 +40,7 @@ class USGSDataLoader:
         cols = []
         self.np_data = dict()
         self.data_length = dict()
+
         for key, df in self.groups:
             data = df[FEATURES].to_numpy()
             # last index 1 locates target discharge_mean; see FEATURES
@@ -45,8 +48,25 @@ class USGSDataLoader:
             # mask the current target
             data[self.target_lag:,1] = data[:-self.target_lag,1]
 
+            # compress site_ids
+            data[:,0] = self.site_idx[key]
+
             self.np_data[self.site_idx[key]] = (data, targets)
             self.data_length[self.site_idx[key]] = len(data)
+
+        # normalize from your own per-site statistics if None, or from reference (train) set 
+        self.normalize_moments = dict()
+        self.normalize_source = normalize_source
+        for key, _ in self.groups:
+            for feature in NORMALIZE_INDICES:
+                if normalize_source:
+                    mean, std = normalize_source.normalize_moments[(self.site_idx[key], feature)]
+                else:
+                    mean = self.np_data[self.site_idx[key]][0][:,feature].mean()
+                    std = self.np_data[self.site_idx[key]][0][:,feature].std()
+                    self.normalize_moments[(self.site_idx[key], feature)] = mean, std
+                self.np_data[self.site_idx[key]][0][:,feature] -= mean
+                self.np_data[self.site_idx[key]][0][:,feature] /= std + 1e-4
 
     def featurize(self, site_idx, t):
         # grab (data, target) sequence from a slice of a time series
