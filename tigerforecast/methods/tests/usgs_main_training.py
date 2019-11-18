@@ -48,6 +48,7 @@ for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_
 	if i%1000 == 0:
 		yhats, ys = usgs_eval(method_LSTM, 0)
 		print('Eval: loss=%f' % ((ys-yhats)**2).mean() )
+		method_LSTM.save('mini_%f.pkl' % i)
 
 print("Training Done")
 # yhats, ys = usgs_eval(method_LSTM, 0)
