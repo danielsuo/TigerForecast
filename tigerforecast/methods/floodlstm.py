@@ -44,7 +44,7 @@ class FloodLSTM(Method):
         W_hh = glorot_init(generate_key(), (4*h, h)) # maps h_t to gates
         W_xh = glorot_init(generate_key(), (4*h, self.postembed_n)) # maps x_t to gates
         W_out = glorot_init(generate_key(), (m, h)) # maps h_t to output
-        W_embed = glorot_init(generate_key(), (e_dim, num_sites))
+        W_embed = glorot_init(generate_key(), (num_sites, e_dim))
         b_h = np.zeros(4*h)
         b_h = jax.ops.index_update(b_h, jax.ops.index[h:2*h], np.ones(h)) # forget gate biased initialization
         self.params = [W_hh, W_xh, W_out, W_embed, b_h]
@@ -68,17 +68,15 @@ class FloodLSTM(Method):
 
         @jax.jit
         def _predict(params, x):
-            site_one_hot, x_rest = x
-            site_embedding = np.dot(site_one_hot, W_embed.T)
-            full_x = np.concatenate((site_embedding, x_rest), axis=-1)
+            full_x = np.concatenate((params[3][x[:,0].astype(np.int32),:], x[:,1:]), axis=-1)
             _, y = jax.lax.scan(_fast_predict, (params, np.zeros(h), np.zeros(h)), full_x)
             return y
 
         self.transform = lambda x: float(x) if (self.m == 1) else x
         self._fast_predict = _fast_predict
-        self._predict = jax.vmap(_predict, in_axes=(None, 0))
+        self._predict = jax.jit(jax.vmap(_predict, in_axes=(None, 0)))
         if optimizer==None:
-            optimizer_instance = OGD(loss=batched_mse, learning_rate=1.0)
+            optimizer_instance = OGD(loss=batched_mse, learning_rate=0.1)
             self._store_optimizer(optimizer_instance, self._predict)
         else:
             self._store_optimizer(optimizer, self._predict)
@@ -102,12 +100,7 @@ class FloodLSTM(Method):
             print("The third dimension of x should be of size n")
             raise
 
-        def _one_hot(x):
-            z = np.zeros((self.num_sites))
-            jax.ops.index_update(z, x, 1.0)
-            return z
-        self.x_site = np.array([[_one_hot(int(j[1])) for j in i] for i in x])
-        self.x = x[:,:,1:]        
+        self.x = x       
     
     def predict(self, x):
         """
@@ -119,7 +112,7 @@ class FloodLSTM(Method):
         """
         assert self.initialized
         self._process_x(x)
-        return self._predict(self.params, [self.x_site, self.x])
+        return self._predict(self.params, self.x)
     
     def forecast(self, x, timeline = 1):
         ### TODO: See if this function needs to be implemented. 
@@ -135,7 +128,7 @@ class FloodLSTM(Method):
             None
         """
         assert self.initialized
-        self.params = self.optimizer.update(self.params, [self.x_site, self.x], y)
+        self.params = self.optimizer.update(self.params, self.x, y)
         return
 
     def save(self, filename):
