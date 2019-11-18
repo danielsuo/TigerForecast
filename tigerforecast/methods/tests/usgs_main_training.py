@@ -7,7 +7,7 @@ import pickle
 from tigerforecast.utils import generate_key
 from usgs_data_loader import *
 
-TRAINING_STEPS = 200
+TRAINING_STEPS = 100
 BATCH_SIZE= 100
 SEQUENCE_LENGTH = 61
 HIDDEN_DIM = 100
@@ -26,7 +26,7 @@ results_LSTM = []
 pred_LSTM = []
 for data, targets in usgs_train.random_batches(batch_size=BATCH_SIZE, num_batches=TRAINING_STEPS):
 	y_pred_LSTM = method_LSTM.predict(data)
-	pred_LSTM.append(y_pred_LSTM[0,:,0])
+	pred_LSTM.append(y_pred_LSTM[0,-1,0])
 	#print(y_pred_LSTM[0,:,0])
 	#print(targets[0,:])
 	targets_exp = np.expand_dims(targets, axis=-1)
