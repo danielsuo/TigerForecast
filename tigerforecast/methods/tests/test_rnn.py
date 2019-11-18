@@ -9,7 +9,7 @@ from tigerforecast.utils import generate_key
 def test_rnn(steps=100, show_plot=True):
     T = steps 
     n, m, l, d = 4, 5, 10, 10
-    problem = tigerforecast.problem("LDS-Control-v0")
+    problem = tigerforecast.problem("LDS-TimeSeries-v0")
     y_true = problem.initialize(n, m, d)
     method = tigerforecast.method("RNN")
     method.initialize(n, m, l, d)

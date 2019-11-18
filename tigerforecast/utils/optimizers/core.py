@@ -51,8 +51,8 @@ class Optimizer():
         self.pred = pred
         if loss != None: self.loss = loss
         self._is_valid_loss(self.loss, raise_error=True)
-        _loss = lambda params, x, y: self.loss(self.pred(params=params, x=x), y)
-        _custom_loss = lambda params, x, y, custom_loss: custom_loss(pred(params=params, x=x), y)
+        _loss = lambda params, x, y: self.loss(self.pred(params, x), y)
+        _custom_loss = lambda params, x, y, custom_loss: custom_loss(pred(params, x), y)
         self._grad = jit(grad(_loss))
         self._custom_grad = jit(grad(_custom_loss), static_argnums=[3])
         self.reset() # reset internal parameters

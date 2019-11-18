@@ -9,6 +9,8 @@ from tigerforecast.methods.rnn import RNN
 from tigerforecast.methods.lstm import LSTM
 from tigerforecast.methods.wave_filtering import WaveFiltering
 from tigerforecast.methods.boosting.simple_boost import SimpleBoost
+from tigerforecast.methods.seq2seqlstmstateless import Seq2seqLSTMStateless
+from tigerforecast.methods.floodlstm import FloodLSTM
 #from tigerforecast.methods.prophet import Prophet
 
 # registration tools
@@ -51,6 +53,16 @@ method_register(
 method_register(
     id='LSTM',
     entry_point='tigerforecast.methods:LSTM',
+)
+
+method_register(
+    id='Seq2seqLSTMStateless',
+    entry_point='tigerforecast.methods:Seq2seqLSTMStateless',
+)
+
+method_register(
+    id='FloodLSTM',
+    entry_point='tigerforecast.methods:FloodLSTM',
 )
 
 method_register(
