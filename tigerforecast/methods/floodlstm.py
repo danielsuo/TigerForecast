@@ -76,7 +76,7 @@ class FloodLSTM(Method):
         self._fast_predict = _fast_predict
         self._predict = jax.jit(jax.vmap(_predict, in_axes=(None, 0)))
         if optimizer==None:
-            optimizer_instance = OGD(loss=batched_mse, learning_rate=0.1)
+            optimizer_instance = Adam(loss=batched_mse, learning_rate=1.0)
             self._store_optimizer(optimizer_instance, self._predict)
         else:
             self._store_optimizer(optimizer, self._predict)
