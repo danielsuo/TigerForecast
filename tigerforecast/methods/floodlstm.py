@@ -122,6 +122,13 @@ class FloodLSTM(Method):
         """
         assert self.initialized
         self.params = self.optimizer.update(self.params, self.x, y)
+
+        alpha = 0.00
+        for x, init_x in zip(self.params, self.initial_params):
+            x = alpha * x + (1-alpha) * init_x
+
+        self.params[3] = self.initial_params[3]
+
         return
 
     def save(self, filename):
@@ -136,6 +143,7 @@ class FloodLSTM(Method):
         """
         f = open(filename, 'rb')
         self.params = pickle.load(f)
+        self.initial_params = [x.copy() for x in self.params]
         f.close()
         return 
      
