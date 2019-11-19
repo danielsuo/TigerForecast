@@ -125,7 +125,7 @@ class FloodLSTM(Method):
         
         self.new_params = self.optimizer.update(self.params, self.x, y)
         if dynamic:
-            prior_lambda = 0.3
+            prior_lambda = 0.6
             prior_step = [self.initial_params[i] - self.params[i] for i in range(len(self.params))]
             
             for i in range(len(self.params)):

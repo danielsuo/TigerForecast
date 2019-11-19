@@ -13,7 +13,7 @@ SEQUENCE_LENGTH = 61
 HIDDEN_DIM = 100
 EMBEDDING_DIM = 10
 DATA_PATH = 'usgs_{}_mini.csv'
-FILENAME = 'full_400.pkl'
+FILENAME = 'full_500.pkl'
 
 TEST_BOOSTING = False
 TEST_ONLINE = True
@@ -57,6 +57,7 @@ if TEST_BOOSTING:
 
 residual = np.abs(yhats - ys)
 print(np.mean(residual))
+print(np.mean(residual[ len(residual)//2: ]))
 np.save('residual.npy', residual)
 np.save('ys.npy', ys)
 
