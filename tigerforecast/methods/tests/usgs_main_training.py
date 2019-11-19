@@ -12,12 +12,12 @@ BATCH_SIZE = 1024
 SEQUENCE_LENGTH = 61
 HIDDEN_DIM = 100
 EMBEDDING_DIM = 10
-DATA_PATH = 'usgs_{}_mini.csv'
+DATA_PATH = '~/data/usgs_{}.csv'
 
 loss = lambda pred, true: np.mean(np.sum((pred - true)**2, axis=(1,2)))
 
 usgs_train = USGSDataLoader(DATA_PATH.format('train'))
-usgs_val = USGSDataLoader(DATA_PATH.format('val'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)
+usgs_val = USGSDataLoader(DATA_PATH.format('val_mini'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)
 
 method_LSTM = tigerforecast.method("FloodLSTM")
 method_LSTM.initialize(n=9, m=1, l = 61, h = HIDDEN_DIM, e_dim = EMBEDDING_DIM, num_sites = len(usgs_train.site_keys), optimizer = None)
@@ -27,7 +27,7 @@ pred_LSTM = []
 
 def usgs_eval(method, site_idx):
 	yhats, ys = [], []
-	for data, targets in usgs_train.sequential_batches(site_idx=1, batch_size=1):
+	for data, targets in usgs_val.sequential_batches(site_idx=1, batch_size=1):
 		y_pred_LSTM = method.predict(data)
 		yhats.append(y_pred_LSTM[0,-1,0])
 		ys.append(targets[0,-1])
@@ -44,11 +44,11 @@ for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_
 	method_LSTM.update(targets_exp)
 
 	if i%100 == 0:
-        	print('Step %i: loss=%f' % (i,results_LSTM[-1]) )
-	if i%1000 == 0:
+		print('Step %i: loss=%f' % (i,results_LSTM[-1]) )
+# if i%1000 == 0:
 		yhats, ys = usgs_eval(method_LSTM, 0)
 		print('Eval: loss=%f' % ((ys-yhats)**2).mean() )
-		method_LSTM.save('mini_%f.pkl' % i)
+		method_LSTM.save('full_%i.pkl' % i)
 
 print("Training Done")
 # yhats, ys = usgs_eval(method_LSTM, 0)
