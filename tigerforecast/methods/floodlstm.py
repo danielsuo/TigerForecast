@@ -24,7 +24,7 @@ class FloodLSTM(Method):
         self.initialized = False
         self.uses_regressors = True
 
-    def initialize(self, n=1, m=1, l = 32, h = 100, e_dim = 10, num_sites = 1000, optimizer = None):
+    def initialize(self, n=1, m=1, l = 32, h = 100, e_dim = 10, num_sites = 1000, optimizer = None, filename=None):
         """
         Description: Randomly initialize the LSTM.
         Args:
@@ -50,7 +50,8 @@ class FloodLSTM(Method):
         self.params = [W_hh, W_xh, W_out, W_embed, b_h]
         self.hid = np.zeros(h)
         self.cell = np.zeros(h)
-
+        if filename != None:
+            self.load(filename)
 
         """ private helper methods"""
 
@@ -76,18 +77,10 @@ class FloodLSTM(Method):
         self._fast_predict = _fast_predict
         self._predict = jax.jit(jax.vmap(_predict, in_axes=(None, 0)))
         if optimizer==None:
-            optimizer_instance = Adam(loss=batched_mse, learning_rate=1.0)
+            optimizer_instance = OGD(loss=batched_mse, learning_rate=0.001)
             self._store_optimizer(optimizer_instance, self._predict)
         else:
             self._store_optimizer(optimizer, self._predict)
-
-    def initialize_with_ckpt(self, n=1, m=1, l = 32, h = 64, e_dim = 10, optimizer = None, filename=None):
-        if filename==None:
-            print("initialize_with_ckpt should be called with a filename. Use initalize instead")
-            raise
-        else:
-            self.initialize(n=n,m=m,l=l,h=h,optimizer=optimizer)
-            self.load(filename)
 
     def _process_x(self, x):
         if x.ndim < 3:
