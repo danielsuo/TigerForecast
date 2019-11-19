@@ -13,12 +13,13 @@ SEQUENCE_LENGTH = 61
 HIDDEN_DIM = 100
 EMBEDDING_DIM = 10
 DATA_PATH = 'usgs_{}_mini.csv'
-FILENAME = 'full_300.pkl'
+FILENAME = 'full_400.pkl'
 
 TEST_BOOSTING = False
 TEST_ONLINE = True
 
 loss = lambda pred, true: np.mean(np.sum((pred - true)**2, axis=(1,2)))
+last_loss = lambda pred, true: np.mean( (pred[:,-1,:]-true[:,-1,:])**2 )
 
 usgs_train = USGSDataLoader(DATA_PATH.format('train'))
 usgs_val = USGSDataLoader(DATA_PATH.format('val'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)
@@ -56,10 +57,15 @@ if TEST_BOOSTING:
 
 residual = np.abs(yhats - ys)
 print(np.mean(residual))
+np.save('residual.npy', residual)
+np.save('ys.npy', ys)
+
 plt.semilogy(residual, 'b', label="Residual")
 if TEST_ONLINE:
 	oresidual = np.abs(oyhats -oys)
 	print(np.mean(oresidual))
+	print(np.mean(oresidual[ len(oresidual)//2: ]))
+	np.save('online_residual.npy', oresidual)
 	plt.semilogy(oresidual, 'k', label="Online Residual")
 
 if TEST_BOOSTING:
