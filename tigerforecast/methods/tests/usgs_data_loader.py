@@ -7,11 +7,10 @@ import os
 import itertools
 
 FEATURES = ['__site_id',
-    'label:USGS:discharge_mean',
+    'sequence:USGS:discharge_mean',
     'sequence:AQUA_VI:NDVI',
     'sequence:GLDAS21:Tair_f_inst',
     'sequence:GSMAP_MERGED:hourlyPrecipRate',
-    'sequence:USGS:discharge_mean',
     'static:drain_area_log2',
     'train:site:mean:USGS:discharge_mean',
     'train:site:std:USGS:discharge_mean']
@@ -44,7 +43,7 @@ class USGSDataLoader:
         for key, df in self.groups:
             data = df[FEATURES].to_numpy()
             # last index 1 locates target discharge_mean; see FEATURES
-            targets = data[:,1]
+            targets = data[:,1].copy()
             # mask the current target
             data[self.target_lag:,1] = data[:-self.target_lag,1]
 
