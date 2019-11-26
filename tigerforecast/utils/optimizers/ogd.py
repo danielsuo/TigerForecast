@@ -48,24 +48,18 @@ class OGD(Optimizer):
             Updated parameters in same shape as input
         """
         assert self.initialized
+        assert type(params) == dict, "optimizers can only take params in dictionary format"
 
         self.T += 1
         grad = self.gradient(params, x, y, loss=loss) # defined in optimizers core class
-
-        # Make everything a list for generality
-        is_list = True
-        if(type(params) is not list):
-            params = [params]
-            grad = [grad]
-            is_list = False
     
         lr = self.lr / np.sqrt(self.T)
         if self.max_norm:
             self.max_norm = np.maximum(self.max_norm, np.linalg.norm([np.linalg.norm(dw) for dw in grad]))
             lr = self.lr / self.max_norm
-        new_params = [w - lr * dw for (w, dw) in zip(params, grad)]
+        new_params = {k:w - lr * dw for (k, w), dw in zip(params.items(), grad.values())}
 
-        return new_params if is_list else new_params[0]
+        return new_params
 
 
     def __str__(self):

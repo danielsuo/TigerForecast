@@ -37,8 +37,8 @@ class Adam(Optimizer):
 
         @jit # helper update method
         def _update(params, grad, m, v, max_norm, beta_1_t, beta_2_t):
-            new_m = [self.beta_1 * m_i + (1. - self.beta_1) * dw for (m_i, dw) in zip(m, grad)]
-            new_v = [self.beta_2 * v_i + (1. - self.beta_2) * np.square(dw) for (v_i, dw) in zip(v, grad)]
+            new_m = {k:self.beta_1 * m_i + (1. - self.beta_1) * dw for (k, m_i), dw in zip(m.items(), grad.values())}
+            new_v = {k:self.beta_2 * v_i + (1. - self.beta_2) * np.square(dw) for (k, v_i), dw in zip(v.items(), grad.values())}
             m_t = [m_i / (1 - beta_1_t) for m_i in new_m] # bias-corrected estimates
             v_t = [v_i / (1 - beta_2_t) for v_i in new_v]
 
@@ -46,7 +46,7 @@ class Adam(Optimizer):
             beta_1_t, beta_2_t = beta_1_t * self.beta_1, beta_2_t * self.beta_2
             max_norm = np.where(max_norm, np.maximum(max_norm, np.linalg.norm([np.linalg.norm(dw) for dw in grad])), max_norm)
             lr = self.lr / np.where(max_norm, max_norm, 1.)
-            new_params = [w - lr * m_i / (np.sqrt(v_i) + self.eps) for (w, v_i, m_i) in zip(params, v_t, m_t)]
+            new_params = {k: (w - lr * m_i / (np.sqrt(v_i) + self.eps)) for (k, w), v_i, m_i in zip(params.items(), v_t, m_t)}
             return new_params, new_m, new_v, max_norm, beta_1_t, beta_2_t
         self._update = _update
 
@@ -66,21 +66,17 @@ class Adam(Optimizer):
             Updated parameters in same shape as input
         """
         assert self.initialized
+        assert type(params) == dict, "optimizers can only take params in dictionary format"
         grad = self.gradient(params, x, y, loss=loss) # defined in optimizers core class
 
         # Make everything a list for generality
-        is_list = True
-        if(type(params) is not list):
-            params = [params]
-            grad = [grad]
-            is_list = False
         if self.m == None: # first run
-            self.m = [np.zeros(dw.shape) for dw in grad]
-            self.v = [np.zeros(dw.shape) for dw in grad]
+            self.m = {k:np.zeros(dw.shape) for k, dw in grad.items()}
+            self.v = {k:np.zeros(dw.shape) for k, dw in grad.items()}
 
         updated_params = self._update(params, grad, self.m, self.v, self.max_norm, self.beta_1_t, self.beta_2_t)
         new_params, self.m, self.v, self.max_norm, self.beta_1_t, self.beta_2_t = updated_params
-        return new_params if is_list else new_params[0]
+        return new_params
 
     def __str__(self):
         return "<Adam Optimizer, lr={}>".format(self.lr)
