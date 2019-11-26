@@ -29,9 +29,25 @@ class Method(object):
             return
         raise error.InvalidInput("Optimizer input cannot be stored")
 
+    def save(self, filename):
+        assert (hasattr(self, "params")), "Model {} does not have params initialized!!!".format(self)
+        f = open(filename, 'wb')
+        pickle.dump(self.params, f)
+        f.close()
+        return
+
+    def load(self, filename):
+        """
+            TODO: Check for dimensions and filename error
+        """
+        f = open(filename, 'rb')
+        self.params = pickle.load(f)
+        #self.initial_params = [x.copy() for x in self.params]
+        f.close()
+        return 
+
     def __str__(self):
         return '<{} instance>'.format(type(self).__name__)
 
     def __repr__(self):
         return self.__str__()
-

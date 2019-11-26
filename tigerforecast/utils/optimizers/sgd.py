@@ -38,10 +38,10 @@ class SGD(Optimizer):
             Updated parameters in same shape as input
         """
         assert self.initialized
+        assert type(params) == dict, "optimizers can only take params in dictionary format"
         grad = self.gradient(params, x, y, loss=loss) # defined in optimizers core class
-        if (type(params) is list):
-            return [w - self.lr * dw for (w, dw) in zip(params, grad)]
-        return params - self.lr * grad
+        new_params = {k:w - self.lr * dw for (k, w), dw in zip(params.items(), grad.values())}
+        return new_params
 
     def __str__(self):
         return "<SGD Optimizer, lr={}>".format(self.lr)

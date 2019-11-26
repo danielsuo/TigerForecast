@@ -35,10 +35,10 @@ class Adagrad(Optimizer):
 
         @jit
         def _update(params, grad, G, max_norm):
-            new_G = [g + np.square(dw) for g, dw in zip(G, grad)]
+            new_G = {k:(g + np.square(dw)) for (k, g), dw in zip(G.items(), grad.values())}
             max_norm = np.where(max_norm, np.maximum(max_norm, np.linalg.norm([np.linalg.norm(dw) for dw in grad])), max_norm)
             lr = self.lr / np.where(max_norm, max_norm, 1.)
-            new_params = [w - lr * dw / np.sqrt(g) for w, dw, g in zip(params, grad, new_G)]
+            new_params = {k:(w - lr * dw / np.sqrt(g)) for (k, w), dw, g in zip(params.items(), grad.values(), new_G.values())}
             return new_params, new_G, max_norm
         self._update = _update
 
@@ -57,19 +57,15 @@ class Adagrad(Optimizer):
             Updated parameters in same shape as input
         """
         assert self.initialized
+        assert type(params) == dict, "optimizers can only take params in dictionary format"
         grad = self.gradient(params, x, y, loss=loss) # defined in optimizers core class
         
         # Make everything a list for generality
-        is_list = True
-        if(type(params) is not list):
-            params = [params]
-            grad = [grad]
-            is_list = False
         if self.G == None: # first run
-            self.G = [1e-3 * np.ones(shape=g.shape) for g in grad]
+            self.G = {k: 1e-3 * np.ones(shape=g.shape) for k, g in grad.items()}
 
         new_params, self.G, self.max_norm = self._update(params, grad, self.G, self.max_norm)
-        return new_params if is_list else new_params[0]
+        return new_params
 
     def __str__(self):
         return "<AdaGrad Optimizer, lr={}>".format(self.lr)
