@@ -81,20 +81,14 @@ class ONS(Optimizer):
             Updated parameters in same shape as input
         """
         assert self.initialized
+        assert type(params) == dict, "optimizers can only take params in dictionary format"
 
         # get args
         grad = self.gradient(params, x, y, loss=loss) # defined in optimizers core class
         eta = self.lr
-        
-        # Make everything a list for generality
-        is_list = True
-        if(type(params) is not list):
-            params = [params]
-            grad = [grad]
-            is_list = False
 
         # used to compute inverse matrix with respect to each parameter vector
-        flat_grad = [np.ravel(dw) for dw in grad]
+        flat_grad = [np.ravel(dw) for dw in grad.values()] # grad is a dict, everything else is a list
 
         # initialize A
         if self.A is None:
@@ -107,17 +101,16 @@ class ONS(Optimizer):
             eta = eta * self.max_norm
             
         # partial_update automatically reshapes flat_grad into correct params shape
-        new_values = [self.partial_update(A, Ainv, g, w) for (A, Ainv, g, w) in zip(self.A, self.Ainv, flat_grad, params)]
+        new_values = [self.partial_update(A, Ainv, g, w) for (A, Ainv, g, w) in zip(self.A, self.Ainv, flat_grad, params.values())]
         self.A, self.Ainv, new_grad = list(map(list, zip(*new_values)))
 
-        new_params = [w - eta * dw for (w, dw) in zip(params, new_grad)]
-
+        new_params = {k:w - eta * dw for (k, w), dw in zip(params.items(), new_grad)}
         if self.project:
             self.min_radius = np.maximum(self.min_radius, self.general_norm(y))
             norm = 5. * self.min_radius
-            new_params = [self.norm_project(p, A, norm) for (p, A) in zip(new_params, self.A)]
+            new_params = {k:self.norm_project(p, A, norm) for (p, A) in zip(new_params.items(), self.A)}
 
-        return new_params if is_list else new_params[0]
+        return new_params
 
     def __str__(self):
         return "<ONS Optimizer, lr={}>".format(self.lr)
