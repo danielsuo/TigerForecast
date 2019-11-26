@@ -3,7 +3,9 @@
 import tigerforecast
 import jax.numpy as np
 import matplotlib.pyplot as plt
+import memory_profiler
 
+#@profile
 def test_last_value(steps=1000, show_plot=True):
     T = steps 
     p, q = 3, 3

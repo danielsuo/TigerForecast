@@ -15,6 +15,7 @@ class Experiment(object):
     def __init__(self):
         self.initialized = False
         
+    #@profile
     def initialize(self, problems = None, methods = None, problem_to_methods = None, metrics = ['mse'], \
                    n_runs = 1, use_precomputed = False, timesteps = None, verbose = 0):
         '''
@@ -68,15 +69,16 @@ class Experiment(object):
             # map of the form [metric][problem][method] -> loss series + time + memory
             self.prob_method_to_result = self.new_experiment.run_all_experiments()
 
+    #@profile
     def add_all_method_variants(self, method_id, method_params = {}, include_boosting = True, lr_tuning = False):
-        optimizers = [OGD, Adagrad, Adam, ONS]
+        optimizers = [OGD, Adagrad, Adam]
         for optimizer in optimizers:
             method_params['optimizer'] = optimizer
             self.add_method(method_id, method_params, lr_tuning = lr_tuning, name = optimizer.__name__)
             if(include_boosting):
                 self.add_method('SimpleBoost', {'method_id' : method_id, 'method_params' : method_params},\
                     name = method_id + '-' + optimizer.__name__)
-                
+    #@profile            
     def add_method(self, method_id, method_params = None, lr_tuning = False, name = None):
         '''
         Description: Add a new method to the experiment instance.
@@ -126,6 +128,7 @@ class Experiment(object):
                     self.prob_method_to_result[('time', new_problem_id, new_id)] = time
                     self.prob_method_to_result[('memory', new_problem_id, new_id)] = memory
 
+    #@profile
     def add_problem(self, problem_id, problem_params = None, name = None):
         '''
         Description: Add a new problem to the experiment instance.

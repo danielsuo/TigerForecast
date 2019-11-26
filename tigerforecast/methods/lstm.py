@@ -44,7 +44,11 @@ class LSTM(Method):
         W_out = glorot_init(generate_key(), (m, h)) # maps h_t to output
         b_h = np.zeros(4*h)
         b_h = jax.ops.index_update(b_h, jax.ops.index[h:2*h], np.ones(h)) # forget gate biased initialization
-        self.params = [W_hh, W_xh, W_out, b_h]
+        # self.params = [W_hh, W_xh, W_out, b_h]
+        self.params = {'W_hh' : W_hh,
+                       'W_xh' : W_xh,
+                       'W_out' : W_out,
+                       'b_h' : b_h}
         self.hid = np.zeros(h)
         self.cell = np.zeros(h)
         self.x = np.zeros((l, m))
@@ -60,7 +64,7 @@ class LSTM(Method):
         @jax.jit
         def _fast_predict(carry, x):
             params, hid, cell = carry # unroll tuple in carry
-            W_hh, W_xh, W_out, b_h = params
+            W_hh, W_xh, W_out, b_h = params.values()
             sigmoid = lambda x: 1. / (1. + np.exp(-x)) # no JAX implementation of sigmoid it seems?
             gate = np.dot(W_hh, hid) + np.dot(W_xh, x) + b_h 
             i, f, g, o = np.split(gate, 4) # order: input, forget, cell, output

@@ -29,6 +29,7 @@ class LeastSquares(Method):
         self.initialized = True
         self.Pinv = np.linalg.inv(reg * np.eye(x.shape[0]) + np.outer(x, x))
         self.w = self.Pinv @ x * y
+        self.params = {}
 
     def step(self, x, y):
         """

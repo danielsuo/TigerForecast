@@ -44,7 +44,11 @@ class RNN(Method):
         W_x = glorot_init(generate_key(), (h, n))
         W_out = glorot_init(generate_key(), (m, h))
         b_h = np.zeros(h)
-        self.params = [W_h, W_x, W_out, b_h]
+        # self.params = [W_h, W_x, W_out, b_h]
+        self.params = {'W_h' : W_h,
+                       'W_x' : W_x,
+                       'W_out:' : W_out
+                       'b_h' : b_H}
         self.hid = np.zeros(h)
         self.x = np.zeros((l, n))
 
@@ -58,7 +62,7 @@ class RNN(Method):
         @jax.jit
         def _fast_predict(carry, x):
             params, hid = carry  # unroll tuple in carry
-            W_h, W_x, W_out, b_h = params
+            W_h, W_x, W_out, b_h = params.values()
             next_hid = np.tanh(np.dot(W_h, hid) + np.dot(W_x, x) + b_h)
             y = np.dot(W_out, next_hid)
             return (params, next_hid), y

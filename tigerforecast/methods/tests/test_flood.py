@@ -158,6 +158,7 @@ def plot_flood_data_histograms(show_plot=True):
     df_site_2231000 = get_site_df()
     seq_len = 61
     rows = df_site_2231000.shape[0]
+    '''
     for (seq_feat, b) in sequence_features_to_use:
         seq_feat_series = []
         for i in range(int(rows/seq_len)):
@@ -183,11 +184,23 @@ def plot_flood_data_histograms(show_plot=True):
     label_series = []
     for i in range(int(rows/seq_len)):
         label_series += ast.literal_eval(df_site_2231000[past_sequence_label_feature_name].iloc[61*i])
-
     if show_plot:
         plt.figure()
         plt.plot(label_series)
         plt.title(past_sequence_label_feature_name)
+    '''
+    timestamp_series = []
+    for i in range(20):
+        stamp = df_site_2231000['label:timestamp'].iloc[i]
+        print(stamp)
+        timestamp_series += stamp
+    print(timestamp_series[:20])
+
+    if show_plot:
+        plt.figure()
+        plt.plot(timestamp_series)
+        plt.title('label:timestamp')
+    
 
     plt.show(block=True)
 
@@ -204,7 +217,9 @@ def get_site_df():
     sequence_length = 61
     label_list = []
     
-    df_site_2231000 = df.loc[df['__site_id'] == 2231000]
+    print(df['label:timestamp'].iloc[0])
+    print(type(df['label:timestamp'].iloc[0]))
+    df_site_2231000 = df.loc[df['__site_id'] == 2376500]
     discharge_mean_0 = df_site_2231000[past_sequence_label_feature_name].iloc[0]
     rows = df_site_2231000.shape[0]
 
@@ -238,8 +253,8 @@ def get_site_df():
 
 
 if __name__=="__main__":
-    plot_loss_site_2231000()
+    # plot_loss_site_2231000()
     # test_lstm()
     # test_autoregressor()
-    # plot_flood_data_histograms()
+    plot_flood_data_histograms(False)
     # get_site_df()

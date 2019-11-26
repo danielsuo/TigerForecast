@@ -16,6 +16,7 @@ from tigerforecast.utils.autotuning import GridSearch
 
 metrics = {'mse': metrics_module.mse, 'cross_entropy': metrics_module.cross_entropy}
 
+#@profile
 def to_dict(x):
     '''
     Description: If x is not a dictionary, transforms it to one by assigning None values to entries of x;
@@ -90,6 +91,7 @@ def tune_lr(method_id, method_params, problem_id, problem_params):
             search_space, trials=trials, smoothing=10, min_steps=min_steps, verbose = 0) # run each model at least 1000 steps
         return optimal_params
 
+#@profile
 def run_experiment(problem, method, metric = 'mse', lr_tuning = True, key = 0, timesteps = None, verbose = 0):
     '''
     Description: Initializes the experiment instance.

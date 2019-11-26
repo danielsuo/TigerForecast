@@ -1,0 +1,13 @@
+Running LSTM on MyProblem-v0...
+Running LSTM on MyProblem-v0...
+Running LSTM on MyProblem-v0...
+Running LSTM on MyProblem-v0...
+Average mse:
++-----------------+-----------+
+| Method\Problems | MyProblem |
++-----------------+-----------+
+|     LSTM-OGD    |   0.043   |
+|     LSTM-OGD    |   0.043   |
+|   LSTM-Adagrad  |   0.043   |
+|    LSTM-Adam    |   0.043   |
++-----------------+-----------+

@@ -60,6 +60,7 @@ class WaveFiltering(Method):
             new_x = jax.ops.index_update(new_x, jax.ops.index[:,0], x)
             return new_x
         self._update_x = _update_x
+        self.params = {}
 
     def predict(self, x):
         """

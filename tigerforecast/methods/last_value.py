@@ -26,6 +26,7 @@ class LastValue(Method):
             None
         """
         self.initialized = True
+        self.params = {}
 
     def predict(self, x):
         """
