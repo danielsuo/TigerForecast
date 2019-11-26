@@ -11,5 +11,3 @@ tqdm
 PrettyTable
 gym
 cvxopt
-pystan
-fbprophet
