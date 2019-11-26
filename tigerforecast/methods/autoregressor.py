@@ -41,7 +41,8 @@ class AutoRegressor(Method):
 
         glorot_init = stax.glorot() # returns a function that initializes weights
 
-        self.params = glorot_init(generate_key(), (p+1,1))
+        # self.params = glorot_init(generate_key(), (p+1,1))
+        self.params = {"phi" : glorot_init(generate_key(), (p+1,1))}
 
         def _update_past(self_past, x):
             new_past = np.roll(self_past, self.n)
@@ -51,7 +52,7 @@ class AutoRegressor(Method):
 
         def _predict(params, x):
             x_plus_bias = np.vstack((np.ones((1, self.n)), x))
-            return np.dot(x_plus_bias.T, params).squeeze()
+            return np.dot(x_plus_bias.T, params["phi"]).squeeze()
         self._predict = jax.jit(_predict)
 
         self._store_optimizer(optimizer, self._predict)
