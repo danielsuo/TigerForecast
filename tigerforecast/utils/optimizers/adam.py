@@ -44,7 +44,7 @@ class Adam(Optimizer):
 
             # maintain current power of betas
             beta_1_t, beta_2_t = beta_1_t * self.beta_1, beta_2_t * self.beta_2
-            max_norm = np.where(max_norm, np.maximum(max_norm, np.linalg.norm([np.linalg.norm(dw) for dw in grad])), max_norm)
+            max_norm = np.where(max_norm, np.maximum(max_norm, np.linalg.norm([np.linalg.norm(dw) for dw in grad.values()])), max_norm)
             lr = self.lr / np.where(max_norm, max_norm, 1.)
             new_params = {k: (w - lr * m_i / (np.sqrt(v_i) + self.eps)) for (k, w), v_i, m_i in zip(params.items(), v_t, m_t)}
             return new_params, new_m, new_v, max_norm, beta_1_t, beta_2_t

@@ -55,7 +55,7 @@ class OGD(Optimizer):
     
         lr = self.lr / np.sqrt(self.T)
         if self.max_norm:
-            self.max_norm = np.maximum(self.max_norm, np.linalg.norm([np.linalg.norm(dw) for dw in grad]))
+            self.max_norm = np.maximum(self.max_norm, np.linalg.norm([np.linalg.norm(dw) for dw in grad.values()]))
             lr = self.lr / self.max_norm
         new_params = {k:w - lr * dw for (k, w), dw in zip(params.items(), grad.values())}
 
