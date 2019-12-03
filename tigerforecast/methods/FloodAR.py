@@ -1,5 +1,5 @@
 """
-Stateless AR method
+Stateless AR method with embedding.
 """
 import jax
 import jax.numpy as np
@@ -12,7 +12,7 @@ from tigerforecast.utils.optimizers.losses import *
 import pickle
 
 
-class ARStateless(Method):
+class FloodAR(Method):
     """
     Description: Produces outputs from a randomly initialized seq2seq LSTM neural network.
                  Supposed to be used in batch seq2seq mode. Not online mode. 
