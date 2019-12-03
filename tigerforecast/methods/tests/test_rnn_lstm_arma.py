@@ -10,13 +10,13 @@ def test_rnn_lstm_arma(steps=100, show_plot=True):
     T = steps 
     p, q = 3, 0
     problem = tigerforecast.problem("ARMA-v0")
-    cur_x = problem.initialize(p, q)
+    cur_x = problem.initialize(p=p, q=q, n=1)
 
     method_RNN = tigerforecast.method("RNN")
-    method_RNN.initialize(1, 1, l = p)
+    method_RNN.initialize(1, 1, l=p, h=1)
 
     method_LSTM = tigerforecast.method("LSTM")
-    method_LSTM.initialize(1, 1, l = p)
+    method_LSTM.initialize(1, 1, l=p, h=1)
 
     loss = lambda pred, true: np.sum((pred - true)**2)
  

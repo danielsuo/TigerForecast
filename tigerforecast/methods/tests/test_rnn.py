@@ -8,18 +8,19 @@ from tigerforecast.utils import generate_key
 
 def test_rnn(steps=100, show_plot=True):
     T = steps 
-    n, m, l, d = 4, 5, 10, 10
-    problem = tigerforecast.problem("LDS-Control-v0")
-    y_true = problem.initialize(n, m, d)
+    p, q = 3, 3
+    n = 1
+    problem = tigerforecast.problem("ARMA-v0")
+    y_true = problem.initialize(p=p,q=q, n=1)
     method = tigerforecast.method("RNN")
-    method.initialize(n, m, l, d)
+    method.initialize(n=1, m=1, l=3, h=1)
     loss = lambda pred, true: np.sum((pred - true)**2)
  
     results = []
     for i in range(T):
         u = random.normal(generate_key(), (n,))
         y_pred = method.predict(u)
-        y_true = problem.step(u)
+        y_true = problem.step()
         results.append(loss(y_true, y_pred))
         method.update(y_true)
 

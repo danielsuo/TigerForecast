@@ -48,7 +48,7 @@ class RNN(Method):
         self.params = {'W_h' : W_h,
                        'W_x' : W_x,
                        'W_out:' : W_out,
-                       'b_h' : b_H}
+                       'b_h' : b_h}
         self.hid = np.zeros(h)
         self.x = np.zeros((l, n))
 
