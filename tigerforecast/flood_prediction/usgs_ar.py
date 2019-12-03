@@ -23,7 +23,7 @@ usgs_train = USGSDataLoader(DATA_PATH.format('train_mini'))
 usgs_val = USGSDataLoader(DATA_PATH.format('val_mini'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)
 
 method = tigerforecast.method("FloodAR")
-method.initialize(n=8, m=1, l=61, optimizer=optim)
+method.initialize(n=8, m=1, l=61, num_sites=len(usgs_train.site_keys), optimizer=optim)
 
 results = []
 preds = []
@@ -40,9 +40,7 @@ def usgs_eval(method, site_idx):
 for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_SIZE, num_batches=TRAINING_STEPS) ):
 	y_pred = method.predict(data)
 	preds.append(y_pred[0,-1,0])
-	#print(y_pred[0,:,0])
-	#print(targets[0,:])
-	targets_exp = np.expand_dims(targets, axis=-1)
+	targets_exp = np.expand_dims( np.expand_dims(targets[:,-1], axis=-1), axis=-1 )
 	loss = float(batched_mse(jax.device_put(targets_exp), y_pred))
 	results.append(loss)
 	method.update(targets_exp)

@@ -24,7 +24,7 @@ class FloodAR(Method):
         self.initialized = False
         self.uses_regressors = True
 
-    def initialize(self, n=1, m=1, l=32, optimizer = None):
+    def initialize(self, n=1, m=1, l=32, num_sites=1000, optimizer = None):
         """
         Description: Randomly initialize the Stateless AR.
         Args:
@@ -38,12 +38,16 @@ class FloodAR(Method):
         self.T = 0
         self.initialized = True
         self.n, self.m, self.l = n, m, l
+        self.num_sites = num_sites
 
         # initialize parameters
         glorot_init = stax.glorot() # returns a function that initializes weights
         W_lnm = glorot_init(generate_key(), (l, m, n)) # maps l inputs to output
         b = np.zeros((m, 1)) # bias 
-        self.params = {'W_lnm': W_lnm, 'b': b}
+
+        W_embed = glorot_init(generate_key(), (num_sites, m)) # per-site embeddings
+
+        self.params = {'W_lnm': W_lnm, 'b': b, 'W_embed': W_embed}
         self.x = np.zeros((l, m))
 
 
@@ -51,7 +55,7 @@ class FloodAR(Method):
 
         @jax.jit
         def _predict(params, x):
-            y = np.einsum('ijk,ik->j', params['W_lnm'], x) + params['b']
+            y = np.einsum('ijk,ik->j', params['W_lnm'], x) + params['b'] + params['W_embed'][x[0,0].astype(np.int32)]
             return y
 
         self.transform = lambda x: float(x) if (self.m == 1) else x
@@ -62,17 +66,7 @@ class FloodAR(Method):
         else:
             self._store_optimizer(optimizer, self._predict)
 
-    def initialize_with_ckpt(self, n=1, m=1, l = 32, optimizer = None, filename=None):
-        if filename==None:
-            print("initialize_with_ckpt should be called with a filename. Use initalize instead")
-            raise
-        else:
-            self.initialize(n=n,m=m,l=l,optimizer=optimizer)
-            self.load(filename)
-
-
     def _check_format(self, x):
-
         if x.ndim < 3:
             print("x needs to be shaped as [batch_size, sequence_length, n]")
             raise
