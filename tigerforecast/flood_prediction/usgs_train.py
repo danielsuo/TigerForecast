@@ -5,7 +5,7 @@ import jax.random as random
 import matplotlib.pyplot as plt
 import pickle
 from tigerforecast.utils import generate_key
-from usgs_data_loader import *
+from tigerforecast.batch.usgs import *
 
 from tigerforecast.utils.optimizers import *
 from tigerforecast.utils.optimizers.losses import *
@@ -15,7 +15,7 @@ BATCH_SIZE = 1024
 SEQUENCE_LENGTH = 61
 HIDDEN_DIM = 100
 EMBEDDING_DIM = 10
-DATA_PATH = '~/data/usgs_{}.csv'
+DATA_PATH = '../data/usgs_flood/usgs_{}.csv'
 
 optim = Adam(loss=batched_mse, learning_rate=0.1)
 
