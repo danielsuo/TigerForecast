@@ -4,6 +4,8 @@
 from tigerforecast import error
 from tigerforecast.utils.optimizers import Optimizer
 
+import pickle
+
 # class for implementing algorithms with enforced modularity
 class Method(object):
 

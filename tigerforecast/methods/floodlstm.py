@@ -47,7 +47,11 @@ class FloodLSTM(Method):
         W_embed = glorot_init(generate_key(), (num_sites, e_dim))
         b_h = np.zeros(4*h)
         b_h = jax.ops.index_update(b_h, jax.ops.index[h:2*h], np.ones(h)) # forget gate biased initialization
-        self.params = [W_hh, W_xh, W_out, W_embed, b_h]
+        self.params = {'W_hh' : W_hh,
+                       'W_xh' : W_xh,
+                       'W_out' : W_out,
+                       'W_embed': W_embed,
+                       'b_h' : b_h}
         self.hid = np.zeros(h)
         self.cell = np.zeros(h)
         if filename != None:
@@ -58,18 +62,17 @@ class FloodLSTM(Method):
         @jax.jit
         def _fast_predict(carry, x):
             params, hid, cell = carry # unroll tuple in carry
-            W_hh, W_xh, W_out, W_embed, b_h = params
             sigmoid = lambda x: 1. / (1. + np.exp(-x)) # no JAX implementation of sigmoid it seems?
-            gate = np.dot(W_hh, hid) + np.dot(W_xh, x) + b_h 
+            gate = np.dot(params['W_hh'], hid) + np.dot(params['W_xh'], x) + params['b_h'] 
             i, f, g, o = np.split(gate, 4) # order: input, forget, cell, output
             next_cell =  sigmoid(f) * cell + sigmoid(i) * np.tanh(g)
             next_hid = sigmoid(o) * np.tanh(next_cell)
-            y = np.dot(W_out, next_hid)
+            y = np.dot(params['W_out'], next_hid)
             return (params, next_hid, next_cell), y
 
         @jax.jit
         def _predict(params, x):
-            full_x = np.concatenate((params[3][x[:,0].astype(np.int32),:], x[:,1:]), axis=-1)
+            full_x = np.concatenate((params['W_embed'][x[:,0].astype(np.int32),:], x[:,1:]), axis=-1)
             _, y = jax.lax.scan(_fast_predict, (params, np.zeros(h), np.zeros(h)), full_x)
             return y
 
@@ -126,29 +129,13 @@ class FloodLSTM(Method):
         self.new_params = self.optimizer.update(self.params, self.x, y)
         if dynamic:
             prior_lambda = 0.6
-            prior_step = [self.initial_params[i] - self.params[i] for i in range(len(self.params))]
+            prior_step = {key: self.initial_params[key] - self.params[key] for key in self.params}
             
-            for i in range(len(self.params)):
-                if i == 3: # skip training the embedding entirely
+            for key in self.params:
+                if key == 'W_embed': # skip training the embedding entirely
                     continue
-                self.params[i] = self.new_params[i] + prior_lambda * prior_step[i]
+                self.params[key] = self.new_params[key] + prior_lambda * prior_step[key]
         else:
             self.params = self.new_params
         return
 
-    def save(self, filename):
-        f = open(filename, 'wb')
-        pickle.dump(self.params, f)
-        f.close()
-        return
-
-    def load(self, filename):
-        """
-            TODO: Check for dimensions and filename error
-        """
-        f = open(filename, 'rb')
-        self.params = pickle.load(f)
-        self.initial_params = [x.copy() for x in self.params]
-        f.close()
-        return 
-     
