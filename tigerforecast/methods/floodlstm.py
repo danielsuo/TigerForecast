@@ -47,11 +47,15 @@ class FloodLSTM(Method):
         W_embed = glorot_init(generate_key(), (num_sites, e_dim))
         b_h = np.zeros(4*h)
         b_h = jax.ops.index_update(b_h, jax.ops.index[h:2*h], np.ones(h)) # forget gate biased initialization
+<<<<<<< HEAD
         self.params = {'W_hh' : W_hh,
                        'W_xh' : W_xh,
                        'W_out' : W_out,
                        'W_embed': W_embed,
                        'b_h' : b_h}
+=======
+        self.params = [W_hh, W_xh, W_out, W_embed, b_h]
+>>>>>>> e65e93956870d103cbf5291271029e044c3d5309
         self.hid = np.zeros(h)
         self.cell = np.zeros(h)
         if filename != None:
