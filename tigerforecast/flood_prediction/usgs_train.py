@@ -17,7 +17,7 @@ HIDDEN_DIM = 100
 EMBEDDING_DIM = 10
 DATA_PATH = '../data/usgs_flood/usgs_{}.csv'
 
-optim = OGD(loss=batched_mse, learning_rate=0.1)
+optim = Adagrad(loss=batched_mse, learning_rate=0.1)
 
 usgs_train = USGSDataLoader(DATA_PATH.format('train_mini'))
 usgs_val = USGSDataLoader(DATA_PATH.format('val_mini'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)

@@ -35,10 +35,10 @@ class Adagrad(Optimizer):
 
         @jit
         def _update(params, grad, G, max_norm):
-            new_G = {k:(g + np.square(dw)) for (k, g), dw in zip(G.items(), grad.values())}
+            new_G = {k:(G[k] + np.square(dw)) for k, dw in grad.items()}
             max_norm = np.where(max_norm, np.maximum(max_norm, np.linalg.norm([np.linalg.norm(dw) for dw in grad.values()])), max_norm)
             lr = self.lr / np.where(max_norm, max_norm, 1.)
-            new_params = {k:(w - lr * dw / np.sqrt(g)) for (k, w), dw, g in zip(params.items(), grad.values(), new_G.values())}
+            new_params = {k:(w - lr * grad[k] / np.sqrt(new_G[k])) for (k, w) in params.items()}
             return new_params, new_G, max_norm
         self._update = _update
 
