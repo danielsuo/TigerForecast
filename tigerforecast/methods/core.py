@@ -27,7 +27,8 @@ class Method(object):
             self.optimizer = optimizer
             return
         if issubclass(optimizer, Optimizer):
-            self.optimizer = optimizer(pred=pred)
+            self.optimizer = optimizer()
+            self.optimizer.set_predict(pred)
             return
         raise error.InvalidInput("Optimizer input cannot be stored")
 

@@ -40,7 +40,7 @@ class SGD(Optimizer):
         assert self.initialized
         assert type(params) == dict, "optimizers can only take params in dictionary format"
         grad = self.gradient(params, x, y, loss=loss) # defined in optimizers core class
-        new_params = {k:w - self.lr * dw for (k, w), dw in zip(params.items(), grad.values())}
+        new_params = {k:w - self.lr * grad[k] for (k, w) in params.items()}
         return new_params
 
     def __str__(self):

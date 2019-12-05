@@ -76,7 +76,7 @@ class Optimizer():
         grad = self._custom_grad(params, x, y, loss) if loss else self._grad(params, x, y)
         if hasattr(self, 'reg'): # if self has L2 regularization, then update gradients
             if self.reg > 0.0:
-                grad = {k:(grad + 2 * self.reg * w) for grad, (k, w) in zip(grad, params.items())}
+                grad = {k:(grad[k] + 2 * self.reg * w) for k, w in params.items()}
         return grad
 
     def _is_valid_loss(self, loss, raise_error=True):
