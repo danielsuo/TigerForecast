@@ -21,6 +21,9 @@ DATA_PATH = '../data/usgs_flood/usgs_{}.csv'
 hyperparams = {'reg':0.0, 'beta_1': 0.9, 'beta_2': 0.999, 'eps': 1e-8, 'max_norm':True}
 optim = Adam(loss=batched_mse, learning_rate=0.1, hyperparameters=hyperparams)
 # lr e-5 bad
+# lr e-1 gives 4 eval loss
+# lr e-2 gives 4 eval loss
+# lr e-3
 
 usgs_train = USGSDataLoader(DATA_PATH.format('train_mini'))
 usgs_val = USGSDataLoader(DATA_PATH.format('val_mini'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)
@@ -53,9 +56,14 @@ for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_
 	if i%100 == 0:
 		print('Step %i: loss=%f' % (i,results_LSTM[-1]) )
 # if i%1000 == 0:
-		yhats, ys = usgs_eval(method_LSTM, 0)
-		print('Eval: loss=%f' % ((ys-yhats)**2).mean() )
 		method_LSTM.save('full_%i.pkl' % i)
+		method_LSTM_eval = tigerforecast.method("FloodLSTM")
+		method_LSTM_eval.initialize(n=8, m=1, l = 61, h = HIDDEN_DIM, e_dim = EMBEDDING_DIM, num_sites = len(usgs_train.site_keys), optimizer=optim)
+		method_LSTM_eval.load('full_%i.pkl' % i)
+
+		yhats, ys = usgs_eval(method_LSTM_eval, 0)
+		print('Eval: loss=%f' % ((ys-yhats)**2).mean() )
+		
 
 print("Training Done")
 # yhats, ys = usgs_eval(method_LSTM, 0)

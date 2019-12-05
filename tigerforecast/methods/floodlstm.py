@@ -86,6 +86,8 @@ class FloodLSTM(Method):
         @jax.jit
         def _predict(params, x):
             full_x = np.concatenate((params['W_embed'][x[:,0].astype(np.int32),:], x[:,1:]), axis=-1)
+            if self.dp_rate > 0:
+                full_x = np.where(self.dp_masks['input_masks'], full_x / self.keep_rate, 0)
             _, y = jax.lax.scan(_fast_predict, (params, np.zeros(h), np.zeros(h), self.dp_masks, 0), full_x)
             return y
 
@@ -125,14 +127,14 @@ class FloodLSTM(Method):
         self.dp_masks = None
         if self.dp_rate > 0:
             self.dp_masks = self.generate_dp_masks(x, self.keep_rate)
-            self.x = np.where(self.dp_masks['input_masks'], x / self.keep_rate, 0)
+            # self.x = np.where(self.dp_masks['input_masks'], x / self.keep_rate, 0)
         
         return self._predict(self.params, self.x)
 
     def generate_dp_masks(self, x, rate):
         batch_size = x.shape[0]
         dp_masks = {}
-        input_masks = random.bernoulli(generate_key(), rate, (self.n,))
+        input_masks = random.bernoulli(generate_key(), rate, (self.postembed_n,))
         recurrent_masks = random.bernoulli(generate_key(), rate, (self.l, self.h))
         output_masks = random.bernoulli(generate_key(), rate, (self.l, self.h))
         dp_masks['input_masks'] = input_masks
