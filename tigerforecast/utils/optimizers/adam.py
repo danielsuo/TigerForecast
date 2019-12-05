@@ -39,6 +39,7 @@ class Adam(Optimizer):
         def _update(params, grad, m, v, max_norm, beta_1_t, beta_2_t):
             new_m = {k:self.beta_1 * m_i + (1. - self.beta_1) * dw for (k, m_i), dw in zip(m.items(), grad.values())}
             new_v = {k:self.beta_2 * v_i + (1. - self.beta_2) * np.square(dw) for (k, v_i), dw in zip(v.items(), grad.values())}
+
             m_t = [m_i / (1 - beta_1_t) for _,m_i in new_m.items()] # bias-corrected estimates
             v_t = [v_i / (1 - beta_2_t) for _,v_i in new_v.items()]
 
@@ -46,7 +47,7 @@ class Adam(Optimizer):
             beta_1_t, beta_2_t = beta_1_t * self.beta_1, beta_2_t * self.beta_2
             max_norm = np.where(max_norm, np.maximum(max_norm, np.linalg.norm([np.linalg.norm(dw) for dw in grad.values()])), max_norm)
             lr = self.lr / np.where(max_norm, max_norm, 1.)
-            new_params = {k: (w - lr * m_i / (np.sqrt(v_i) + self.eps)) for (k, w), v_i, m_i in zip(params.items(), v_t, m_t)}
+            new_params = {k: (w - lr * m_t[k] / (np.sqrt(v_t[k]) + self.eps)) for k, w in params.items()}
             return new_params, new_m, new_v, max_norm, beta_1_t, beta_2_t
         self._update = _update
 
