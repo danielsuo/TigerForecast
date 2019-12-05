@@ -17,13 +17,17 @@ HIDDEN_DIM = 100
 EMBEDDING_DIM = 10
 DATA_PATH = '../data/usgs_flood/usgs_{}.csv'
 
-optim = OGD(loss=batched_mse, learning_rate=0.1)
+# optim = OGD(loss=batched_mse, learning_rate=0.1)
+hyperparams = {'reg':0.0, 'beta_1': 0.9, 'beta_2': 0.999, 'eps': 1e-8, 'max_norm':True}
+optim = Adam(loss=batched_mse, learning_rate=0.1, hyperparameters=hyperparams)
+# lr e-5 bad
+
 
 usgs_train = USGSDataLoader(DATA_PATH.format('train_mini'))
 usgs_val = USGSDataLoader(DATA_PATH.format('val_mini'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)
 
 method_LSTM = tigerforecast.method("FloodLSTM")
-method_LSTM.initialize(n=8, m=1, l = 61, h = HIDDEN_DIM, e_dim = EMBEDDING_DIM, num_sites = len(usgs_train.site_keys), optimizer=optim)
+method_LSTM.initialize(n=8, m=1, l = 61, h = HIDDEN_DIM, e_dim = EMBEDDING_DIM, num_sites = len(usgs_train.site_keys), optimizer=optim, dp_rate=0.1)
 
 results_LSTM = []
 pred_LSTM = []

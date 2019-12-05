@@ -4,6 +4,7 @@ LSTM neural network method
 import jax
 import jax.numpy as np
 import jax.experimental.stax as stax
+import jax.random as random
 import tigerforecast
 from tigerforecast.utils.random import generate_key
 from tigerforecast.methods import Method
@@ -24,7 +25,9 @@ class FloodLSTM(Method):
         self.initialized = False
         self.uses_regressors = True
 
-    def initialize(self, n=1, m=1, l = 32, h = 100, e_dim = 10, num_sites = 1000, optimizer = None, filename=None):
+    def initialize(self, n=1, m=1, l = 32, h = 100, 
+                   e_dim = 10, num_sites = 1000, optimizer = None, dp_rate=0., filename=None
+                  ):
         """
         Description: Randomly initialize the LSTM.
         Args:
@@ -54,6 +57,8 @@ class FloodLSTM(Method):
                        'b_h' : b_h}
         self.hid = np.zeros(h)
         self.cell = np.zeros(h)
+        self.dp_rate = dp_rate
+        self.keep_rate = 1.0 - dp_rate
         if filename != None:
             self.load(filename)
 
@@ -61,19 +66,27 @@ class FloodLSTM(Method):
 
         @jax.jit
         def _fast_predict(carry, x):
-            params, hid, cell = carry # unroll tuple in carry
+            params, hid, cell, dp_masks, t = carry # unroll tuple in carry
             sigmoid = lambda x: 1. / (1. + np.exp(-x)) # no JAX implementation of sigmoid it seems?
+            # x *= dp_masks['input_masks']
+            # x = np.where(dp_masks['input_masks'], x / self.dp_rate, 0)
+            # hid *= dp_masks['recurrent_masks'][t]
+            if self.dp_rate > 0:
+                hid = np.where(dp_masks['recurrent_masks'][t], hid / self.keep_rate, 0)
             gate = np.dot(params['W_hh'], hid) + np.dot(params['W_xh'], x) + params['b_h'] 
             i, f, g, o = np.split(gate, 4) # order: input, forget, cell, output
             next_cell =  sigmoid(f) * cell + sigmoid(i) * np.tanh(g)
             next_hid = sigmoid(o) * np.tanh(next_cell)
+            # next_hid *= dp_masks['output_masks'][t]
+            if self.dp_rate > 0:
+                next_hid = np.where(dp_masks['output_masks'][t], next_hid / self.keep_rate, 0)
             y = np.dot(params['W_out'], next_hid)
-            return (params, next_hid, next_cell), y
+            return (params, next_hid, next_cell, dp_masks, t+1), y
 
         @jax.jit
         def _predict(params, x):
             full_x = np.concatenate((params['W_embed'][x[:,0].astype(np.int32),:], x[:,1:]), axis=-1)
-            _, y = jax.lax.scan(_fast_predict, (params, np.zeros(h), np.zeros(h)), full_x)
+            _, y = jax.lax.scan(_fast_predict, (params, np.zeros(h), np.zeros(h), self.dp_masks, 0), full_x)
             return y
 
         self.transform = lambda x: float(x) if (self.m == 1) else x
@@ -109,7 +122,23 @@ class FloodLSTM(Method):
         """
         assert self.initialized
         self._process_x(x)
+        self.dp_masks = None
+        if self.dp_rate > 0:
+            self.dp_masks = self.generate_dp_masks(x, self.keep_rate)
+            self.x = np.where(self.dp_masks['input_masks'], x / self.keep_rate, 0)
+        
         return self._predict(self.params, self.x)
+
+    def generate_dp_masks(self, x, rate):
+        batch_size = x.shape[0]
+        dp_masks = {}
+        input_masks = random.bernoulli(generate_key(), rate, (self.n,))
+        recurrent_masks = random.bernoulli(generate_key(), rate, (self.l, self.h))
+        output_masks = random.bernoulli(generate_key(), rate, (self.l, self.h))
+        dp_masks['input_masks'] = input_masks
+        dp_masks['recurrent_masks'] = recurrent_masks
+        dp_masks['output_masks'] = output_masks
+        return dp_masks
     
     def forecast(self, x, timeline = 1):
         ### TODO: See if this function needs to be implemented. 
@@ -125,8 +154,8 @@ class FloodLSTM(Method):
             None
         """
         assert self.initialized
-        
         self.new_params = self.optimizer.update(self.params, self.x, y)
+        # self.new_params = self.optimizer.update(self.params, x, y)
         if dynamic:
             prior_lambda = 0.6
             prior_step = {key: self.initial_params[key] - self.params[key] for key in self.params}
