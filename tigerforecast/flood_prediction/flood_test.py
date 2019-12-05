@@ -5,10 +5,11 @@ import jax.random as random
 import matplotlib.pyplot as plt
 import pickle
 from tigerforecast.utils import generate_key
-from usgs_data_loader import *
+from tigerforecast.batch.usgs import *
 
 from tigerforecast.utils.optimizers import *
 from tigerforecast.utils.optimizers.losses import *
+from tigerforecast.utils.download_tools import *
 
 TRAINING_STEPS = 2000
 BATCH_SIZE = 1024
@@ -16,14 +17,18 @@ SEQUENCE_LENGTH = 61
 HIDDEN_DIM = 100
 EMBEDDING_DIM = 10
 DATA_PATH = '/home/cyrilzhang/data/usgs_{}.csv'
-
+tigerforecast_dir = get_tigerforecast_dir()
+train_mini_path = os.path.join(tigerforecast_dir, 'data/usgs_flood/usgs_train_mini.csv')
+val_mini_path = os.path.join(tigerforecast_dir, 'data/usgs_flood/usgs_val_mini.csv')
 optim = Adam(loss=batched_mse, learning_rate=1.0)
 
-usgs_train = USGSDataLoader(DATA_PATH.format('train_mini'))
-usgs_val = USGSDataLoader(DATA_PATH.format('val_mini'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)
+# usgs_train = USGSDataLoader(DATA_PATH.format('train_mini'))
+usgs_train = USGSDataLoader(train_mini_path)
+usgs_val = USGSDataLoader(val_mini_path, site_idx=usgs_train.site_idx, normalize_source=usgs_train)
+# usgs_val = USGSDataLoader(DATA_PATH.format('val_mini'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)
 
 method_LSTM = tigerforecast.method("FloodLSTM")
-method_LSTM.initialize(n=8, m=1, l = 61, h = HIDDEN_DIM, e_dim = EMBEDDING_DIM, num_sites = len(usgs_train.site_keys), optimizer=optim)
+method_LSTM.initialize(n=8, m=1, l = 61, h = HIDDEN_DIM, e_dim = EMBEDDING_DIM, num_sites = len(usgs_train.site_keys), optimizer=optim, dp_rate=0.1)
 
 results_LSTM = []
 pred_LSTM = []
