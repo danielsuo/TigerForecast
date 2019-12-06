@@ -29,20 +29,34 @@ usgs_train = USGSDataLoader(DATA_PATH.format('train_mini'))
 usgs_val = USGSDataLoader(DATA_PATH.format('val_mini'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)
 
 method_LSTM = tigerforecast.method("FloodLSTM")
-method_LSTM.initialize(n=8, m=1, l = 61, h = HIDDEN_DIM, e_dim = EMBEDDING_DIM, num_sites = len(usgs_train.site_keys), optimizer=optim, dp_rate=0.1)
-eval_LSTM = tigerforecast.method("FloodLSTM")
-eval_LSTM.initialize(n=8, m=1, l = 61, h = HIDDEN_DIM, e_dim = EMBEDDING_DIM, num_sites = len(usgs_train.site_keys), optimizer=optim, dp_rate=0.0)
-
+method_LSTM.initialize(n=8, m=1, l=61, h=HIDDEN_DIM, e_dim=EMBEDDING_DIM, num_sites=len(usgs_train.site_keys), optimizer=optim, dp_rate=0.1)
 
 results_LSTM = []
 pred_LSTM = []
 
-def usgs_eval(method, site_idx):
+def usgs_eval(method, site_idx, dynamic=False):
+	optim = OGD(loss=batched_mse, learning_rate=0.1)
+	if dynamic:
+		optim = DynamicEval(optim, prior_weight=0.0, exclude={'W_embed'})
+
+	eval_method = tigerforecast.method("FloodLSTM")
+	eval_method.initialize(n=8, m=1, l=61, h=HIDDEN_DIM, e_dim=EMBEDDING_DIM, num_sites=len(usgs_train.site_keys), optimizer=optim, dp_rate=0.0)
+	eval_method.params = method.copy()
+
+	if dynamic:
+		dynamic_optim.set_prior(eval_method.params)
+
 	yhats, ys = [], []
 	for data, targets in usgs_val.sequential_batches(site_idx=1, batch_size=1):
-		y_pred_LSTM = method.predict(data)
-		yhats.append(y_pred_LSTM[0,-1,0])
+		y_pred = eval_method.predict(data)
+
+		targets_exp = np.expand_dims( np.expand_dims(targets[:,-1], axis=-1), axis=-1 )
+		if dynamic:
+			eval_method.update(targets_exp)
+
+		yhats.append(y_pred[0,-1,0])
 		ys.append(targets[0,-1])
+
 	return np.array(yhats), np.array(ys)
 
 
@@ -58,8 +72,7 @@ for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_
 
 	if i%100 == 0:
 		print('Step %i: loss=%f' % (i,results_LSTM[-1]) )
-		eval_LSTM.params = method_LSTM.copy()
-		yhats, ys = usgs_eval(eval_LSTM, 0)
+		yhats, ys = usgs_eval(method_LSTM, 0, dynamic=False)
 		print('Eval: loss=%f' % ((ys-yhats)**2).mean() )
 		
 
