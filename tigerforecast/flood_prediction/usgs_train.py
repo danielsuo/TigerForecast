@@ -19,11 +19,7 @@ DATA_PATH = '../data/usgs_flood/usgs_{}.csv'
 
 # optim = OGD(loss=batched_mse, learning_rate=0.1)
 hyperparams = {'reg':0.0, 'beta_1': 0.9, 'beta_2': 0.999, 'eps': 1e-8, 'max_norm':True}
-optim = Adam(loss=batched_mse, learning_rate=0.1, hyperparameters=hyperparams)
-# lr e-5 bad
-# lr e-1 gives 4 eval loss
-# lr e-2 gives 4 eval loss
-# lr e-3
+optim = Adam(loss=batched_mse, learning_rate=1.0, hyperparameters=hyperparams)
 
 usgs_train = USGSDataLoader(DATA_PATH.format('train_mini'))
 usgs_val = USGSDataLoader(DATA_PATH.format('val_mini'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)
@@ -74,7 +70,9 @@ for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_
 		print('Step %i: loss=%f' % (i,results_LSTM[-1]) )
 		yhats, ys = usgs_eval(method_LSTM, 0, dynamic=False)
 		print('Eval: loss=%f' % ((ys-yhats)**2).mean() )
-		
+
+	if i == 1100:
+		optim.lr /= 10
 
 print("Training Done")
 # yhats, ys = usgs_eval(method_LSTM, 0)
