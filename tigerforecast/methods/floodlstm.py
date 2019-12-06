@@ -157,16 +157,6 @@ class FloodLSTM(Method):
         """
         assert self.initialized
         self.new_params = self.optimizer.update(self.params, self.x, y)
-        # self.new_params = self.optimizer.update(self.params, x, y)
-        if dynamic:
-            prior_lambda = 0.6
-            prior_step = {key: self.initial_params[key] - self.params[key] for key in self.params}
-            
-            for key in self.params:
-                if key == 'W_embed': # skip training the embedding entirely
-                    continue
-                self.params[key] = self.new_params[key] + prior_lambda * prior_step[key]
-        else:
-            self.params = self.new_params
+        self.params = self.new_params
         return
 

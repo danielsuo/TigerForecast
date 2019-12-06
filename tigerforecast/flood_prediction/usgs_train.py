@@ -30,6 +30,9 @@ usgs_val = USGSDataLoader(DATA_PATH.format('val_mini'), site_idx=usgs_train.site
 
 method_LSTM = tigerforecast.method("FloodLSTM")
 method_LSTM.initialize(n=8, m=1, l = 61, h = HIDDEN_DIM, e_dim = EMBEDDING_DIM, num_sites = len(usgs_train.site_keys), optimizer=optim, dp_rate=0.1)
+eval_LSTM = tigerforecast.method("FloodLSTM")
+eval_LSTM.initialize(n=8, m=1, l = 61, h = HIDDEN_DIM, e_dim = EMBEDDING_DIM, num_sites = len(usgs_train.site_keys), optimizer=optim, dp_rate=0.0)
+
 
 results_LSTM = []
 pred_LSTM = []
@@ -55,13 +58,8 @@ for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_
 
 	if i%100 == 0:
 		print('Step %i: loss=%f' % (i,results_LSTM[-1]) )
-# if i%1000 == 0:
-		method_LSTM.save('full_%i.pkl' % i)
-		method_LSTM_eval = tigerforecast.method("FloodLSTM")
-		method_LSTM_eval.initialize(n=8, m=1, l = 61, h = HIDDEN_DIM, e_dim = EMBEDDING_DIM, num_sites = len(usgs_train.site_keys), optimizer=optim)
-		method_LSTM_eval.load('full_%i.pkl' % i)
-
-		yhats, ys = usgs_eval(method_LSTM_eval, 0)
+		eval_LSTM.params = method_LSTM.copy()
+		yhats, ys = usgs_eval(eval_LSTM, 0)
 		print('Eval: loss=%f' % ((ys-yhats)**2).mean() )
 		
 
