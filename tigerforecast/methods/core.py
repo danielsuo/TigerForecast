@@ -33,7 +33,7 @@ class Method(object):
         raise error.InvalidInput("Optimizer input cannot be stored")
 
     def save(self, filename):
-        assert (hasattr(self, "params")), "Model {} does not have params initialized!!!".format(self)
+        assert (hasattr(self, "params")), "Model {} does not have params initialized".format(self)
         f = open(filename, 'wb')
         pickle.dump(self.params, f)
         f.close()
@@ -48,6 +48,12 @@ class Method(object):
         #self.initial_params = [x.copy() for x in self.params]
         f.close()
         return 
+
+    def copy(self):
+        # deep copy of params dict
+        # usage: A.params = B.copy()
+        assert (hasattr(self, "params")), "Model {} does not have params initialized".format(self)
+        return {key: param.copy() for key, param in self.params.items()}
 
     def __str__(self):
         return '<{} instance>'.format(type(self).__name__)
