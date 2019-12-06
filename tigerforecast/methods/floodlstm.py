@@ -66,40 +66,61 @@ class FloodLSTM(Method):
 
         @jax.jit
         def _fast_predict(carry, x):
-            params, hid, cell, dp_masks, t = carry # unroll tuple in carry
+            params, hid, cell = carry # unroll tuple in carry
             sigmoid = lambda x: 1. / (1. + np.exp(-x)) # no JAX implementation of sigmoid it seems?
-            # x *= dp_masks['input_masks']
-            # x = np.where(dp_masks['input_masks'], x / self.dp_rate, 0)
-            # hid *= dp_masks['recurrent_masks'][t]
-            if self.dp_rate > 0:
-                hid = np.where(dp_masks['recurrent_masks'][t], hid / self.keep_rate, 0)
             gate = np.dot(params['W_hh'], hid) + np.dot(params['W_xh'], x) + params['b_h'] 
             i, f, g, o = np.split(gate, 4) # order: input, forget, cell, output
             next_cell =  sigmoid(f) * cell + sigmoid(i) * np.tanh(g)
             next_hid = sigmoid(o) * np.tanh(next_cell)
-            # next_hid *= dp_masks['output_masks'][t]
-            if self.dp_rate > 0:
-                next_hid = np.where(dp_masks['output_masks'][t], next_hid / self.keep_rate, 0)
             y = np.dot(params['W_out'], next_hid)
-            return (params, next_hid, next_cell, dp_masks, t+1), y
+            return (params, next_hid, next_cell), y
+
+        @jax.jit
+        def _fast_predict_with_dropout(carry, x):
+            params, hid, cell, recurrent_mask, output_mask, t = carry # unroll tuple in carry
+            sigmoid = lambda x: 1. / (1. + np.exp(-x)) # no JAX implementation of sigmoid it seems?
+
+            hid *= recurrent_mask[t]
+            
+            gate = np.dot(params['W_hh'], hid) + np.dot(params['W_xh'], x) + params['b_h'] 
+            i, f, g, o = np.split(gate, 4) # order: input, forget, cell, output
+            next_cell =  sigmoid(f) * cell + sigmoid(i) * np.tanh(g)
+            next_hid = sigmoid(o) * np.tanh(next_cell)
+
+            y = np.dot(params['W_out'], next_hid * output_mask[t])
+
+            return (params, next_hid, next_cell, recurrent_mask, output_mask, t+1), y
 
         @jax.jit
         def _predict(params, x):
             full_x = np.concatenate((params['W_embed'][x[:,0].astype(np.int32),:], x[:,1:]), axis=-1)
-            if self.dp_rate > 0:
-                full_x = np.where(self.dp_masks['input_masks'], full_x / self.keep_rate, 0)
-            _, y = jax.lax.scan(_fast_predict, (params, np.zeros(h), np.zeros(h), self.dp_masks, 0), full_x)
+            _, y = jax.lax.scan(_fast_predict, (params, np.zeros(h), np.zeros(h)), full_x)
+            return y
+
+        @jax.jit
+        def _predict_with_dropout(params, x):
+            x, input_mask, recurrent_mask, output_mask = x
+            full_x = np.concatenate((params['W_embed'][x[:,0].astype(np.int32),:], x[:,1:]), axis=-1) * input_mask
+            _, y = jax.lax.scan(_fast_predict_with_dropout, (params, np.zeros(h), np.zeros(h), recurrent_mask, output_mask, 0), full_x)
             return y
 
         self.transform = lambda x: float(x) if (self.m == 1) else x
+       
         self._fast_predict = _fast_predict
         self._predict = jax.jit(jax.vmap(_predict, in_axes=(None, 0)))
+
+        self._fast_predict_with_dropout = _fast_predict_with_dropout
+        self._predict_with_dropout = jax.jit(jax.vmap(_predict_with_dropout, in_axes=(None, 0)))
+
         if optimizer==None:
-            # last_loss = lambda x,y : np.mean( ( x[:,-1,:]-y[:,-1,:] )**2 )
-            optimizer_instance = OGD(loss=batched_mse, learning_rate=0.01)
-            self._store_optimizer(optimizer_instance, self._predict)
+            optimizer = OGD(loss=batched_mse, learning_rate=0.01)
+
+        if self.dp_rate > 0.:
+            pred_fn = self._predict_with_dropout
         else:
-            self._store_optimizer(optimizer, self._predict)
+            pred_fn = self._predict
+
+        self._store_optimizer(optimizer, pred_fn)
 
     def _process_x(self, x):
         if x.ndim < 3:
@@ -114,7 +135,7 @@ class FloodLSTM(Method):
 
         self.x = x       
     
-    def predict(self, x):
+    def predict(self, x, inference=False):
         """
         Description: Predict next value given observation
         Args:
@@ -124,30 +145,28 @@ class FloodLSTM(Method):
         """
         assert self.initialized
         self._process_x(x)
-        self.dp_masks = None
-        if self.dp_rate > 0:
-            self.dp_masks = self.generate_dp_masks(x, self.keep_rate)
-            # self.x = np.where(self.dp_masks['input_masks'], x / self.keep_rate, 0)
-        
-        return self._predict(self.params, self.x)
 
-    def generate_dp_masks(self, x, rate):
+        if self.dp_rate > 0 and not inference:
+            self.input_masks, self.recurrent_masks, self.output_masks = self.generate_dp_masks(x, self.keep_rate)
+            return self._predict_with_dropout(self.params, (self.x, self.input_masks, self.recurrent_masks, self.output_masks))
+        else:
+            return self._predict(self.params, self.x)
+
+    def generate_dp_masks(self, x, keep_rate):
         batch_size = x.shape[0]
-        dp_masks = {}
-        input_masks = random.bernoulli(generate_key(), rate, (self.postembed_n,))
-        recurrent_masks = random.bernoulli(generate_key(), rate, (self.l, self.h))
-        output_masks = random.bernoulli(generate_key(), rate, (self.l, self.h))
-        dp_masks['input_masks'] = input_masks
-        dp_masks['recurrent_masks'] = recurrent_masks
-        dp_masks['output_masks'] = output_masks
-        return dp_masks
+
+        input_masks = random.bernoulli(generate_key(), keep_rate, (batch_size, self.postembed_n,)) / keep_rate
+        recurrent_masks = random.bernoulli(generate_key(), keep_rate, (batch_size, self.l, self.h)) / keep_rate
+        output_masks = random.bernoulli(generate_key(), keep_rate, (batch_size, self.l, self.h)) / keep_rate
+
+        return input_masks, recurrent_masks, output_masks
     
     def forecast(self, x, timeline = 1):
         ### TODO: See if this function needs to be implemented. 
         raise NotImplementedError
       
 
-    def update(self, y, dynamic=False):
+    def update(self, y):
         """
         Description: Updates parameters
         Args:
@@ -156,7 +175,11 @@ class FloodLSTM(Method):
             None
         """
         assert self.initialized
-        self.new_params = self.optimizer.update(self.params, self.x, y)
+        if self.dp_rate > 0:
+            x = (self.x, self.input_masks, self.recurrent_masks, self.output_masks)
+        else:
+            x = self.x
+        self.new_params = self.optimizer.update(self.params, x, y)
         self.params = self.new_params
         return
 
