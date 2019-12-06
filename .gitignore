@@ -1,6 +1,7 @@
 *.swp
 *.pyc
 *.py~
+*.pkl
 .DS_Store
 .cache
 .pytest_cache/
