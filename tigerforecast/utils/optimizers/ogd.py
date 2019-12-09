@@ -16,7 +16,7 @@ class OGD(Optimizer):
     Returns:
         None
     """
-    def __init__(self, pred=None, loss=mse, learning_rate=1.0, hyperparameters={}):
+    def __init__(self, pred=None, loss=mse, learning_rate=1.0, include_x_loss=False, hyperparameters={}):
         self.initialized = False
         self.lr = learning_rate
         self.hyperparameters = {'T':0, 'max_norm':True}
@@ -29,6 +29,7 @@ class OGD(Optimizer):
         self.G = None
         self.pred = pred
         self.loss = loss
+        self.include_x_loss = include_x_loss
         if self._is_valid_pred(pred, raise_error=False) and self._is_valid_loss(loss, raise_error=False):
             self.set_predict(pred, loss=loss)
 

@@ -19,7 +19,7 @@ class Optimizer():
     Returns:
         None
     """
-    def __init__(self, pred=None, loss=mse, learning_rate=1.0, hyperparameters={}):
+    def __init__(self, pred=None, loss=mse, learning_rate=1.0, include_x_loss= False, hyperparameters={}):
         self.initialized = False
         self.lr = learning_rate
         self.hyperparameters = {'reg':0.00} # L2 regularization, default value 0.01
@@ -30,8 +30,10 @@ class Optimizer():
             setattr(self, key, value) # store all hyperparameters        
         self.pred = pred
         self.loss = loss
+        self.include_x_loss = include_x_loss
         if self._is_valid_pred(pred, raise_error=False) and self._is_valid_loss(loss, raise_error=False):
             self.set_predict(pred, loss=loss)
+
 
     def set_loss(self, new_loss):
         """ Description: updates internal loss """
@@ -51,7 +53,10 @@ class Optimizer():
         self.pred = pred
         if loss != None: self.loss = loss
         self._is_valid_loss(self.loss, raise_error=True)
-        _loss = lambda params, x, y: self.loss(self.pred(params, x), y)
+        if self.include_x_loss:
+            _loss = lambda params, x, y: self.loss(self.pred(params, x), x, y)
+        else:
+            _loss = lambda params, x, y: self.loss(self.pred(params, x), y)
         _custom_loss = lambda params, x, y, custom_loss: custom_loss(pred(params, x), y)
         self._grad = jit(grad(_loss))
         self._custom_grad = jit(grad(_custom_loss), static_argnums=[3])
@@ -86,9 +91,13 @@ class Optimizer():
                 raise error.InvalidInput("Optimizer 'loss' input {} is not callable".format(loss))
             return False
         inputs = list(inspect.signature(loss).parameters)
-        if len(inputs) != 2:
+        if self.include_x_loss == False and len(inputs) != 2:
             if raise_error:
                 raise error.InvalidInput("Optimizer 'loss' input {} must take two arguments as input".format(loss))
+            return False
+        if self.include_x_loss == True and len(inputs) != 3:
+            if raise_error:
+                raise error.InvalidInput("Optimizer 'loss' input {} must take three arguments as input (include_x_loss flag True)".format(loss))
             return False
         try:
             jit_grad_loss = jit(grad(loss))
