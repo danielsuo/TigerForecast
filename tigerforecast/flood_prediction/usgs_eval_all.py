@@ -26,7 +26,7 @@ def usgs_eval(path, site_idx, dynamic=False):
 
 	eval_method = tigerforecast.method("FloodLSTM")
 	eval_method.initialize(n=8, m=1, l=61, h=HIDDEN_DIM, e_dim=EMBEDDING_DIM, num_sites=len(usgs_train.site_keys), optimizer=optim, dp_rate=0.0)
-	eval_method.params = method.copy()
+	eval_method.load(path)
 
 	if dynamic:
 		dynamic_optim.set_prior(eval_method.params)
@@ -39,7 +39,7 @@ def usgs_eval(path, site_idx, dynamic=False):
 		if dynamic:
 			eval_method.update(targets_exp)
 
-		loss = float(batched_mse_flood_adjusted(y_pred_LSTM, (data,), targets_exp) )
+		loss = float(batched_mse_flood_adjusted(y_pred, (data,), targets_exp) )
 
 		yhats.append(y_pred[0,-1,0])
 		ys.append(targets[0,-1])
@@ -47,9 +47,9 @@ def usgs_eval(path, site_idx, dynamic=False):
 
 	return np.array(yhats), np.array(ys), np.array(losses)
 
-site = 0
-yhats, ys, losses = usgs_eval(MODEL_PATH, site, dynamic=False)
-print('Eval %i: mse=%f, seq_loss' % (site, ((ys-yhats)**2).mean(), losses.mean()) )
+for idx, key in usgs_val.site_idx.items():
+	yhats, ys, losses = usgs_eval(MODEL_PATH, idx, dynamic=False)
+	print('Eval %i: mse=%f, seq_loss=%f' % (key, ((ys-yhats)**2).mean(), losses.mean()) )
 
 
 
