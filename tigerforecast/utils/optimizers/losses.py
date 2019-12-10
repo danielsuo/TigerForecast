@@ -35,11 +35,7 @@ def batched_mse_flood_adjusted(y_pred, x, y_true):
             x : input
             y_true : ground truth value
     '''
-    example_wise_loss = np.sum((y_pred - y_true)**2, axis=tuple(range(1, y_true.ndim)))
+    example_wise_loss = np.mean((y_pred - y_true)**2, axis=tuple(range(1, y_true.ndim)))
     rescale_vector = 1/(x[0][:,-1,-1] + 0.1)**2
-    print(x[0].shape)
-    print(x[0][:,-1,-1].shape)
-    print(rescale_vector.shape)
-    print(example_wise_loss.shape)
     return np.mean(rescale_vector*example_wise_loss)
 

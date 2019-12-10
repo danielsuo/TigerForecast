@@ -19,9 +19,9 @@ DATA_PATH = '../data/usgs_flood/usgs_{}.csv'
 
 # optim = OGD(loss=batched_mse, learning_rate=0.1)
 hyperparams = {'reg':0.0, 'beta_1': 0.9, 'beta_2': 0.999, 'eps': 1e-8, 'max_norm':True}
-optim = Adam(loss=batched_mse_flood_adjusted, learning_rate=1.0, include_x_loss=True, hyperparameters=hyperparams)
+optim = Adam(loss=batched_mse_flood_adjusted, learning_rate=1e-3, include_x_loss=True, hyperparameters=hyperparams)
 
-usgs_train = USGSDataLoader(DATA_PATH.format('train_mini'))
+usgs_train = USGSDataLoader(DATA_PATH.format('train'))
 usgs_val = USGSDataLoader(DATA_PATH.format('val_mini'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)
 
 method_LSTM = tigerforecast.method("FloodLSTM")
@@ -62,18 +62,17 @@ for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_
 	#print(y_pred_LSTM[0,:,0])
 	#print(targets[0,:])
 	targets_exp = np.expand_dims(targets, axis=-1)
-	loss = float(batched_mse(jax.device_put(targets_exp), y_pred_LSTM))
+	loss = float(batched_mse_flood_adjusted(y_pred_LSTM, (data,), targets_exp) )
 	results_LSTM.append(loss)
 	method_LSTM.update(targets_exp)
 
 	if i%100 == 0:
 		print('Step %i: loss=%f' % (i,results_LSTM[-1]) )
+
+	if i>0 and i%3000 == 0:
 		yhats, ys = usgs_eval(method_LSTM, 0, dynamic=False)
 		print('Eval: loss=%f' % ((ys-yhats)**2).mean() )
-
-	if i == 1100:
-		optim.lr /= 10
-
+		method_LSTM.save('full_%i.npy' % i)
 print("Training Done")
 # yhats, ys = usgs_eval(method_LSTM, 0)
 # print(yhats.shape, ys.shape)
