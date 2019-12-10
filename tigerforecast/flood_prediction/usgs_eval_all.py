@@ -16,7 +16,8 @@ EMBEDDING_DIM = 10
 DATA_PATH = '../data/usgs_flood/usgs_{}.csv'
 MODEL_PATH = 'full_27000.pkl'
 
-usgs_val = USGSDataLoader(DATA_PATH.format('val_mini'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)
+usgs_train = USGSDataLoader(DATA_PATH.format('train'))
+usgs_val = USGSDataLoader(DATA_PATH.format('val'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)
 
 def usgs_eval(path, site_idx, dynamic=False):
 	optim = OGD(loss=batched_mse, learning_rate=0.1)
