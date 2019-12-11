@@ -14,10 +14,10 @@ SEQUENCE_LENGTH = 61
 HIDDEN_DIM = 100
 EMBEDDING_DIM = 10
 DATA_PATH = '../data/usgs_flood/usgs_{}.csv'
-MODEL_PATH = 'full_27000.pkl'
+MODEL_PATH = 'full_99000.pkl'
 
 usgs_train = USGSDataLoader(DATA_PATH.format('train'))
-usgs_val = USGSDataLoader(DATA_PATH.format('val'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)
+usgs_val = USGSDataLoader(DATA_PATH.format('val'), site_idx=usgs_train.site_idx, normalize_source=None)
 
 def usgs_eval(path, site_idx, dynamic=False):
 	optim = OGD(loss=batched_mse, learning_rate=0.1)
