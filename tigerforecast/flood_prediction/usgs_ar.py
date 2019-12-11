@@ -11,7 +11,7 @@ from tigerforecast.utils.optimizers import *
 from tigerforecast.utils.optimizers.losses import *
 from tigerforecast.utils.dynamic import *
 
-TRAINING_STEPS = 150000
+TRAINING_STEPS = 250000
 BATCH_SIZE = 1024
 SEQUENCE_LENGTH = 61
 HIDDEN_DIM = 100
@@ -67,11 +67,14 @@ for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_
 	loss = float(batched_mse(jax.device_put(targets_exp), y_pred))
 	results.append(loss)
 	train_method.update(targets_exp)
+    if i == 100:
+        train_method.save("check_save.pkl")
 
 	if i%3000 == 0:
 		print('Step %i: loss=%f' % (i,results[-1]) )
 # if i%1000 == 0:
 		yhats, ys = usgs_eval(train_method, 0, False)
 		print('Eval: loss=%f' % ((ys-yhats)**2).mean() )
-#		train_method.save('full_%i.pkl' % i)
+
+train_method.save('trained_ar_0_reg.pkl')
 
