@@ -40,6 +40,7 @@ class USGSDataLoader:
         # site_idx : site_id -> index
         if site_idx:
             self.site_idx = site_idx
+            self.site_keys = [x for x in self.site_keys if x in site_idx]
         else:
             self.site_idx = {x:i for i,x in enumerate(self.site_keys)}
  
@@ -49,6 +50,8 @@ class USGSDataLoader:
         self.data_length = dict()
 
         for key, df in self.groups:
+            if key not in self.site_idx:
+                continue
             data = df[FEATURES].to_numpy()
 
             # df_metrics = self.groups_metrics.get_group(key)
@@ -73,6 +76,8 @@ class USGSDataLoader:
         self.normalize_moments = dict()
         self.normalize_source = normalize_source
         for key, _ in self.groups:
+            if key not in self.site_idx:
+                continue
             for feature in NORMALIZE_INDICES:
                 if normalize_source:
                     mean, std = normalize_source.normalize_moments[(self.site_idx[key], feature)]

@@ -11,18 +11,18 @@ from tigerforecast.utils.optimizers import *
 from tigerforecast.utils.optimizers.losses import *
 from tigerforecast.utils.dynamic import *
 
-TRAINING_STEPS = 150000
+TRAINING_STEPS = 250000
 BATCH_SIZE = 1024
 SEQUENCE_LENGTH = 61
 HIDDEN_DIM = 100
 EMBEDDING_DIM = 10
 DATA_PATH = '../data/usgs_flood/usgs_{}.csv'
-L2_REG_CONST = 0.005
+L2_REG_CONST = 0.000
 
 optim = OGD(loss=batched_mse, learning_rate=0.1, hyperparameters={'reg':L2_REG_CONST})
 #reg = lambda params: L2_REG_CONST*np.sum([np.linalg.norm(w) for w in params.values()])
 
-usgs_train = USGSDataLoader(DATA_PATH.format('train_mini'))
+usgs_train = USGSDataLoader(DATA_PATH.format('train'))
 usgs_val = USGSDataLoader(DATA_PATH.format('val_mini'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)
 
 train_method = tigerforecast.method("FloodAR")
@@ -67,11 +67,12 @@ for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_
 	loss = float(batched_mse(jax.device_put(targets_exp), y_pred))
 	results.append(loss)
 	train_method.update(targets_exp)
-
+	
 	if i%3000 == 0:
 		print('Step %i: loss=%f' % (i,results[-1]) )
 # if i%1000 == 0:
 		yhats, ys = usgs_eval(train_method, 0, False)
 		print('Eval: loss=%f' % ((ys-yhats)**2).mean() )
-#		train_method.save('full_%i.pkl' % i)
+
+train_method.save('trained_ar_0_reg.pkl')
 
