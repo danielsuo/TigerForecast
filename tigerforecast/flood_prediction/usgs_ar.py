@@ -67,7 +67,7 @@ for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_
 	loss = float(batched_mse(jax.device_put(targets_exp), y_pred))
 	results.append(loss)
 	train_method.update(targets_exp)
-	
+
 	if i%3000 == 0:
 		print('Step %i: loss=%f' % (i,results[-1]) )
 # if i%1000 == 0:
