@@ -11,18 +11,18 @@ from tigerforecast.utils.optimizers import *
 from tigerforecast.utils.optimizers.losses import *
 from tigerforecast.utils.dynamic import *
 
-TRAINING_STEPS = 150000
+TRAINING_STEPS = 300000
 BATCH_SIZE = 1024
 SEQUENCE_LENGTH = 61
 HIDDEN_DIM = 100
 EMBEDDING_DIM = 10
 DATA_PATH = '../data/usgs_flood/usgs_{}.csv'
-L2_REG_CONST = 0.005
+L2_REG_CONST = 0.000
 
 optim = OGD(loss=batched_mse, learning_rate=0.1, hyperparameters={'reg':L2_REG_CONST})
 #reg = lambda params: L2_REG_CONST*np.sum([np.linalg.norm(w) for w in params.values()])
 
-usgs_train = USGSDataLoader(DATA_PATH.format('train_mini'))
+usgs_train = USGSDataLoader(DATA_PATH.format('train'))
 usgs_val = USGSDataLoader(DATA_PATH.format('val_mini'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)
 
 train_method = tigerforecast.method("FloodAR")
