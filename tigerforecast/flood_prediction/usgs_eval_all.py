@@ -32,7 +32,7 @@ def usgs_eval(path, site_idx, dynamic=False):
 		dynamic_optim.set_prior(eval_method.params)
 
 	yhats, ys, losses = [], [], []
-	for data, targets in usgs_val.sequential_batches(site_idx=1, batch_size=1):
+	for data, targets in usgs_val.sequential_batches(site_idx=site_idx, batch_size=1):
 		y_pred = eval_method.predict(data)
 
 		targets_exp = np.expand_dims( np.expand_dims(targets[:,-1], axis=-1), axis=-1 )
@@ -48,8 +48,8 @@ def usgs_eval(path, site_idx, dynamic=False):
 	return np.array(yhats), np.array(ys), np.array(losses)
 
 for idx, key in usgs_val.site_idx.items():
-	yhats, ys, losses = usgs_eval(MODEL_PATH, idx, dynamic=False)
-	print('Eval %i: mse=%f, seq_loss=%f' % (key, ((ys-yhats)**2).mean(), losses.mean()) )
+	yhats, ys, losses = usgs_eval(MODEL_PATH, key, dynamic=False)
+	print('Eval %i: mse=%f, seq_loss=%f' % (idx, ((ys-yhats)**2).mean(), losses.mean()) )
 
 
 
