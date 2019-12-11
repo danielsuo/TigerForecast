@@ -22,7 +22,7 @@ L2_REG_CONST = 0.000
 optim = OGD(loss=batched_mse, learning_rate=0.1, hyperparameters={'reg':L2_REG_CONST})
 #reg = lambda params: L2_REG_CONST*np.sum([np.linalg.norm(w) for w in params.values()])
 
-usgs_train = USGSDataLoader(DATA_PATH.format('train'))
+usgs_train = USGSDataLoader(DATA_PATH.format('train_mini'))
 usgs_val = USGSDataLoader(DATA_PATH.format('val_mini'), site_idx=usgs_train.site_idx, normalize_source=usgs_train)
 
 train_method = tigerforecast.method("FloodAR")
@@ -67,7 +67,7 @@ for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_
 	loss = float(batched_mse(jax.device_put(targets_exp), y_pred))
 	results.append(loss)
 	train_method.update(targets_exp)
-	
+
 	if i%3000 == 0:
 		print('Step %i: loss=%f' % (i,results[-1]) )
 # if i%1000 == 0:
