@@ -16,10 +16,12 @@ FEATURES = ['__site_id',
     'train:site:mean:USGS:discharge_mean',
     'train:site:std:USGS:discharge_mean']
 
+FEATURES_METRICS = ['__site_id', 'metrics:return_period_values', 'metrics:return_periods']
+
 NORMALIZE_INDICES = [2,3]
 
 class USGSDataLoader:
-    def __init__(self, path, seq_length=61, site_idx=None, normalize_source=None):
+    def __init__(self, path, metrics_path=None, seq_length=61, site_idx=None, normalize_source=None):
         self.seq_length = seq_length
         self.target_lag = 1
 
@@ -29,7 +31,11 @@ class USGSDataLoader:
         self.site_keys = list(self.groups.groups.keys())
         self.site_keys.sort()
 
-        
+        self.df_metrics = pd.read_csv(metrics_path)
+        # self.groups_metrics = self.df_metrics.groupby(by='__site_id')
+        # self.site_keys_metrics = list(self.groups_metrics.groups.keys())
+        # self.site_keys_metrics.sort()
+
         # site_keys: index -> site_id
         # site_idx : site_id -> index
         if site_idx:
@@ -47,6 +53,9 @@ class USGSDataLoader:
             if key not in self.site_idx:
                 continue
             data = df[FEATURES].to_numpy()
+
+            # df_metrics = self.groups_metrics.get_group(key)
+            data_metrics = self.df_metrics.loc[self.df_metrics['__site_id'] == key].to_numpy()
             # last index 1 locates target discharge_mean; see FEATURES
             targets = data[:,1].copy()
             # mask the current target
@@ -54,8 +63,13 @@ class USGSDataLoader:
 
             # compress site_ids
             data[:,0] = self.site_idx[key]
-        
-            self.np_data[self.site_idx[key]] = data, targets
+            data_metrics[:,0] = self.site_idx[key]
+            data_metric_row = data_metrics[0]
+            data_metric_row = data_metric_row[2:]
+            data_metric_row[1] = np.around(np.array(ast.literal_eval(data_metric_row[1])), 3)
+            data_metric_row[2] = np.around(np.array(ast.literal_eval(data_metric_row[2])), 3)
+
+            self.np_data[self.site_idx[key]] = (data, targets, data_metric_row)
             self.data_length[self.site_idx[key]] = len(data)
 
         # normalize from your own per-site statistics if None, or from reference (train) set 
@@ -81,12 +95,21 @@ class USGSDataLoader:
         if t < self.seq_length + self.target_lag - 1:
             raise KeyError
 
-        all_data, all_targets = self.np_data[site_idx]
+        all_data, all_targets, _ = self.np_data[site_idx]
 
         data = all_data[t-self.seq_length+1:t+1, :]
         target = all_targets[t-self.seq_length+1:t+1]
 
         return data, target
+
+    def get_data_metrics(self, site_idx):
+        return self.np_data[site_idx][2]
+        '''
+        row = self.np_data[site_idx][2][0][2:]
+        if not isinstance(row[1], np.ndarray):
+            row[1] = np.around(np.array(ast.literal_eval(row[1])), 3)
+            row[2] = np.around(np.array(ast.literal_eval(row[2])), 3)
+        return row'''
 
     def random_site_idx(self):
         # generates a random site index
