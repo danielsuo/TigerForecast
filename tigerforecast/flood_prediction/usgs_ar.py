@@ -19,7 +19,7 @@ EMBEDDING_DIM = 10
 DATA_PATH = '../data/usgs_flood/usgs_{}.csv'
 L2_REG_CONST = 0.000
 
-optim = OGD(loss=batched_mse, learning_rate=0.1, hyperparameters={'reg':L2_REG_CONST})
+optim = OGD(loss=batched_mse, learning_rate=0.01, hyperparameters={'reg':L2_REG_CONST})
 #reg = lambda params: L2_REG_CONST*np.sum([np.linalg.norm(w) for w in params.values()])
 
 usgs_train = USGSDataLoader(DATA_PATH.format('train_mini'))
