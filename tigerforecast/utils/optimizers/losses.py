@@ -39,3 +39,16 @@ def batched_mse_flood_adjusted(y_pred, x, y_true):
     rescale_vector = 1/(x[0][:,-1,-1] + 0.1)**2
     return np.mean(rescale_vector*example_wise_loss)
 
+def batched_mse_flood_adjusted_withoutDO(y_pred, x, y_true):
+    ''' Description: mean-square-error loss on a batch adjusting on site std for flood
+        Args:
+            y_pred : value predicted by method
+            x : input
+            y_true : ground truth value
+    '''
+    example_wise_loss = np.mean((y_pred - y_true)**2, axis=tuple(range(1, y_true.ndim)))
+    # print("x.shape = " + str(x.shape))
+    rescale_vector = 1/(x[:,-1,-1] + 0.1)**2
+    return np.mean(rescale_vector*example_wise_loss)
+
+

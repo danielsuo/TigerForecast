@@ -10,7 +10,7 @@ from tigerforecast.methods.lstm import LSTM
 from tigerforecast.methods.wave_filtering import WaveFiltering
 from tigerforecast.methods.boosting.simple_boost import SimpleBoost
 from tigerforecast.methods.seq2seqlstmstateless import Seq2seqLSTMStateless
-from tigerforecast.methods.floodlstm import FloodLSTM
+from tigerforecast.methods.floodlstm_Alex import FloodLSTM
 from tigerforecast.methods.ARStateless import ARStateless
 from tigerforecast.methods.FloodAR import FloodAR
 #from tigerforecast.methods.prophet import Prophet
