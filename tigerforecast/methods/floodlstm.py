@@ -195,4 +195,3 @@ class FloodLSTM(Method):
         self.new_params = self.optimizer.update(self.params, x, y)
         self.params = self.new_params
         return
-

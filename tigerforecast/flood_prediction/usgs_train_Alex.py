@@ -15,17 +15,16 @@ _METRICS_CLIPPED_RMSE_RETURN_PERIOD = 0.005  # Roughly 50% of the data.
 _METRICS_RETURN_PERIODS = (0.05, 0.1, 1.)
 
 
-TRAINING_STEPS = 100
+TRAINING_STEPS = 1000
 BATCH_SIZE = 1024
 SEQUENCE_LENGTH = 61
 HIDDEN_DIM = 100
 EMBEDDING_DIM = 10
 DATA_PATH = '../data/usgs_flood/usgs_{}.csv'
-DATA_METRICS_PATH = '../data/usgs_flood/usgs_{}.csv'
 
 # optim = OGD(loss=batched_mse, learning_rate=0.1)
 hyperparams = {'reg':0.0, 'beta_1': 0.9, 'beta_2': 0.999, 'eps': 1e-8, 'max_norm':True}
-optim = Adam(loss=batched_mse_flood_adjusted, learning_rate=1e-3, include_x_loss=True, hyperparameters=hyperparams)
+optim = Adam(loss=batched_mse_flood_adjusted_withoutDO, learning_rate=1e-3, include_x_loss=True, hyperparameters=hyperparams)
 
 usgs_train = USGSDataLoader(path=DATA_PATH.format('train_mini'), 
 							metrics_path = DATA_PATH.format('train_threshold_data'))
@@ -35,7 +34,7 @@ usgs_val = USGSDataLoader(path=DATA_PATH.format('val_mini'),
 						  normalize_source=usgs_train)
 
 method_LSTM = tigerforecast.method("FloodLSTM")
-method_LSTM.initialize(n=8, m=1, l=61, h=HIDDEN_DIM, e_dim=EMBEDDING_DIM, num_sites=len(usgs_train.site_keys), optimizer=optim, dp_rate=0.1)
+method_LSTM.initialize(n=8, m=1, l=61, h=HIDDEN_DIM, e_dim=EMBEDDING_DIM, num_sites=len(usgs_train.site_keys), optimizer=optim, dp_rate=0.)
 
 results_LSTM = []
 pred_LSTM = []
@@ -45,7 +44,6 @@ def calculate_r2_per_site(y_true, y_pred):
 	Args:
 	y_true: The true labels of a single site.
 	y_pred: The predictions (must match y_true.shape).
-	weights: NOT SUPPORTED.
 	Returns:
 	R2 for this site's data.
 	"""
@@ -247,13 +245,20 @@ for return_period in _METRICS_RETURN_PERIODS:
 
 for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_SIZE, num_batches=TRAINING_STEPS) ):
 	y_pred_LSTM = method_LSTM.predict(data)
+	if i%10 == 0:
+		print("i = " + str(i))
+		print(y_pred_LSTM[0,-10:,0])
+	# print("data.shape = " + str(data.shape))
+	# print("y_pred_LSTM.shape = " + str(y_pred_LSTM.shape))
 	pred_LSTM.append(y_pred_LSTM[0,-1,0])
 	#print(y_pred_LSTM[0,:,0])
 	#print(targets[0,:])
 	targets_exp = np.expand_dims(targets, axis=-1)
-	loss = float(batched_mse_flood_adjusted(y_pred_LSTM, (data,), targets_exp) )
+	loss = float(batched_mse_flood_adjusted_withoutDO(y_pred_LSTM, data, targets_exp) )
 	results_LSTM.append(loss)
+	# print("about to update")
 	method_LSTM.update(targets_exp)
+	# print("finished update")
 
 	y_hats = y_pred_LSTM[:,-1,0]
 	ys = targets[:,-1]
@@ -350,11 +355,11 @@ for return_period in _METRICS_RETURN_PERIODS:
 	plt.legend()
 
 	plt.subplot(233)
-	plt.plot(train_recall[return_period], label="train_recall" + p)
+	plt.plot(train_recall[return_period], label="train_recall_" + p)
 	plt.legend()
 
 	plt.subplot(234)
-	plt.plot(train_f1[return_period], label="train_f1" + p)
+	plt.plot(train_f1[return_period], label="train_f1_" + p)
 	plt.legend()
 
 	plt.subplot(235)
@@ -378,11 +383,11 @@ for return_period in _METRICS_RETURN_PERIODS:
 	plt.legend()
 
 	plt.subplot(233)
-	plt.plot(eval_recall[return_period], label="eval_recall" + p)
+	plt.plot(eval_recall[return_period], label="eval_recall_" + p)
 	plt.legend()
 
 	plt.subplot(234)
-	plt.plot(eval_f1[return_period], label="eval_f1" + p)
+	plt.plot(eval_f1[return_period], label="eval_f1_" + p)
 	plt.legend()
 
 	plt.subplot(235)
