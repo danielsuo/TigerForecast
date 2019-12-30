@@ -25,6 +25,18 @@ class FloodLSTM(Method):
         self.initialized = False
         self.uses_regressors = True
 
+    def _keras_initialize_params(self):
+        glorot_uniform_init = jax.nn.initializers.glorot_uniform()
+        glorot_init = stax.glorot()
+        W_xh = glorot_uniform_init(generate_key(), (4*self.h, self.postembed_n))
+        W_out = glorot_uniform_init(generate_key(), (self.m, self.h)) # maps h_t to output
+        W_embed = glorot_uniform_init(generate_key(), (self.num_sites, self.e_dim))
+        b_h = np.zeros(4*h)
+        b_h = jax.ops.index_update(b_h, jax.ops.index[self.h:2*self.h], np.ones(self.h)) # forget gate biased initialization
+        W_hh_normal = glorot_init(generate_key(), (4*self.h, self.postembed_n))
+        W_hh = np.vstack([np.linalg.svd(W_hh_normal[i:i+self.h,:])[0] for i in range(0,4*self.h,self.h)])
+        return W_hh, W_xh, W_out, W_embed, b_h 
+
     def initialize(self, n=1, m=1, l = 32, h = 100, 
                    e_dim = 10, num_sites = 1000, optimizer = None, dp_rate=0., filename=None
                   ):
@@ -43,13 +55,14 @@ class FloodLSTM(Method):
         self.n, self.m, self.l, self.h, self.e_dim, self.num_sites = n, m, l, h, e_dim, num_sites
         self.postembed_n = self.n - 1 + self.e_dim 
         # initialize parameters
-        glorot_init = stax.glorot() # returns a function that initializes weights
-        W_hh = glorot_init(generate_key(), (4*h, h)) # maps h_t to gates
-        W_xh = glorot_init(generate_key(), (4*h, self.postembed_n)) # maps x_t to gates
-        W_out = glorot_init(generate_key(), (m, h)) # maps h_t to output
-        W_embed = glorot_init(generate_key(), (num_sites, e_dim))
-        b_h = np.zeros(4*h)
-        b_h = jax.ops.index_update(b_h, jax.ops.index[h:2*h], np.ones(h)) # forget gate biased initialization
+        # glorot_init = stax.glorot() # returns a function that initializes weights
+        # W_hh = glorot_init(generate_key(), (4*h, h)) # maps h_t to gates
+        # W_xh = glorot_init(generate_key(), (4*h, self.postembed_n)) # maps x_t to gates
+        # W_out = glorot_init(generate_key(), (m, h)) # maps h_t to output
+        # W_embed = glorot_init(generate_key(), (num_sites, e_dim))
+        # b_h = np.zeros(4*h)
+        # b_h = jax.ops.index_update(b_h, jax.ops.index[h:2*h], np.ones(h)) # forget gate biased initialization
+        W_hh, W_xh, W_out, W_embed, b_h = self._keras_initialize_params()
         self.params = {'W_hh' : W_hh,
                        'W_xh' : W_xh,
                        'W_out' : W_out,
