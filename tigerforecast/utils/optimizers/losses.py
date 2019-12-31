@@ -26,7 +26,7 @@ def batched_mse(y_pred, y_true):
             y_pred : value predicted by method
             y_true : ground truth value
     '''
-    return np.mean(np.sum((y_pred - y_true)**2, axis=tuple(range(1, y_true.ndim))))
+    return np.mean(np.mean((y_pred - y_true)**2, axis=tuple(range(1, y_true.ndim))))
 
 def batched_mse_flood_adjusted(y_pred, x, y_true):
     ''' Description: mean-square-error loss on a batch adjusting on site std for flood

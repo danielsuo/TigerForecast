@@ -7,12 +7,9 @@ import os
 import itertools
 import ast
 
-
-
-
 # order of columns:
-# 0 = gauge
-# 1 - 60 = static features
+# 0 = gauge_id
+# 1 - 59 = static features
 # 60 - 64 = seq_features
 # 65    b = target
 
@@ -214,16 +211,16 @@ usgs_train = USGSDataLoader(mode='train')
 
 usgs_val = USGSDataLoader(mode='val', gaugeID_to_idx=usgs_train.gaugeID_to_idx)
 
-# # get site 0, time 123
-data, target = usgs_train.featurize(1, 300)
-print(data.shape, target.shape)
+# # # get site 0, time 123
+# data, target = usgs_train.featurize(1, 300)
+# print(data.shape, target.shape, data[0:2 ,58:65], data[0:2, 0:4])
 
 # # probe randomly into the dataset
-for data, targets in usgs_train.random_batches(batch_size=8, num_batches=5):
-     print(data.shape, targets.shape, data[:,0,1])
+# for data, targets in usgs_train.random_batches(batch_size=8, num_batches=1):
+#      print(data.shape, targets.shape, data[:,0:1,58:65])
 
-# # probe sequentially to cover a single site's time series
-for data, targets in usgs_val.sequential_batches(site_idx=1, batch_size=1, num_batches=10):
-     print(data.shape, targets.shape, data[:,0:5,64])
+# # # probe sequentially to cover a single site's time series
+# for data, targets in usgs_val.sequential_batches(site_idx=1, batch_size=1, num_batches=10):
+#      print(data.shape, targets.shape, data[:,0:5,64])
 
 # print(data, target)

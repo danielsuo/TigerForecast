@@ -10,6 +10,8 @@ from tigerforecast.methods.lstm import LSTM
 from tigerforecast.methods.wave_filtering import WaveFiltering
 from tigerforecast.methods.boosting.simple_boost import SimpleBoost
 from tigerforecast.methods.seq2seqlstmstateless import Seq2seqLSTMStateless
+from tigerforecast.methods.seq2seqLSTM import Seq2SeqLSTM
+from tigerforecast.methods.seq2valLSTM import Seq2ValLSTM
 from tigerforecast.methods.floodlstm import FloodLSTM
 from tigerforecast.methods.ARStateless import ARStateless
 from tigerforecast.methods.FloodAR import FloodAR
@@ -60,6 +62,16 @@ method_register(
 method_register(
     id='Seq2seqLSTMStateless',
     entry_point='tigerforecast.methods:Seq2seqLSTMStateless',
+)
+
+method_register(
+    id='Seq2SeqLSTM',
+    entry_point='tigerforecast.methods:Seq2SeqLSTM',
+)
+
+method_register(
+    id='Seq2ValLSTM',
+    entry_point='tigerforecast.methods:Seq2ValLSTM',
 )
 
 method_register(
