@@ -15,7 +15,7 @@ import numpy as onp
 TRAINING_STEPS = 100000
 BATCH_SIZE = 1024
 SEQUENCE_LENGTH = 270
-HIDDEN_DIM = 100
+HIDDEN_DIM = 256
 EMBEDDING_DIM = 10
 DP_RATE = 0.4
 INDICES_TO_KEEP = [15, 16, 17, 18, 19, 20, 21, 22, 26, 27, 28, 29, 30, 31, 32, 34, 35, 37, 38, 39, 40, 41, 48, 49, 50, 56, 58, 60, 61, 62, 63, 64, 65]
@@ -79,13 +79,14 @@ for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_
 	
 	if i%100 == 0:
 		print('Step %i: loss=%f' % (i,results_LSTM[-1]) )
+	if i%1000 == 0:
 		# handle eval metrics	
 		yhats, ys = usgs_eval(method_LSTM, 0, dynamic=False)
 		print('Eval: loss=%f' % ((ys-yhats)**2).mean() )
 		ys_mean = ys.mean()
 		print('NSE: %f' % (1 - ((ys - yhats)**2).sum()/((ys - ys_mean)**2).sum()))
 
-	
+
 
 	# if i == 1100:
 	# 	optim.lr /= 10
