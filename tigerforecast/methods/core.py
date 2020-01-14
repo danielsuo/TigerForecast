@@ -45,6 +45,7 @@ class Method(object):
         """
         f = open(filename, 'rb')
         self.params = pickle.load(f)
+        # print(self.params)
         #self.initial_params = [x.copy() for x in self.params]
         f.close()
         return 

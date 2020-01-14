@@ -5,6 +5,7 @@ import jax
 import jax.numpy as np
 import jax.experimental.stax as stax
 import jax.random as random
+import jax.nn.initializers as nninit
 import tigerforecast
 from tigerforecast.utils.random import generate_key
 from tigerforecast.methods import Method
@@ -36,6 +37,19 @@ class Seq2ValLSTM(Method):
         W_hh = np.vstack([np.linalg.svd(W_hh_normal[i:i+self.h,:])[0] for i in range(0,4*self.h,self.h)])
         return W_hh, W_xh, W_out, b_h 
 
+    def _flood_initialize_params(self):
+        glorot_uniform_init = jax.nn.initializers.glorot_uniform()
+        glorot_init = stax.glorot()
+        # W_xh = glorot_uniform_init(generate_key(), (4*self.h, self.n))
+        W_xh = nninit.orthogonal()(generate_key(), (4*self.h, self.n))
+        W_out = glorot_uniform_init(generate_key(), (self.m, self.h)) # maps h_t to output
+        b_h = np.zeros(4*self.h)
+        b_h = jax.ops.index_update(b_h, jax.ops.index[self.h:2*self.h], 5*np.ones(self.h)) # forget gate biased initialization
+        W_hh = np.tile(np.eye(self.h), (4,1))
+        # W_hh_normal = glorot_init(generate_key(), (4*self.h, self.n))
+        # W_hh = np.vstack([np.linalg.svd(W_hh_normal[i:i+self.h,:])[0] for i in range(0,4*self.h,self.h)])
+        return W_hh, W_xh, W_out, b_h 
+
     def _jon_initialize_params(self):
         glorot_init = stax.glorot() # returns a function that initializes weights
         W_hh = glorot_init(generate_key(), (4*self.h, self.h)) # maps h_t to gates
@@ -63,8 +77,8 @@ class Seq2ValLSTM(Method):
         self.initialized = True
         self.n, self.m, self.l, self.h = n, m, l, h
         # initialize parameters
-        #W_hh, W_xh, W_out, b_h = self._keras_initialize_params()
-        W_hh, W_xh, W_out, b_h = self._jon_initialize_params()
+        W_hh, W_xh, W_out, b_h = self._keras_initialize_params()
+        # W_hh, W_xh, W_out, b_h = self._flood_initialize_params()
         self.params = {'W_hh' : W_hh,
                        'W_xh' : W_xh,
                        'W_out' : W_out,
