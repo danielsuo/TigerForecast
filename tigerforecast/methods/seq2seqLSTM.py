@@ -12,6 +12,7 @@ from tigerforecast.utils.optimizers import *
 from tigerforecast.utils.optimizers.losses import *
 import pickle
 
+#TODO: INPUT MASK IS NOT USED 
 
 class Seq2SeqLSTM(Method):
     """

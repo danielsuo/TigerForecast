@@ -13,6 +13,8 @@ from tigerforecast.utils.optimizers import *
 from tigerforecast.utils.optimizers.losses import *
 import pickle
 
+# TODO: Input Masks are not Used. Correct it. 
+# TODO: REcurrent Masks are also turned off. Correct it. 
 
 class Seq2ValLSTM(Method):
     """
@@ -42,7 +44,7 @@ class Seq2ValLSTM(Method):
         glorot_init = stax.glorot()
         # W_xh = glorot_uniform_init(generate_key(), (4*self.h, self.n))
         W_xh = nninit.orthogonal()(generate_key(), (4*self.h, self.n))
-        W_out = glorot_uniform_init(generate_key(), (self.m, self.h)) # maps h_t to output
+        W_out = glorot_uniform_init(generate_key(), (self.m, self.h)) * np.sqrt(self.m + self.h)/(6*np.sqrt(self.h))  # maps h_t to output
         b_h = np.zeros(4*self.h)
         b_h = jax.ops.index_update(b_h, jax.ops.index[self.h:2*self.h], 5*np.ones(self.h)) # forget gate biased initialization
         W_hh = np.tile(np.eye(self.h), (4,1))
@@ -77,8 +79,8 @@ class Seq2ValLSTM(Method):
         self.initialized = True
         self.n, self.m, self.l, self.h = n, m, l, h
         # initialize parameters
-        W_hh, W_xh, W_out, b_h = self._keras_initialize_params()
-        # W_hh, W_xh, W_out, b_h = self._flood_initialize_params()
+        #W_hh, W_xh, W_out, b_h = self._keras_initialize_params()
+        W_hh, W_xh, W_out, b_h = self._flood_initialize_params()
         self.params = {'W_hh' : W_hh,
                        'W_xh' : W_xh,
                        'W_out' : W_out,
@@ -108,7 +110,7 @@ class Seq2ValLSTM(Method):
             params, hid, cell, recurrent_mask, output_mask, t = carry # unroll tuple in carry
             sigmoid = lambda x: 1. / (1. + np.exp(-x)) # no JAX implementation of sigmoid it seems?
 
-            hid *= recurrent_mask[t]
+            # hid *= recurrent_mask[t]
             
             gate = np.dot(params['W_hh'], hid) + np.dot(params['W_xh'], x) + params['b_h'] 
             i, f, g, o = np.split(gate, 4) # order: input, forget, cell, output
