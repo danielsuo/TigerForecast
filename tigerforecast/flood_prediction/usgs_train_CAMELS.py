@@ -18,7 +18,7 @@ SEQUENCE_LENGTH = 270
 HIDDEN_DIM = 256
 EMBEDDING_DIM = 10
 DP_RATE = 0.4
-INDICES_TO_KEEP = [15, 16, 17, 18, 19, 20, 21, 22, 26, 27, 28, 29, 30, 31, 32, 34, 35, 37, 38, 39, 40, 41, 48, 49, 50, 56, 58, 60, 61, 62, 63, 64, 65]
+INDICES_TO_KEEP = [15, 16, 17, 18, 19, 20, 21, 22, 26, 27, 28, 29, 30, 31, 32, 34, 35, 37, 38, 39, 40, 41, 48, 49, 50, 56, 58, 60, 61, 62, 63, 64]
 INPUT_DIM = len(INDICES_TO_KEEP)
 DATA_PATH = '../data/usgs_flood/usgs_{}.csv'
 TRAIN_SEQ_TO_SEQ = False
@@ -28,7 +28,13 @@ hyperparams = {'reg':0.0, 'beta_1': 0.9, 'beta_2': 0.999, 'eps': 1e-8, 'max_norm
 optim = Adam(loss=batched_mse, learning_rate=1e-3, include_x_loss=False, hyperparameters=hyperparams)
 
 usgs_train = USGSDataLoader(mode='train')
+print(usgs_train.gauge_keys)
+a = [usgs_train.data_length[usgs_train.gaugeID_to_idx[k]] for k in usgs_train.gauge_keys]
+print(a)
+print(sum(a))
 usgs_val = USGSDataLoader(mode='val', gaugeID_to_idx=usgs_train.gaugeID_to_idx)
+
+
 
 if TRAIN_SEQ_TO_SEQ:
 	method_LSTM = tigerforecast.method("Seq2SeqLSTM")
