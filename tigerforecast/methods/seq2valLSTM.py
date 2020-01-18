@@ -105,7 +105,7 @@ class Seq2ValLSTM(Method):
             i, f, g, o = np.split(gate, 4) # order: input, forget, cell, output
             next_cell =  sigmoid(f) * cell + sigmoid(i) * np.tanh(g)
             next_hid = sigmoid(o) * np.tanh(next_cell)
-            y = np.dot(params['W_out'], next_hid)
+            y = np.dot(params['W_out'], next_hid) + params['b_out']
             return (params, next_hid, next_cell), y
 
         @jax.jit
@@ -120,7 +120,7 @@ class Seq2ValLSTM(Method):
             next_cell =  sigmoid(f) * cell + sigmoid(i) * np.tanh(g)
             next_hid = sigmoid(o) * np.tanh(next_cell)
 
-            y = np.dot(params['W_out'], next_hid * output_mask[t])
+            y = np.dot(params['W_out'], next_hid * output_mask[t]) + params['b_out']
 
             return (params, next_hid, next_cell, recurrent_mask, output_mask, t+1), y
 
