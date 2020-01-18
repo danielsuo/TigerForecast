@@ -6,6 +6,7 @@ import random
 import os
 import itertools
 import ast
+from tigerforecast.utils.download_tools import *
 
 # order of columns:
 # 0 = gauge_id
@@ -17,6 +18,8 @@ import ast
 
 FACTORIZE = ['gauge_id', 'gauge_name', 'high_prec_timing', 'low_prec_timing', 'dom_land_cover', 'geol_1st_class', 'geol_2nd_class']
 NUM_FEATURES = 66
+tigerforecast_dir = get_tigerforecast_dir()
+
 
 class USGSDataLoader:
     def __init__(self, mode=None, seq_length=270, gaugeID_to_idx=None, normalize_source=None):
@@ -25,11 +28,14 @@ class USGSDataLoader:
 
         # load and group data
         # self.df = pd.read_csv(path)
-        static_features_path = '../data/usgs_flood/attributes.csv'
+        # static_features_path = '../data/usgs_flood/attributes.csv'
+        static_features_path = os.path.join(tigerforecast_dir, 'data/usgs_flood/attributes.csv')
         if mode == 'train':
-            seq_features_path = '../data/usgs_flood/train_data.csv'
+            # seq_features_path = '../data/usgs_flood/train_data.csv'
+            seq_features_path = os.path.join(tigerforecast_dir, 'data/usgs_flood/train_data.csv')
         elif mode == 'val':
-            seq_features_path = '../data/usgs_flood/val_data.csv'
+            # seq_features_path = '../data/usgs_flood/val_data.csv'
+            seq_features_path = os.path.join(tigerforecast_dir, 'data/usgs_flood/val_data.csv')
 
         self.df_static = pd.read_csv(static_features_path, converters={'gauge_id': lambda x: str(x)})
         for col in FACTORIZE:
@@ -169,6 +175,9 @@ class USGSDataLoader:
         # generates a random time in a given site
         return random.randint(self.seq_length + self.target_lag - 1,
             self.data_length[site_idx] - 1)
+
+    def get_all_sites(self):
+        return [self.gaugeID_to_idx[key] for key in self.gauge_keys]
 
     def random_batches(self, batch_size, num_batches=None):
         # generator for random batches
