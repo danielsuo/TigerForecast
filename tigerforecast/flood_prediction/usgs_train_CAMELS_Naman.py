@@ -19,7 +19,7 @@ SEQUENCE_LENGTH = 270
 HIDDEN_DIM = 256
 EMBEDDING_DIM = 10
 DP_RATE = 0.4
-LR = 0.1
+LR = 0.001
 OFFSET = 0
 INDICES_TO_KEEP = [15, 16, 17, 18, 19, 20, 21, 22, 26, 27, 28, 29, 30, 31, 32, 34, 35, 37, 38, 39, 40, 41, 48, 49, 50, 56, 58, 60, 61, 62, 63, 64]
 INPUT_DIM = len(INDICES_TO_KEEP)
@@ -67,7 +67,6 @@ def usgs_eval(method, site_idx, batch_size=None, dynamic=False, path=None):
                 yhats.append(y_pred[:,-1].copy())
                 ys.append(targets[:,-1].copy())
         return np.array(yhats), np.array(ys)
-
 best_index = -1
 best_loss = 1000
 best_nse = -1
@@ -76,7 +75,6 @@ best_loss_no_outliers = 1000
 best_nse_no_outliers = -1
 all_sites = usgs_train.get_all_sites()
 # sites_100 = rnd.sample(all_sites, 100)
-print('LR = ' + str(LR))
 for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_SIZE, num_batches=TRAINING_STEPS) ):
 	y_pred_LSTM = method_LSTM.predict(data[:,:,INDICES_TO_KEEP])
 	if TRAIN_SEQ_TO_SEQ:
@@ -89,13 +87,13 @@ for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_
 	if i % 1000 == 0:
                 print("i = " + str(i))
 	if i%10000 == 0 and i > 0:
-                method_LSTM.save('trained_CAMEL_newdp_'+ str(LR) + '_' + str(i+OFFSET) + '.pkl')
                 print('Step %i: loss=%f' % (i,results_LSTM[-1]) )
                 losses = []
                 losses_no_outliers = []
                 nses = []
                 nses_no_outliers = []
                 for site in all_sites:
+                        print("Doing Site ", site)
                         yhats, ys = usgs_eval(method_LSTM, site, batch_size=1024, dynamic=False)
                         loss = ((ys-yhats)**2).mean()
                         # print("loss = " + str(loss))
@@ -122,61 +120,3 @@ for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_
                         best_nse= avg_nse
 	if i == 1000000:
 		break
-
-print("best_index = " + str(best_index))
-print("best_loss = " + str(best_loss))
-print("best_nse = " + str(best_nse))
-best_path = 'trained_CAMEL_newdp_' + str(LR) + "_" + str(best_index+OFFSET) + '.pkl'
-print("best_path = " + str(best_path))
-all_sites = usgs_val.get_all_sites()
-eval_losses = []
-nses = []
-nses_no_outliers = []
-cnt = 0
-for site in all_sites:
-        print("site = " + str(site))
-        print(" =========== pkl eval ============ ")
-        yhats, ys = usgs_eval(method_LSTM, site, batch_size=1024,dynamic=False, path=best_path)
-        loss = ((ys-yhats)**2).mean()
-        print("loss = " + str(loss))
-        if not np.isnan(loss):
-                eval_losses.append(loss)
-        print("mean eval loss so far: " + str(np.array(eval_losses).mean()))
-        ys_mean = ys.mean()
-        nse = 1 - ((((ys - yhats)**2).sum())/(((ys - ys_mean)**2).sum()))
-        print("nse = " + str(nse))
-        if not np.isnan(nse):
-                nses.append(nse)
-        if not np.isnan(nse) and np.abs(nse) < 2:
-                nses_no_outliers.append(nse)
-        print("mean NSE so far: " + str(np.array(nses).mean()))
-        print("mean NSE no outliers so far:" + str(np.array(nses_no_outliers).mean()))
-        cnt += 1
-        print("cnt = " + str(cnt))
-                
-print('head of eval losses: ' + str(eval_losses[:10]))
-print('mean NSE: %f' % np.array(nses).mean())
-print('mean NSE no outliers: %f' % np.array(nses_no_outliers).mean())
-print('mean eval loss: ' + str(np.array(eval_losses).mean()))
-print("OFFSET = " + str(OFFSET))
-print('LR = ' + str(LR))
-print('best_index = ' + str(best_index))
-print("Training Done")
-
-# plt.plot(yhats, 'b', label='predicted')
-# plt.plot(ys, 'k', label='actual')
-# plt.legend()
-# plt.show()
-
-# print(results_LSTM)
-
-plt.subplot(121)
-plt.plot(results_LSTM, label = 'LSTM')
-
-
-plt.subplot(122)
-plt.plot(pred_LSTM, label="prediction")
-
-plt.legend()
-plt.title("Seq to Seq LSTM Training on Flood problem")
-plt.show(block=True)

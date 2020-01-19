@@ -38,15 +38,16 @@ class Adam(Optimizer):
 
         @jit # helper update method
         def _update(params, grad, m, v, max_norm, beta_1_t, beta_2_t):
-            new_m = {k:self.beta_1 * m_i + (1. - self.beta_1) * dw for (k, m_i), dw in zip(m.items(), grad.values())}
-            new_v = {k:self.beta_2 * v_i + (1. - self.beta_2) * np.square(dw) for (k, v_i), dw in zip(v.items(), grad.values())}
+            new_m = {k:self.beta_1 * m[k] + (1. - self.beta_1) * grad[k] for k in m.keys()}
+            new_v = {k:self.beta_2 * v[k] + (1. - self.beta_2) * np.square(grad[k]) for k in v.keys()}
             m_t = {k:w / (1 - beta_1_t) for k, w in new_m.items()} # bias-corrected estimates
             v_t = {k:w / (1 - beta_2_t) for k, w in new_v.items()}
 
             # maintain current power of betas
             beta_1_t, beta_2_t = beta_1_t * self.beta_1, beta_2_t * self.beta_2
-            max_norm = np.where(max_norm, np.maximum(max_norm, np.linalg.norm([np.linalg.norm(dw) for dw in grad.values()])), max_norm)
-            lr = self.lr / np.where(max_norm, max_norm, 1.)
+            #max_norm = np.where(max_norm, np.maximum(max_norm, np.linalg.norm([np.linalg.norm(dw) for dw in grad.values()])), max_norm)
+            #lr = self.lr / np.where(max_norm, max_norm, 1.)
+            lr = self.lr
             new_params = {k: (w - lr * m_t[k] / (np.sqrt(v_t[k]) + self.eps)) for k, w in params.items()}
             return new_params, new_m, new_v, max_norm, beta_1_t, beta_2_t
         self._update = _update
