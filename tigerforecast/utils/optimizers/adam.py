@@ -21,7 +21,7 @@ class Adam(Optimizer):
     def __init__(self, pred=None, loss=mse, learning_rate=1.0, include_x_loss= False, hyperparameters={}):
         self.initialized = False
         self.lr = learning_rate
-        self.hyperparameters = {'reg':0.0, 'beta_1': 0.9, 'beta_2': 0.999, 'eps': 1e-7, 'max_norm':True}
+        self.hyperparameters = {'reg':0.0, 'beta_1': 0.9, 'beta_2': 0.999, 'eps': 1e-7, 'clip_norm':True, 'max_norm':1.0}
         self.hyperparameters.update(hyperparameters)
         for key, value in self.hyperparameters.items():
             if hasattr(self, key):
@@ -38,6 +38,10 @@ class Adam(Optimizer):
 
         @jit # helper update method
         def _update(params, grad, m, v, max_norm, beta_1_t, beta_2_t):
+            scale = 1.0
+            if self.clip_norm:
+                scale = np.maximum(self.max_norm, np.linalg.norm([np.linalg.norm(dw) for dw in grad.values()]))
+            grad = {k : dw/scale for (k,dw) in grad.items()}
             new_m = {k:self.beta_1 * m[k] + (1. - self.beta_1) * grad[k] for k in m.keys()}
             new_v = {k:self.beta_2 * v[k] + (1. - self.beta_2) * np.square(grad[k]) for k in v.keys()}
             m_t = {k:w / (1 - beta_1_t) for k, w in new_m.items()} # bias-corrected estimates

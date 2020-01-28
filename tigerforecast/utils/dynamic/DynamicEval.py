@@ -23,6 +23,9 @@ class DynamicEval(Optimizer):
 
         self.optimizer = optimizer
         self.prior_weight = prior_weight
+
+        if exclude is None:
+            exclude = []
         self.exclude = set(exclude)
 
         # inherit pointers from base optimizer

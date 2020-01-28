@@ -34,7 +34,9 @@ class Optimizer():
         if self._is_valid_pred(pred, raise_error=False) and self._is_valid_loss(loss, raise_error=False):
             self.set_predict(pred, loss=loss)
 
-
+    def set_learning_rate(self, rate):
+        self.lr = rate
+        
     def set_loss(self, new_loss):
         """ Description: updates internal loss """
         self.loss = new_loss

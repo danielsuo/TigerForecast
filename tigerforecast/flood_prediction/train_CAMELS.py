@@ -9,8 +9,7 @@ from tigerforecast.batch.usgs_Alex import *
 
 from tigerforecast.utils.optimizers import *
 from tigerforecast.utils.optimizers.losses import *
-from tigerforecast.flood_prediction.ealstm_regional_modeling import main
-
+from tigerforecast.data.ealstm_regional_modeling import main
 
 import numpy as onp
 import random as rnd
@@ -148,8 +147,8 @@ for epoch in range(1,31):
                                if not np.isnan(nse):
                                        nses.append(nse)
                                        losses.append(loss)
-                                       gc.collect()
-                               avg_loss = np.array(losses).mean()
+                       gc.collect()
+                       avg_loss = np.array(losses).mean()
                        avg_loss_no_outliers = np.array(losses_no_outliers).mean()
                        avg_nse = np.array(nses).mean()
                        avg_nse_no_outliers = np.array(nses_no_outliers).mean()

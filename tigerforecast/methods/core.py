@@ -32,6 +32,9 @@ class Method(object):
             return
         raise error.InvalidInput("Optimizer input cannot be stored")
 
+    def set_learning_rate(self, rate):
+        self.optimizer.set_learning_rate(rate)
+    
     def save(self, filename):
         assert (hasattr(self, "params")), "Model {} does not have params initialized".format(self)
         f = open(filename, 'wb')
