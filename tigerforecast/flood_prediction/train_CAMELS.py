@@ -15,9 +15,11 @@ import numpy as onp
 import random as rnd
 import sys
 from tqdm import tqdm
-from tigerforecast.data.ealstm_regional_modeling.papercode.utils import get_basin_list
-from tigerforecast.data.ealstm_regional_modeling.papercode.datautils import rescale_features
+# from tigerforecast.data.ealstm_regional_modeling.papercode.utils import get_basin_list
+# from tigerforecast.data.ealstm_regional_modeling.papercode.datautils import rescale_features
+from tigerforecast.batch.camels_dataloader import *
 import gc
+
 
 TRAINING_STEPS = 1000000
 BATCH_SIZE = 256
@@ -37,7 +39,7 @@ TRAIN_SEQ_TO_SEQ = False
 hyperparams = {'reg':0.0, 'beta_1': 0.9, 'beta_2': 0.999, 'eps': 1e-8, 'max_norm':True}
 optim = Adam(loss=batched_mse, learning_rate=LR, include_x_loss=False, hyperparameters=hyperparams)
 
-# usgs_train = USGSDataLoader(mode='train')
+#usgs_train = USGSDataLoader(mode='train')
 #usgs_val = USGSDataLoader(mode='val', seq_length=SEQUENCE_LENGTH, gaugeID_to_idx=usgs_train.gaugeID_to_idx)
 
 
@@ -51,7 +53,7 @@ method_LSTM.initialize(n=INPUT_DIM, m=1, l=SEQUENCE_LENGTH, h=HIDDEN_DIM, optimi
 results_LSTM = []
 pred_LSTM = []
 
-def usgs_eval(method, site_idx, usgs_val, batch_size=None, dynamic=False, path=None):
+def usgs_eval(method, usgs_val, batch_size=None, dynamic=False, path=None):
         ### We will do this with the NE metric
         #optim = OGD(loss=batched_mse, learning_rate=LR)
         # optim = Adam(loss=batched_mse, learning_rate=LR, include_x_loss=False, hyperparameters=hyperparams)
@@ -66,12 +68,12 @@ def usgs_eval(method, site_idx, usgs_val, batch_size=None, dynamic=False, path=N
         if dynamic:
                 dynamic_optim.set_prior(eval_method.params)
 
-        yhats, ys = [], [] 
-        #for data, targets in usgs_val.sequential_batches(site_idx=site_idx, batch_size=batch_size):
-        for x_y in usgs_val:
-                data, targets = x_y
-                data = data.numpy()
-                targets = targets.numpy()
+        yhats, ys = [], []
+        # for x_y in usgs_val:
+        for data, targets in usgs_val.sequential_batches(batch_size=batch_size):
+                # data, targets = x_y
+                # data = data.numpy()
+                # targets = targets.numpy()
                 y_pred = eval_method.predict(data)
                 targets_exp = np.expand_dims(targets[:,-1], axis=-1)
                 if dynamic:
@@ -97,20 +99,33 @@ best_index_no_outliers = -1
 best_loss_no_outliers = 1000
 best_nse_no_outliers = -1
 # all_sites = usgs_train.get_all_sites()
-all_sites = get_basin_list()
+tigerforecast_dir = get_tigerforecast_dir()
+BASIN_PATH = os.path.join(tigerforecast_dir, 'data/usgs_flood/basin_list.txt')
+all_sites = get_basin_list(BASIN_PATH)
 # sites_100 = rnd.sample(all_sites, 100)
-usgs_train = main.get_data_loader('train')
+'''
+usgs_train_main = main.get_data_loader('train')
+for i, x_y_z in enumerate(usgs_train_main):
+        data, targets, q_stds = x_y_z
+        print(data.shape)
+        print(targets.shape)
+        if i == 5:
+                break'''
+usgs_train = CamelsH5(concat_static=True)
 # for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=BATCH_SIZE, num_batches=TRAINING_STEPS) ):
-user_cfg, run_cfg, db_path, means, stds = main.make_eval_usercfg_runcfg_dbpath_means_stds()
+# user_cfg, run_cfg, db_path, means, stds = main.make_eval_usercfg_runcfg_dbpath_means_stds()
 
 learning_rates = {11: 5e-4, 21: 1e-4}
 for epoch in range(1,31):
-       for i, x_y_z in enumerate(usgs_train):
+        # for i, x_y_z in enumerate(usgs_train):
+        for i, (data, targets) in enumerate( usgs_train.random_batches(batch_size=256, num_batches=6800)):
                if epoch in learning_rates.keys():
                        method_LSTM.set_learning_rate(learning_rates[epoch])
-               data, targets, q_stds = x_y_z
-               data = data.numpy()
-               targets = targets.numpy()
+               # data, targets, q_stds = x_y_z
+               # data = data.numpy()
+               # targets = targets.numpy()
+               # print("data.shape = " + str(data.shape))
+               # print("targets.shape = " + str(targets.shape))
                y_pred_LSTM = method_LSTM.predict(data)
                if TRAIN_SEQ_TO_SEQ:
                        targets_exp = np.expand_dims(targets, axis=-1)
@@ -123,10 +138,10 @@ for epoch in range(1,31):
                method_LSTM.update(targets_exp) 
                if i % 400 == 0:
                        print("i = " + str(i))
-               if i%6800 == 0 and i > 0:
+               if i == 6799:
                        print('epoch = ' + str(epoch))
                        print('Step %i: loss=%f' % (i,results_LSTM[-1]) )
-                       method_LSTM.save('trained_CAMEL_newdataloader_' + str(epoch) + '.pkl')
+                       method_LSTM.save('trained_CAMEL_torchlessdataloader_' + str(epoch) + '.pkl')
                        losses = []
                        losses_no_outliers = []
                        nses = []
@@ -134,8 +149,9 @@ for epoch in range(1,31):
 
                        for site in all_sites:
                                # print("Doing Site ", site)
-                               usgs_val = main.make_eval_data_loader(site, user_cfg, run_cfg, db_path, means, stds)
-                               yhats, ys = usgs_eval(method_LSTM, site, usgs_val, batch_size=1024, dynamic=False)
+                               # usgs_val = main.make_eval_data_loader(site, user_cfg, run_cfg, db_path, means, stds)
+                               usgs_val = CamelsTXT(basin=site, concat_static=True)
+                               yhats, ys = usgs_eval(method_LSTM, usgs_val, batch_size=1024, dynamic=False)
                                loss = ((ys-yhats)**2).mean()
                                # print("loss = " + str(loss))
                                ys_mean = ys.mean()

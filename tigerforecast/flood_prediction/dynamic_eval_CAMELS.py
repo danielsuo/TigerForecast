@@ -79,7 +79,7 @@ def usgs_eval(method, site_idx, usgs_val, lr, prior_wt, batch_size=None, dynamic
         yhats = np.where(yhats < 0.0, 0.0, yhats)
         return yhats, np.array(np.concatenate(ys).ravel())
 
-all_sites = get_basin_list()
+all_sites = get_basin_list()[:100]
 lr = 1e-3
 user_cfg, run_cfg, db_path, means, stds = main.make_eval_usercfg_runcfg_dbpath_means_stds()
 losses = []

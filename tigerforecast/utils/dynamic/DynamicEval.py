@@ -18,7 +18,7 @@ class DynamicEval(Optimizer):
     Returns:
         None
     """
-    def __init__(self, optimizer=None, prior_weight=0.0, exclude=None):
+    def __init__(self, optimizer=None, prior_weight=0.0, include_x_loss=False,  exclude=None):
         self.initialized = False
 
         self.optimizer = optimizer
@@ -31,6 +31,8 @@ class DynamicEval(Optimizer):
         # inherit pointers from base optimizer
         self.pred = optimizer.pred
         self.loss = optimizer.loss
+
+        self.include_x_loss=include_x_loss
 
         if self._is_valid_pred(self.pred, raise_error=False) and self._is_valid_loss(self.loss, raise_error=False):
             self.set_predict(self.pred, loss=self.loss)

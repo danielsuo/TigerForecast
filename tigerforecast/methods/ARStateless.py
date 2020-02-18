@@ -41,7 +41,8 @@ class ARStateless(Method):
 
         # initialize parameters
         glorot_init = stax.glorot() # returns a function that initializes weights
-        W_lnm = glorot_init(generate_key(), (l, m, n)) # maps l inputs to output
+        # W_lnm = glorot_init(generate_key(), (l, m, n)) # maps l inputs to output
+        W_lnm = np.zeros((l,m,n))
         b = np.zeros((m, 1)) # bias 
         self.params = {'W_lnm': W_lnm, 'b': b}
         self.x = np.zeros((l, m))
