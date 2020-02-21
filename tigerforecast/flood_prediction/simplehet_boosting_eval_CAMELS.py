@@ -50,20 +50,7 @@ method_LSTM.load('trained_CAMEL_torchlessdataloader_11.pkl')
 optim_ar = OGD(loss=batched_mse, learning_rate=LR_ar)
 method_ar = tigerforecast.method("ARStateless")
 method_ar.initialize(n=INPUT_DIM, m=1, l=SEQUENCE_LENGTH, optimizer=optim_ar)
-# train_method.initialize(n=8, m=1, l=61, num_sites=len(usgs_train.site_keys), optimizer=optim)
-# method_ar.initialize(n=INPUT_DIM, m=1, l=SEQUENCE_LENGTH, num_sites=NUM_SITES, optimizer=optim_ar)
-'''
-M1 = tigerforecast.method("Seq2ValLSTM")
-M2 = tigerforecast.method("Seq2ValLSTM")
-M1.load('trained_CAMEL_torchlessdataloader_11.pkl')
-M2.load('trained_CAMEL_torchlessdataloader_11.pkl')
-opt1 = OGD(loss=batched_mse, learning_rate=LR_LSTM)
-opt2 = OGD(loss=batched_mse, learning_rate=LR_LSTM)
-M1.initialize(m=INPUT_DIM, m=1, l=SEQUENCE_LENGTH, h=HIDDEN_DIM, optimizer=opt1, dp_rate=DP_RATE)
-M2.initialize(m=INPUT_DIM, m=1, l=SEQUENCE_LENGTH, h=HIDDEN_DIM, optimizer=opt2, dp_rate=DP_RATE)
-method_boosted = SimpleBoostHet()
-method_boosted.initialize([M1, M2], loss=batched_mse, reg=REG)'''
-# print("reg = " + str(REG))
+
 results_boosted = []
 pred_boosted = []
 
@@ -89,6 +76,7 @@ def usgs_eval_LSTM(method_LSTM, usgs_val, batch_size=None, dynamic=False):
                 y_pred_lstm = np.where(y_pred_lstm < 0.0, 0.0, y_pred_lstm)
                 yhats_LSTM.append(y_pred_lstm[:,-1].copy())
                 ys.append(targets[:,-1].copy())
+                method_LSTM.update(targets[:,-1].copy())
         # yhats_boosted = rescale_features(onp.array(yhats_boosted), variable='output')
         # yhats_shapes = [x.shape for x in yhats_boosted]
         # print(yhats_shapes)
@@ -127,19 +115,14 @@ def usgs_eval_boosted(yhats_LSTM, method_ar, usgs_val, batch_size=None, dynamic=
         gc.collect()
         return np.array(yhats_boosted), np.array(np.concatenate(ys).ravel())
 
-
-# lr = 1e-3
 # user_cfg, run_cfg, db_path, means, stds = main.make_eval_usercfg_runcfg_dbpath_means_stds()
 losses = []
 losses_no_outliers = []
 losses_yes_outliers = []
 nses = []
 nses_no_outliers = []
-# prior_wts = [1.0, 0.9, 0.8, 0.7, 0.6, 0.5]
-prior_wts = [1.0]
-LR_ar = [0.1]
-# LR_ar = [1e-5, 1e-6, 1e-7, 1e-8]
-# LR_ar = [0.0]
+LR_lstm = [0.0, 0.1, 0.01, 0.001, 0.0001]
+# LR_lstm = [0.0, 1.0, 0.9, 0.8, 0.7, 0.6]
 tigerforecast_dir = get_tigerforecast_dir()
 BASIN_PATH = os.path.join(tigerforecast_dir, 'data/usgs_flood/basin_list.txt')
 all_sites = get_basin_list(BASIN_PATH)
@@ -147,57 +130,26 @@ site0_yhats_LSTM = []
 site0_yhsts_boosted = []
 site0_ys = []
 
-for lr_ar in LR_ar:
-       print("lr_ar = " + str(lr_ar))
-       print("optim = OGD")
-       # print("optim = Adam")
-       # optim_ar = Adam(loss=batched_mse, learning_rate=lr_ar, include_x_loss=False, hyperparameters=hyperparams)     
-       # optim_ar = OGD(loss=batched_mse, learning_rate=lr_ar)
-       # method_ar = tigerforecast.method("ARStateless")
-       # method_ar.initialize(n=INPUT_DIM, m=1, l=SEQUENCE_LENGTH, optimizer=optim_ar)
-       # optim_ar = Adam(loss=batched_mse, learning_rate=lr_ar, include_x_loss=False, hyperparameters=hyperparams)
-       for i, site in enumerate(all_sites[:1]):
+for lr in LR_lstm:
+       print("lr = " + str(lr))
+       # print("optim = OGD")
+       M1 = tigerforecast.method("Seq2ValLSTM")
+       M2 = tigerforecast.method("Seq2ValLSTM")
+       opt1 = OGD(loss=batched_mse, learning_rate=lr)
+       opt2 = OGD(loss=batched_mse, learning_rate=lr)
+       M1.initialize(n=INPUT_DIM, m=1, l=SEQUENCE_LENGTH, h=HIDDEN_DIM, optimizer=opt1, dp_rate=DP_RATE)
+       M2.initialize(n=INPUT_DIM, m=1, l=SEQUENCE_LENGTH, h=HIDDEN_DIM, optimizer=opt2, dp_rate=DP_RATE)
+       M1.load('trained_CAMEL_torchlessdataloader_11.pkl')
+       # M2.load('trained_CAMEL_torchlessdataloader_11.pkl')
+       method_boosted = SimpleBoostHet()
+       method_boosted.initialize([M1, M2], loss=batched_mse, reg=REG)
+       for i, site in enumerate(all_sites[:20]):
               if i % 10 == 0:
                       print("i = " + str(i))
-              # print("Doing Site ", site)
-              optim_ar = OGD(loss=batched_mse, learning_rate=lr_ar)
-              method_ar = tigerforecast.method("ARStateless")
-              method_ar.initialize(n=INPUT_DIM, m=1, l=SEQUENCE_LENGTH, optimizer=optim_ar)
               usgs_val = CamelsTXT(basin=site, concat_static=True)
               # usgs_val = main.make_eval_data_loader(site, user_cfg, run_cfg, db_path, means, stds)
-              yhats_LSTM, _ = usgs_eval_LSTM(method_LSTM, usgs_val, batch_size=1024, dynamic=False)
-              yhats, ys = usgs_eval_boosted(yhats_LSTM, method_ar, usgs_val, batch_size=1, dynamic=False)
-              if i == 0:
-                      site0_yhats_LSTM = yhats_LSTM
-                      site0_yhats_boosted = yhats
-                      site0_ys = ys
-                      site0_LSTM_residuals = []
-                      site0_boosted_residuals = []
-                      for i in range(len(site0_yhats_LSTM)):
-                              site0_LSTM_residuals.append(np.abs(site0_ys[i] - site0_yhats_LSTM[i]))
-                              site0_boosted_residuals.append(np.abs(site0_ys[i] - site0_yhats_boosted[i]))
-                      # plt.plot(site0_yhats_LSTM, label="LSTM")
-                      # plt.plot(site0_yhats_boosted, label="boosted")
-                      # plt.plot(site0_ys, label="ground truth")
-                      f = plt.figure(figsize=(20,10))
-                      ax = f.add_subplot(121)
-                      
-                      # plt.subplot(121)
-                      ax.plot(site0_LSTM_residuals, label="LSTM residuals")
-                      ax.plot(site0_boosted_residuals, label="boosted residuals")
-                      ax.set_title("LSTM vs boosted residuals")
-                      plt.legend()
-                      # plt.legend()
-                      # plt.savefig('site0_residuals')
-                      site0_LSTM_cummean = np.cumsum(site0_LSTM_residuals) / (np.arange(len(site0_LSTM_residuals))+1)
-                      site0_boosted_cummean = np.cumsum(site0_boosted_residuals) / (np.arange(len(site0_boosted_residuals))+1)
-
-                      ax2 = f.add_subplot(122)
-                      ax2.plot(site0_LSTM_cummean, label="LSTM running mean")
-                      ax2.plot(site0_boosted_cummean, label="boosted running mean")
-                      ax2.set_title("LSTM vs boosted residuals running means")
-                      plt.legend()
-                      plt.savefig('site0_residuals_and_running_means')
+              yhats, ys = usgs_eval_LSTM(method_boosted, usgs_val, batch_size=1024, dynamic=False)
+              # yhats, ys = usgs_eval_boosted(yhats_LSTM, method_ar, usgs_val, batch_size=1, dynamic=False)
                                                                                                                           
               loss = ((ys-yhats)**2).mean()
               # print("loss = " + str(loss))

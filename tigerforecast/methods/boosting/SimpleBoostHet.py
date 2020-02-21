@@ -18,12 +18,12 @@ class SimpleBoostHet:
     def __init__(self):
         self.initialized = False
 
-    def initialize(self, method_id, method_params, n = None, m = None, loss=mse, reg=0.0):
+    def initialize(self, method_id, n = None, m = None, loss=mse, reg=0.0):
         """
         Description: Initializes autoregressive method parameters
         Args:
-            method_id (string): id of weak learner method
-            method_params (dict): dict of params to pass method
+            method_id (string): list of instances of methods
+            method_params (dict): list of dict of params to pass to methods
             N (int): default 3. Number of weak learners
             loss (function): loss function for boosting method
             reg (float): default 1.0. constant for regularization.
@@ -38,12 +38,14 @@ class SimpleBoostHet:
         assert len(method_id) > 0
         self.N = len(method_id)
         self.methods = []
+        '''
         for m_params in method_params:
             m_params['n'] = n
-            m_params['m'] = m
-        for i in range(N):
-            new_method = tigerforecast.method(method_id)
-            new_method.initialize(**method_params[i])
+            m_params['m'] = m'''
+        for i in range(self.N):
+            # new_method = tigerforecast.method(method_id)
+            # new_method.initialize(**method_params[i])
+            new_method = method_id[i]
             new_method.optimizer.set_loss(proxy_loss) # proxy loss
             self.methods.append(new_method)
 
@@ -53,11 +55,18 @@ class SimpleBoostHet:
             for i, method_i in enumerate(self.methods):
                 eta_i = 2 / (i + 2)
                 y_pred = method_i.predict(x)
+                y_pred = np.array([a.flatten() for a in y_pred])
                 cur_y = (1 - eta_i) * cur_y + eta_i * y_pred
                 y.append(cur_y)
+                # print("i = " + str(i))
+                # print("y_pred = " + str(y_pred[:3]))
+                # print("y_pred.shape = " + str(y_pred.shape))
+                # print("cur_y.shape = " + str(cur_y.shape))
+                # print("cur_y = " + str(cur_y[:3]))
+                
             return [np.zeros(shape=y[0].shape)] + y
         self._prev_predict = _prev_predict
-
+        
         def _get_grads(y_true, prev_predicts):
             g = jax.grad(loss)
             v_list = [g(y_prev, y_true) for y_prev in prev_predicts]
@@ -84,6 +93,8 @@ class SimpleBoostHet:
         assert self.initialized
         x = self.to_ndarray(x)
         self._prev_predicts = self._prev_predict(x)
+        # print("self._prev_predicts = " + str(self._prev_predicts))
+        # print(type(self._prev_predicts[-1]))
         return self._prev_predicts[-1]
 
 

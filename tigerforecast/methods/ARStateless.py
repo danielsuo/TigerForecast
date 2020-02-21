@@ -45,7 +45,7 @@ class ARStateless(Method):
         W_lnm = np.zeros((l,m,n))
         b = np.zeros((m, 1)) # bias 
         self.params = {'W_lnm': W_lnm, 'b': b}
-        self.x = np.zeros((l, m))
+        self.x = np.zeros((l, n))
 
 
         """ private helper methods"""
