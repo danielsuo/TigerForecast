@@ -14,9 +14,10 @@ class SGD(Optimizer):
     Returns:
         None
     """
-    def __init__(self, pred=None, loss=mse, learning_rate=0.0001, hyperparameters={}):
+    def __init__(self, pred=None, loss=mse, learning_rate=0.0001, include_x_loss=False, hyperparameters={}):
         self.initialized = False
         self.lr = learning_rate
+        self.include_x_loss = include_x_loss
         self.hyperparameters = hyperparameters
         self.pred = pred
         self.loss = loss

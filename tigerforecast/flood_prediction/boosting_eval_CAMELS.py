@@ -90,7 +90,7 @@ def usgs_eval_LSTM(method_LSTM, usgs_val, batch_size=None, dynamic=False):
                 yhats_LSTM.append(y_pred_lstm[:,-1].copy())
                 ys.append(targets[:,-1].copy())
         # yhats_boosted = rescale_features(onp.array(yhats_boosted), variable='output')
-        # yhats_shapes = [x.shape for x in yhats_boosted]
+        # yhats_shapes = [x.shape for x in yhats_LSTM]
         # print(yhats_shapes)
         # yhats_flat = [x.flatten() for x in yhats]
         yhats_LSTM = np.array(onp.hstack(yhats_LSTM))
@@ -130,16 +130,22 @@ def usgs_eval_boosted(yhats_LSTM, method_ar, usgs_val, batch_size=None, dynamic=
 
 # lr = 1e-3
 # user_cfg, run_cfg, db_path, means, stds = main.make_eval_usercfg_runcfg_dbpath_means_stds()
-losses = []
-losses_no_outliers = []
-losses_yes_outliers = []
-nses = []
-nses_no_outliers = []
+# losses = []
+# losses_no_outliers = []
+# losses_yes_outliers = []
+# nses = []
+# nses_no_outliers = []
 # prior_wts = [1.0, 0.9, 0.8, 0.7, 0.6, 0.5]
-prior_wts = [1.0]
-LR_ar = [0.1]
-# LR_ar = [1e-5, 1e-6, 1e-7, 1e-8]
-# LR_ar = [0.0]
+# prior_wts = [1.0]
+# LR_ar = [0.0, 0.1, 1e-3, 1e-5, 1e-7, 1e-9]
+# LR_ar_adam = [0.0, 5e-7, 1e-6, 5e-6]
+# LR_ar_adam = [0.0, 5e-6]
+# LR_ar_sgd = [0.0, 5e-6, 1e-5, 5e-5]
+LR_ar_sgd = [0.0, 1e-5] # 1e-5 with SGD achieves 2.9 avg_loss
+# LR_ar = [0.0 1e-5, 1e-6, 1e-7, 1e-8]
+# LR_ar = [0.0, 1.0]
+# eps = [1e-4]
+# eps = [1e-4, 1e-8, 1e-12]
 tigerforecast_dir = get_tigerforecast_dir()
 BASIN_PATH = os.path.join(tigerforecast_dir, 'data/usgs_flood/basin_list.txt')
 all_sites = get_basin_list(BASIN_PATH)
@@ -147,27 +153,33 @@ site0_yhats_LSTM = []
 site0_yhsts_boosted = []
 site0_ys = []
 
-for lr_ar in LR_ar:
+for lr_ar in LR_ar_sgd:
        print("lr_ar = " + str(lr_ar))
-       print("optim = OGD")
+       print("optim = SGD")
+       losses = []
+       losses_no_outliers = []
+       losses_yes_outliers = []
+       nses = []
+       nses_no_outliers = []
        # print("optim = Adam")
        # optim_ar = Adam(loss=batched_mse, learning_rate=lr_ar, include_x_loss=False, hyperparameters=hyperparams)     
        # optim_ar = OGD(loss=batched_mse, learning_rate=lr_ar)
        # method_ar = tigerforecast.method("ARStateless")
        # method_ar.initialize(n=INPUT_DIM, m=1, l=SEQUENCE_LENGTH, optimizer=optim_ar)
        # optim_ar = Adam(loss=batched_mse, learning_rate=lr_ar, include_x_loss=False, hyperparameters=hyperparams)
-       for i, site in enumerate(all_sites[:1]):
-              if i % 10 == 0:
+       for i, site in enumerate(all_sites):
+              if i % 25 == 0:
                       print("i = " + str(i))
-              # print("Doing Site ", site)
-              optim_ar = OGD(loss=batched_mse, learning_rate=lr_ar)
+                      # print("Doing Site ", site)
+              optim_ar = SGD(loss=batched_mse, learning_rate=lr_ar)
               method_ar = tigerforecast.method("ARStateless")
               method_ar.initialize(n=INPUT_DIM, m=1, l=SEQUENCE_LENGTH, optimizer=optim_ar)
               usgs_val = CamelsTXT(basin=site, concat_static=True)
               # usgs_val = main.make_eval_data_loader(site, user_cfg, run_cfg, db_path, means, stds)
               yhats_LSTM, _ = usgs_eval_LSTM(method_LSTM, usgs_val, batch_size=1024, dynamic=False)
+              # print("yhats_LSTM.shape = " + str(yhats_LSTM.shape))
               yhats, ys = usgs_eval_boosted(yhats_LSTM, method_ar, usgs_val, batch_size=1, dynamic=False)
-              if i == 0:
+              '''if i == 0:
                       site0_yhats_LSTM = yhats_LSTM
                       site0_yhats_boosted = yhats
                       site0_ys = ys
@@ -181,7 +193,7 @@ for lr_ar in LR_ar:
                       # plt.plot(site0_ys, label="ground truth")
                       f = plt.figure(figsize=(20,10))
                       ax = f.add_subplot(121)
-                      
+
                       # plt.subplot(121)
                       ax.plot(site0_LSTM_residuals, label="LSTM residuals")
                       ax.plot(site0_boosted_residuals, label="boosted residuals")
@@ -197,8 +209,8 @@ for lr_ar in LR_ar:
                       ax2.plot(site0_boosted_cummean, label="boosted running mean")
                       ax2.set_title("LSTM vs boosted residuals running means")
                       plt.legend()
-                      plt.savefig('site0_residuals_and_running_means')
-                                                                                                                          
+                      plt.savefig('site0_residuals_and_running_means')'''
+
               loss = ((ys-yhats)**2).mean()
               # print("loss = " + str(loss))
               ys_mean = ys.mean()
@@ -212,15 +224,18 @@ for lr_ar in LR_ar:
               if not np.isnan(nse):
                       nses.append(nse)
                       losses.append(loss)
-              # method_ar = method_ar_updated
+                      # method_ar = method_ar_updated
               gc.collect()
-       avg_loss = np.array(losses).mean()
-       avg_loss_no_outliers = np.array(losses_no_outliers).mean()
-       avg_nse = np.array(nses).mean()
-       avg_nse_no_outliers = np.array(nses_no_outliers).mean()
-       # print("prior_wt = " + str(prior_wt))
+              avg_loss = np.array(losses).mean()
+              avg_loss_no_outliers = np.array(losses_no_outliers).mean()
+              avg_nse = np.array(nses).mean()
+              avg_nse_no_outliers = np.array(nses_no_outliers).mean()
+              # print("prior_wt = " + str(prior_wt))
        print("avg_loss = " + str(avg_loss))
        print("avg_loss_no_outliers = " + str(avg_loss_no_outliers))
        # print("losses_yes_outliers = " + str(losses_yes_outliers))
        print("avg_nse = " + str(avg_nse))
-       print("avg_nse_no_outliers = " + str(avg_nse_no_outliers))         
+       print("avg_nse_no_outliers = " + str(avg_nse_no_outliers))
+       
+
+              
