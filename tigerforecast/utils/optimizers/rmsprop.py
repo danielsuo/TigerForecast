@@ -44,7 +44,7 @@ class RMSProp(Optimizer):
             v_t = {k:self.beta_2 * v[k] + (1. - self.beta_2) * np.square(grad[k]) for k in v.keys()}
             lr = self.lr
             new_params = {k: (w - lr * grad[k] / (np.sqrt(v_t[k]) + self.eps)) for k, w in params.items()}
-            return new_params, new_v, max_norm
+            return new_params, v_t, max_norm
         self._update = _update
 
     def reset(self): # reset internal parameters
