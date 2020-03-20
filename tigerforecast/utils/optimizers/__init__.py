@@ -6,4 +6,5 @@ from tigerforecast.utils.optimizers.ogd import OGD
 from tigerforecast.utils.optimizers.ons import ONS
 from tigerforecast.utils.optimizers.adam import Adam
 from tigerforecast.utils.optimizers.adagrad import Adagrad
+from tigerforecast.utils.optimizers.rmsprop import RMSProp
 from tigerforecast.utils.optimizers.losses import *
