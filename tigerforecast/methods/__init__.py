@@ -15,6 +15,7 @@ from tigerforecast.methods.seq2valLSTM import Seq2ValLSTM
 from tigerforecast.methods.floodlstm import FloodLSTM
 from tigerforecast.methods.ARStateless import ARStateless
 from tigerforecast.methods.FloodAR import FloodAR
+from tigerforecast.methods.ols import OLS
 #from tigerforecast.methods.prophet import Prophet
 
 # registration tools
@@ -87,6 +88,11 @@ method_register(
 method_register(
     id='FloodAR',
     entry_point='tigerforecast.methods:FloodAR',
+)
+
+method_register(
+    id='OLS',
+    entry_point='tigerforecast.methods:OLS',
 )
 
 method_register(
