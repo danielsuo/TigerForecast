@@ -38,7 +38,7 @@ class OLS(Method):
         # initialize parameters
         glorot_init = stax.glorot() # returns a function that initializes weights
         # W_lnm = glorot_init(generate_key(), (l, m, n)) # maps l inputs to output
-        W_n = np.zeros((l,m,n))
+        W_ln = np.zeros((l,n))
         b = np.zeros((1, 1)) # bias 
         self.params = {'W_ln': W_ln, 'b': b}
         self.x = np.zeros((l, n))
@@ -96,6 +96,7 @@ class OLS(Method):
         """
         assert self.initialized
         self._check_format(x)
+        x = np.squeeze(x)
         self.x = x
         return self._predict(self.params, x)
     
