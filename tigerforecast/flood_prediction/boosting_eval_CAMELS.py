@@ -29,7 +29,7 @@ TRAINING_STEPS = 1000000
 BATCH_SIZE = 256
 SEQUENCE_LENGTH = 270
 HIDDEN_DIM = 256
-DP_RATE = 0.4
+DP_RATE = 0.0
 LR_ar = 0.0
 LR_LSTM = 0.001
 INDICES_TO_KEEP = [15, 16, 17, 18, 19, 20, 21, 22, 26, 27, 28, 29, 30, 31, 32, 34, 35, 37, 38, 39, 40, 41, 48, 49, 50, 56, 58, 60, 61, 62, 63, 64]
@@ -84,7 +84,7 @@ def usgs_eval_LSTM(method_LSTM, usgs_val, batch_size=None, dynamic=False):
                 # targets = targets.numpy()
                 data = np.array(data)
                 targets = np.array(targets)
-                y_pred_lstm = method_LSTM.predict(data)
+                y_pred_lstm = method_LSTM.predict(data, inference=True)
                 y_pred_lstm = SCALER['output_std'] * y_pred_lstm + SCALER['output_mean']
                 y_pred_lstm = np.where(y_pred_lstm < 0.0, 0.0, y_pred_lstm)
                 yhats_LSTM.append(y_pred_lstm[:,-1].copy())
@@ -108,7 +108,9 @@ def usgs_eval_boosted(yhats_LSTM, method_ar, usgs_val, batch_size=None, dynamic=
                 data = np.array(data)
                 targets = np.array(targets)
                 y_pred_ar = method_ar.predict(data)
+                # assert(y_pred_ar[:,-1] == 0)
                 # print("y_pred_ar.shape = " + str(y_pred_ar.shape))
+                # print("y_pred_ar = " + str(y_pred_ar))
                 # print("y_pred_lstm.shape = " + str(y_pred_lstm.shape))
                 # print("(targets - y_pred_lstm).shape = " + str((targets - y_pred_lstm).shape))
                 y_pred_ar = np.array([a.flatten() for a in y_pred_ar])
@@ -141,7 +143,9 @@ def usgs_eval_boosted(yhats_LSTM, method_ar, usgs_val, batch_size=None, dynamic=
 # LR_ar_adam = [0.0, 5e-7, 1e-6, 5e-6]
 # LR_ar_adam = [0.0, 5e-6]
 # LR_ar_sgd = [0.0, 5e-6, 1e-5, 5e-5]
-LR_ar_sgd = [0.0, 1e-5] # 1e-5 with SGD achieves 2.9 avg_loss
+# LR_ar_sgd = [0.0, 1e-3, 1e-5, 1e-7, 1e-9]
+LR_ar_sgd = [1e-5]
+# LR_ar_sgd = [0.0, 1e-5] # 1e-5 with SGD achieves 2.9 avg_loss
 # LR_ar = [0.0 1e-5, 1e-6, 1e-7, 1e-8]
 # LR_ar = [0.0, 1.0]
 # eps = [1e-4]
@@ -168,7 +172,7 @@ for lr_ar in LR_ar_sgd:
        # method_ar.initialize(n=INPUT_DIM, m=1, l=SEQUENCE_LENGTH, optimizer=optim_ar)
        # optim_ar = Adam(loss=batched_mse, learning_rate=lr_ar, include_x_loss=False, hyperparameters=hyperparams)
        for i, site in enumerate(all_sites):
-              if i % 25 == 0:
+              if i % 50 == 0:
                       print("i = " + str(i))
                       # print("Doing Site ", site)
               optim_ar = SGD(loss=batched_mse, learning_rate=lr_ar)
@@ -176,41 +180,10 @@ for lr_ar in LR_ar_sgd:
               method_ar.initialize(n=INPUT_DIM, m=1, l=SEQUENCE_LENGTH, optimizer=optim_ar)
               usgs_val = CamelsTXT(basin=site, concat_static=True)
               # usgs_val = main.make_eval_data_loader(site, user_cfg, run_cfg, db_path, means, stds)
-              yhats_LSTM, _ = usgs_eval_LSTM(method_LSTM, usgs_val, batch_size=1024, dynamic=False)
+              # yhats, ys = usgs_eval_LSTM(method_LSTM, usgs_val, batch_size=1024, dynamic=False)
+              yhats_LSTM, ys = usgs_eval_LSTM(method_LSTM, usgs_val, batch_size=1024, dynamic=False)
               # print("yhats_LSTM.shape = " + str(yhats_LSTM.shape))
               yhats, ys = usgs_eval_boosted(yhats_LSTM, method_ar, usgs_val, batch_size=1, dynamic=False)
-              '''if i == 0:
-                      site0_yhats_LSTM = yhats_LSTM
-                      site0_yhats_boosted = yhats
-                      site0_ys = ys
-                      site0_LSTM_residuals = []
-                      site0_boosted_residuals = []
-                      for i in range(len(site0_yhats_LSTM)):
-                              site0_LSTM_residuals.append(np.abs(site0_ys[i] - site0_yhats_LSTM[i]))
-                              site0_boosted_residuals.append(np.abs(site0_ys[i] - site0_yhats_boosted[i]))
-                      # plt.plot(site0_yhats_LSTM, label="LSTM")
-                      # plt.plot(site0_yhats_boosted, label="boosted")
-                      # plt.plot(site0_ys, label="ground truth")
-                      f = plt.figure(figsize=(20,10))
-                      ax = f.add_subplot(121)
-
-                      # plt.subplot(121)
-                      ax.plot(site0_LSTM_residuals, label="LSTM residuals")
-                      ax.plot(site0_boosted_residuals, label="boosted residuals")
-                      ax.set_title("LSTM vs boosted residuals")
-                      plt.legend()
-                      # plt.legend()
-                      # plt.savefig('site0_residuals')
-                      site0_LSTM_cummean = np.cumsum(site0_LSTM_residuals) / (np.arange(len(site0_LSTM_residuals))+1)
-                      site0_boosted_cummean = np.cumsum(site0_boosted_residuals) / (np.arange(len(site0_boosted_residuals))+1)
-
-                      ax2 = f.add_subplot(122)
-                      ax2.plot(site0_LSTM_cummean, label="LSTM running mean")
-                      ax2.plot(site0_boosted_cummean, label="boosted running mean")
-                      ax2.set_title("LSTM vs boosted residuals running means")
-                      plt.legend()
-                      plt.savefig('site0_residuals_and_running_means')'''
-
               loss = ((ys-yhats)**2).mean()
               # print("loss = " + str(loss))
               ys_mean = ys.mean()
@@ -226,16 +199,16 @@ for lr_ar in LR_ar_sgd:
                       losses.append(loss)
                       # method_ar = method_ar_updated
               gc.collect()
-              avg_loss = np.array(losses).mean()
-              avg_loss_no_outliers = np.array(losses_no_outliers).mean()
-              avg_nse = np.array(nses).mean()
-              avg_nse_no_outliers = np.array(nses_no_outliers).mean()
+       avg_loss = np.array(losses).mean()
+       avg_loss_no_outliers = np.array(losses_no_outliers).mean()
+       avg_nse = np.array(nses).mean()
+       avg_nse_no_outliers = np.array(nses_no_outliers).mean()
               # print("prior_wt = " + str(prior_wt))
        print("avg_loss = " + str(avg_loss))
        print("avg_loss_no_outliers = " + str(avg_loss_no_outliers))
        # print("losses_yes_outliers = " + str(losses_yes_outliers))
        print("avg_nse = " + str(avg_nse))
        print("avg_nse_no_outliers = " + str(avg_nse_no_outliers))
-       
-
-              
+       f = open('SGD_losses_list', 'wb')
+       pickle.dump(losses, f)
+       f.close()
